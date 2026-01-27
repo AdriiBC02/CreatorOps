@@ -16,38 +16,87 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [0.3.2] - 2026-01-27
 
+### Added - Notifications Backend (`/notifications/*`)
+- `GET /notifications` - Listar notificaciones del usuario (limit configurable)
+- `POST /notifications` - Crear nueva notificación
+- `GET /notifications/unread-count` - Obtener contador de no leídas
+- `PUT /notifications/:id/read` - Marcar como leída
+- `PUT /notifications/read-all` - Marcar todas como leídas
+- `DELETE /notifications/:id` - Eliminar notificación
+- `DELETE /notifications` - Eliminar todas las notificaciones
+- `GET /notifications/preferences` - Obtener preferencias
+- `PUT /notifications/preferences` - Actualizar preferencias
+
+### Added - Database Schema
+- Tabla `notifications` con campos: id, userId, type, title, message, entityType, entityId, isRead, readAt, metadata, createdAt
+- Tabla `notification_preferences` con campos para cada tipo de notificación
+- Índices optimizados para consultas por usuario y estado de lectura
+
+### Added - Milestone Service
+- Detección automática de hitos del canal (subscribers, views)
+- Umbrales configurables (1K, 5K, 10K, 50K, 100K, 500K, 1M)
+- Prevención de notificaciones duplicadas
+
+### Added - NotificationBell Component
+- Campana de notificaciones en el sidebar
+- Badge con contador de no leídas (animado)
+- Panel desplegable con lista de notificaciones
+- Polling cada 5 segundos para actualizaciones
+- Marcar como leída al hacer clic
+- Botón "Marcar todas como leídas"
+- Botón "Borrar todas"
+- Eliminar notificaciones individuales (hover para ver botón)
+- Formateo de tiempo relativo (Ahora, Hace Xm, Hace Xh, Hace Xd)
+
 ### Added - Notification Toast System
-- Sistema completo de notificaciones toast con animaciones
+- Toasts flotantes en esquina superior derecha
 - Barra de progreso animada (4 segundos) de derecha a izquierda
-- Colores por tipo de notificación (milestone, upload_complete, new_comment, system, ai_suggestion)
+- Colores por tipo: milestone (amarillo), upload_complete (verde), new_comment (azul), system (gris), ai_suggestion (púrpura)
 - Animación "Guardando..." cuando el toast se guarda en la campana
 - Animación de vuelo hacia la izquierda al cerrar
 - Reposicionamiento suave cuando se elimina un toast
-- Sistema de deduplicación para evitar toasts duplicados
-- Refresh instantáneo de la campana cuando se guarda una notificación (eventos custom)
-- Soporte para notificaciones de escritorio (browser notifications)
+- Sistema de deduplicación (30 segundos) para evitar toasts duplicados
+- Refresh instantáneo de la campana vía eventos custom (`NOTIFICATION_SAVED_EVENT`)
+- Soporte para notificaciones de escritorio (browser Notification API)
+- Máximo 3 toasts visibles simultáneamente
+
+### Added - UI Components
+- `AnimatedCounter` - Contador animado con transiciones suaves
+- `ProgressRing` - Anillo de progreso circular
+- `MiniProgress` - Barra de progreso mini
+- `Skeleton` / `SkeletonCard` / `SkeletonList` - Estados de carga
+- `FloatingShapes` - Formas decorativas flotantes
+- `GlowingBadge` - Badge con efecto de brillo
+- `PulsingDot` - Punto con animación de pulso
+- `ThemeToggle` - Selector de tema (light/dark/system)
 
 ### Added - Quick Stats Refresh Animation
 - Animación de refresh en Quick Stats del sidebar
 - Icono giratorio (`animate-spin`) mientras carga
 - Atenuación de stats (opacity 50%) durante la recarga
 - Delay mínimo de 500ms para feedback visual
-- Animación `hover:rotate-180` en botones de refresh (sidebar, dashboard, analytics)
+- Animación `hover:rotate-180` en botones de refresh
+
+### Added - CSS & Tailwind
+- Keyframes: `shrink`, `slideInFromRight`, `scale-in`, `fade-in`, `shimmer`
+- Clases de utilidad: `toast-progress-bar`, `animate-slide-in-right`, `animate-scale-in`
+- Clases de delay: `animation-delay-*`
+- Clase `stagger-cards` para animaciones escalonadas
+- Nuevas variables CSS para colores del tema
 
 ### Changed
 - Botones de test de notificaciones en Settings ahora muestran duración ("guarda en 4s")
-- Mejorada la sincronización entre toasts y campana de notificaciones
+- Dashboard layout incluye NotificationBell en sidebar
+- Imágenes de YouTube usan `referrerPolicy="no-referrer"` (fix para Chrome)
 
 ### Fixed
-- Barra de progreso ahora funciona en todos los tipos de notificación (usando colores hex inline)
+- Barra de progreso funciona en todos los tipos de notificación (colores hex inline vs Tailwind JIT)
 - Animación de colapso no corta la animación de vuelo (delay de 200ms)
 - Timing sincronizado entre animaciones CSS y JavaScript (500ms)
+- Notificaciones no se duplican al guardar en campana (sistema de deduplicación)
 
 ### Removed
-- Eliminados console.log y console.error de múltiples archivos:
-  - layout.tsx, page.tsx (dashboard)
-  - NotificationToast.tsx, NotificationBell.tsx
-  - analytics/page.tsx
+- Eliminados console.log y console.error de múltiples archivos
 
 ---
 
