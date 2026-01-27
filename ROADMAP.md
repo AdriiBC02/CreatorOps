@@ -128,7 +128,7 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 - [x] Vista de lista para Ideas (alternar con kanban)
 - [ ] Vista de timeline para Calendar
 - [ ] Vista compacta para Videos
-- [ ] Vista de galería de thumbnails
+- [x] Vista de galería de thumbnails
 
 #### Templates
 - [ ] Plantillas para ideas

@@ -72,6 +72,10 @@
     "views": "views",
     "likes": "likes"
   },
+  "view": {
+    "table": "Table",
+    "gallery": "Gallery"
+  },
   "analysis": {
     "aiAnalysis": "AI Video Analysis",
     "title": "Video Analysis",

@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Search, RefreshCw, Play, Edit, Download, Copy, ExternalLink, X, ChevronUp, ChevronDown, Calendar, Sparkles, BarChart3, Lightbulb, Target, Users, TrendingUp, Video } from 'lucide-react';
+import { Plus, Search, RefreshCw, Play, Edit, Download, Copy, ExternalLink, X, ChevronUp, ChevronDown, Calendar, Sparkles, BarChart3, Lightbulb, Target, Users, TrendingUp, Video, LayoutGrid, Table2, Eye, ThumbsUp, MessageCircle } from 'lucide-react';
 import { Skeleton, SkeletonTable } from '@/components/ui/skeleton';
 import { FloatingShapes, GlowingBadge } from '@/components/ui/decorative';
 import Link from 'next/link';
@@ -56,6 +56,12 @@ export default function VideosPage() {
   const [dateTo, setDateTo] = useState<string>('');
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [previewVideo, setPreviewVideo] = useState<Video | null>(null);
+  const [viewMode, setViewMode] = useState<'table' | 'gallery'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('videos-view-mode') as 'table' | 'gallery') || 'table';
+    }
+    return 'table';
+  });
 
   // AI Analysis states
   const [analyzingVideo, setAnalyzingVideo] = useState<Video | null>(null);
@@ -89,6 +95,11 @@ export default function VideosPage() {
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [channel, previewVideo]);
+
+  // Persist view mode preference
+  useEffect(() => {
+    localStorage.setItem('videos-view-mode', viewMode);
+  }, [viewMode]);
 
   const fetchData = async () => {
     try {
@@ -349,6 +360,33 @@ export default function VideosPage() {
           </p>
         </div>
         <div className="flex gap-2">
+          {/* View Toggle */}
+          <div className="flex rounded-xl border bg-muted/50 p-1">
+            <button
+              onClick={() => setViewMode('table')}
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                viewMode === 'table'
+                  ? 'bg-background shadow text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+              title={t('view.table')}
+            >
+              <Table2 className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('gallery')}
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                viewMode === 'gallery'
+                  ? 'bg-background shadow text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+              title={t('view.gallery')}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+          </div>
           <button
             onClick={exportToCSV}
             disabled={videos.length === 0}
@@ -492,7 +530,105 @@ export default function VideosPage() {
             {syncing ? t('sync.syncing') : t('sync.syncFromYouTube')}
           </button>
         </div>
+      ) : viewMode === 'gallery' ? (
+        /* Gallery View */
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+          {filteredAndSortedVideos.map((video) => (
+            <div
+              key={video.id}
+              className="group glass-card rounded-2xl overflow-hidden hover:shadow-lg transition-all duration-200"
+            >
+              <div className="relative aspect-video">
+                {video.thumbnailUrl ? (
+                  <button
+                    onClick={() => setPreviewVideo(video)}
+                    className="block w-full h-full hover:opacity-90 transition-opacity"
+                    title={t('actions.clickToEnlarge')}
+                  >
+                    <img
+                      src={video.thumbnailUrl}
+                      alt={video.title}
+                      className="w-full h-full object-cover"
+                      referrerPolicy="no-referrer"
+                    />
+                  </button>
+                ) : (
+                  <div className="w-full h-full bg-muted flex items-center justify-center">
+                    <Play className="w-12 h-12 text-muted-foreground" />
+                  </div>
+                )}
+                {/* Duration badge */}
+                {video.durationSeconds && (
+                  <span className="absolute bottom-2 right-2 px-2 py-1 rounded bg-black/80 text-white text-xs font-medium">
+                    {formatDuration(video.durationSeconds)}
+                  </span>
+                )}
+                {/* Status badge */}
+                <span className={cn(
+                  'absolute top-2 left-2 px-2 py-1 rounded text-xs font-medium capitalize',
+                  statusColors[video.privacyStatus] || 'bg-gray-100 text-gray-700'
+                )}>
+                  {video.privacyStatus}
+                </span>
+              </div>
+              <div className="p-4">
+                <h3 className="font-medium line-clamp-2 mb-2" title={video.title}>
+                  {video.title}
+                </h3>
+                <div className="flex items-center gap-4 text-sm text-muted-foreground mb-3">
+                  <span className="flex items-center gap-1">
+                    <Eye className="w-3.5 h-3.5" />
+                    {formatNumber(video.viewCount)}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <ThumbsUp className="w-3.5 h-3.5" />
+                    {formatNumber(video.likeCount)}
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <MessageCircle className="w-3.5 h-3.5" />
+                    {formatNumber(video.commentCount)}
+                  </span>
+                </div>
+                <div className="flex items-center justify-between">
+                  <span className="text-xs text-muted-foreground">
+                    {video.publishedAt ? new Date(video.publishedAt).toLocaleDateString() : '-'}
+                  </span>
+                  <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button
+                      onClick={() => analyzeVideoWithAI(video)}
+                      className="p-1.5 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg text-purple-500"
+                      title={t('actions.analyze')}
+                    >
+                      <Sparkles className="w-4 h-4" />
+                    </button>
+                    {video.youtubeVideoId && (
+                      <>
+                        <button
+                          onClick={() => copyToClipboard(`https://youtube.com/watch?v=${video.youtubeVideoId}`)}
+                          className="p-1.5 hover:bg-muted rounded-lg"
+                          title={t('actions.copyUrl')}
+                        >
+                          <Copy className="w-4 h-4" />
+                        </button>
+                        <a
+                          href={`https://youtube.com/watch?v=${video.youtubeVideoId}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="p-1.5 hover:bg-muted rounded-lg"
+                          title={t('actions.openInYoutube')}
+                        >
+                          <ExternalLink className="w-4 h-4" />
+                        </a>
+                      </>
+                    )}
+                  </div>
+                </div>
+              </div>
+            </div>
+          ))}
+        </div>
       ) : (
+        /* Table View */
         <div className="border rounded-lg overflow-hidden">
           <table className="w-full">
             <thead className="bg-muted/50">

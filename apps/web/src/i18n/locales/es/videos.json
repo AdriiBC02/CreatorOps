@@ -72,6 +72,10 @@
     "views": "vistas",
     "likes": "me gusta"
   },
+  "view": {
+    "table": "Tabla",
+    "gallery": "Galería"
+  },
   "analysis": {
     "aiAnalysis": "Análisis de Video con IA",
     "title": "Análisis de Video",
