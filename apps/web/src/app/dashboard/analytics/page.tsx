@@ -107,7 +107,7 @@ export default function AnalyticsPage() {
         {/* Video stats skeleton */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
           {Array.from({ length: 3 }).map((_, i) => (
-            <div key={i} className="p-6 rounded-2xl border bg-card">
+            <div key={i} className="p-6 rounded-2xl card">
               <Skeleton className="h-4 w-32 mb-3" />
               <Skeleton className="h-8 w-20" />
             </div>
@@ -203,7 +203,7 @@ export default function AnalyticsPage() {
         {stats.map((stat, index) => (
           <div
             key={stat.name}
-            className="group relative p-6 rounded-2xl border bg-card hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden"
+            className="group relative p-6 rounded-2xl card hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden"
           >
             {/* Animated background gradient */}
             <div className={cn(
@@ -240,7 +240,7 @@ export default function AnalyticsPage() {
       {videos.length > 0 && (
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 animate-fade-in animation-delay-200">
           {/* Engagement Ring */}
-          <div className="p-6 rounded-2xl border bg-card lg:row-span-2">
+          <div className="p-6 rounded-2xl card lg:row-span-2">
             <div className="flex items-center gap-3 mb-6">
               <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
                 <Sparkles className="w-4 h-4 text-purple-500" />
@@ -275,7 +275,7 @@ export default function AnalyticsPage() {
           </div>
 
           {/* Stat Cards */}
-          <div className="group p-6 rounded-2xl border bg-card hover:shadow-lg transition-all duration-300">
+          <div className="group p-6 rounded-2xl card hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 group-hover:scale-110 transition-transform">
                 <Video className="w-4 h-4 text-indigo-500" />
@@ -287,7 +287,7 @@ export default function AnalyticsPage() {
             </p>
           </div>
 
-          <div className="group p-6 rounded-2xl border bg-card hover:shadow-lg transition-all duration-300">
+          <div className="group p-6 rounded-2xl card hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30 group-hover:scale-110 transition-transform">
                 <Eye className="w-4 h-4 text-amber-500" />
@@ -299,7 +299,7 @@ export default function AnalyticsPage() {
             </p>
           </div>
 
-          <div className="group p-6 rounded-2xl border bg-card hover:shadow-lg transition-all duration-300">
+          <div className="group p-6 rounded-2xl card hover:shadow-lg transition-all duration-300">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 group-hover:scale-110 transition-transform">
                 <MessageCircle className="w-4 h-4 text-green-500" />
@@ -311,7 +311,7 @@ export default function AnalyticsPage() {
             </p>
           </div>
 
-          <div className="group p-6 rounded-2xl border bg-card hover:shadow-lg transition-all duration-300 lg:col-span-2">
+          <div className="group p-6 rounded-2xl card hover:shadow-lg transition-all duration-300 lg:col-span-2">
             <div className="flex items-center gap-3 mb-3">
               <div className="p-2 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 group-hover:scale-110 transition-transform">
                 <TrendingUp className="w-4 h-4 text-cyan-500" />
@@ -329,7 +329,7 @@ export default function AnalyticsPage() {
       )}
 
       {/* Top Videos */}
-      <div className="p-6 rounded-2xl border bg-card animate-fade-in animation-delay-300">
+      <div className="p-6 rounded-2xl card animate-fade-in animation-delay-300">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30">

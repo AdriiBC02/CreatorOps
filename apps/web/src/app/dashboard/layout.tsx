@@ -167,10 +167,10 @@ export default function DashboardLayout({
         {sidebarOpen ? <X size={20} /> : <Menu size={20} />}
       </button>
 
-      {/* Sidebar */}
+      {/* Sidebar - macOS glass style */}
       <aside
         className={cn(
-          'fixed inset-y-0 left-0 z-40 w-72 bg-card/95 backdrop-blur-xl border-r transform transition-all duration-300 ease-out lg:translate-x-0',
+          'fixed inset-y-0 left-0 z-40 w-72 glass-sidebar vibrancy transform transition-all duration-300 ease-out lg:translate-x-0',
           sidebarOpen ? 'translate-x-0' : '-translate-x-full'
         )}
       >
@@ -337,14 +337,14 @@ export default function DashboardLayout({
       {/* Notification Toasts */}
       <NotificationToastContainer />
 
-      {/* Keyboard Shortcuts Modal */}
+      {/* Keyboard Shortcuts Modal - Glass style */}
       {showShortcuts && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md animate-fade-in"
           onClick={() => setShowShortcuts(false)}
         >
           <div
-            className="bg-card border rounded-2xl p-6 w-full max-w-lg shadow-2xl animate-scale-in"
+            className="glass-modal vibrancy rounded-2xl p-6 w-full max-w-lg animate-scale-in"
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between mb-6">

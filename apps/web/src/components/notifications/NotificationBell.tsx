@@ -225,9 +225,9 @@ export function NotificationBell() {
       </button>
 
       {isOpen && (
-        <div className="fixed left-4 bottom-20 w-80 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-2xl z-50 overflow-hidden animate-scale-in">
+        <div className="fixed left-4 bottom-20 w-80 glass-modal vibrancy rounded-2xl z-50 overflow-hidden animate-scale-in">
           {/* Header */}
-          <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 dark:border-gray-700/50 bg-white/30 dark:bg-gray-800/30">
+          <div className="flex items-center justify-between px-4 py-3 border-b border-border/30">
             <h3 className="font-semibold">{t('title')}</h3>
             <div className="flex items-center gap-2">
               {notifications.length > 0 && (

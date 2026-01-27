@@ -443,9 +443,9 @@ export function AIWidget({ channelId }: AIWidgetProps) {
   }
 
   return (
-    <div className="fixed bottom-6 right-6 w-96 h-[500px] bg-card border rounded-lg shadow-xl flex flex-col z-50">
+    <div className="fixed bottom-6 right-6 w-96 h-[500px] glass-modal vibrancy rounded-2xl flex flex-col z-50 animate-scale-in">
       {/* Header */}
-      <div className="flex items-center justify-between p-3 border-b bg-muted/30 rounded-t-lg">
+      <div className="flex items-center justify-between p-3 border-b border-border/50 rounded-t-2xl">
         <div className="flex items-center gap-2">
           <Bot className="w-5 h-5 text-primary" />
           <span className="font-medium">{t('widget.title')}</span>

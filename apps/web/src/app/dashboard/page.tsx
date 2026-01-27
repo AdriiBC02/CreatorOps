@@ -345,11 +345,11 @@ export default function DashboardPage() {
         {stats.map((stat, index) => (
           <div
             key={stat.name}
-            className="group relative p-6 rounded-2xl border bg-card hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden"
+            className="group relative p-6 rounded-2xl card-glass spring-bounce overflow-hidden"
           >
             {/* Animated background gradient */}
             <div className={cn(
-              'absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-all duration-500',
+              'absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-15 transition-all duration-500',
               stat.color
             )} />
 
@@ -358,10 +358,16 @@ export default function DashboardPage() {
               <div className="absolute inset-0 shimmer" />
             </div>
 
+            {/* Top accent line */}
+            <div className={cn(
+              'absolute top-0 left-4 right-4 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300',
+              `bg-gradient-to-r ${stat.color}`
+            )} />
+
             <div className="relative">
               <div className="flex items-center justify-between mb-4">
                 <div className={cn(
-                  'p-3 rounded-xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3',
+                  'p-3 rounded-xl transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-lg',
                   stat.bgColor
                 )}>
                   <stat.icon className={cn('w-5 h-5', stat.iconColor)} />
@@ -384,9 +390,9 @@ export default function DashboardPage() {
       </div>
 
       {/* Quick Stats Bar with Progress */}
-      <div className="relative p-6 rounded-2xl bg-gradient-to-r from-muted/50 via-muted/30 to-muted/50 border overflow-hidden animate-fade-in animation-delay-200">
+      <div className="relative p-6 rounded-2xl glass-card overflow-hidden animate-fade-in animation-delay-200">
         {/* Decorative gradient */}
-        <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-primary via-purple-500 to-pink-500" />
+        <div className="absolute top-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary via-purple-500 to-pink-500 opacity-80" />
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
           <div className="text-center group">
@@ -434,7 +440,7 @@ export default function DashboardPage() {
       {/* Main Content Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Engagement Ring */}
-        <div className="p-6 rounded-2xl border bg-card animate-fade-in animation-delay-300 lg:col-span-1">
+        <div className="p-6 rounded-2xl card animate-fade-in animation-delay-300 lg:col-span-1">
           <div className="flex items-center gap-3 mb-6">
             <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
               <Target className="w-4 h-4 text-purple-500" />
@@ -482,7 +488,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Top Videos */}
-        <div className="p-6 rounded-2xl border bg-card animate-fade-in animation-delay-400 lg:col-span-2">
+        <div className="p-6 rounded-2xl card animate-fade-in animation-delay-400 lg:col-span-2">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 group-hover:scale-110 transition-transform">
@@ -553,7 +559,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Upcoming Content */}
-        <div className="p-6 rounded-2xl border bg-card animate-fade-in animation-delay-500 lg:col-span-2">
+        <div className="p-6 rounded-2xl card animate-fade-in animation-delay-500 lg:col-span-2">
           <div className="flex items-center justify-between mb-6">
             <div className="flex items-center gap-3">
               <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
@@ -652,7 +658,7 @@ export default function DashboardPage() {
       </div>
 
       {/* Recent Ideas */}
-      <div className="p-6 rounded-2xl border bg-card animate-fade-in animation-delay-600">
+      <div className="p-6 rounded-2xl card animate-fade-in animation-delay-600">
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center gap-3">
             <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30">

@@ -477,7 +477,7 @@ export default function CalendarPage() {
       </div>
 
       {/* Calendar Navigation */}
-      <div className="relative flex items-center justify-between p-4 bg-card border rounded-2xl animate-fade-in animation-delay-100">
+      <div className="relative flex items-center justify-between p-4 glass-card rounded-2xl animate-fade-in animation-delay-100">
         <button
           onClick={prevMonth}
           className="p-2.5 hover:bg-muted rounded-xl hover:scale-110 transition-all"
@@ -496,7 +496,7 @@ export default function CalendarPage() {
 
           {/* Date Picker Dropdown */}
           {showDatePicker && (
-            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-card border rounded-2xl shadow-xl p-5 z-50 min-w-[320px] animate-fade-in">
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 glass-modal vibrancy rounded-2xl p-5 z-50 min-w-[320px] animate-fade-in">
               {/* Year selector */}
               <div className="mb-4">
                 <label className="block text-sm font-medium mb-2 text-muted-foreground">{t('navigation.year')}</label>
@@ -660,7 +660,7 @@ export default function CalendarPage() {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-3 p-4 bg-card border rounded-2xl animate-fade-in animation-delay-300">
+      <div className="flex flex-wrap gap-3 p-4 card rounded-2xl animate-fade-in animation-delay-300">
         <span className="text-sm font-medium text-muted-foreground mr-2">{t('status.label')}</span>
         {Object.entries(statusColors).map(([status, color]) => (
           <div
@@ -675,8 +675,8 @@ export default function CalendarPage() {
 
       {/* Add/Edit Content Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
-          <div className="bg-card border rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md animate-fade-in">
+          <div className="glass-modal vibrancy rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto animate-scale-in">
             <div className="flex items-center justify-between mb-6">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-primary/10">

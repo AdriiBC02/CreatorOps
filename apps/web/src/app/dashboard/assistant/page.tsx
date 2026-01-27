@@ -896,8 +896,8 @@ export default function AssistantPage() {
 
       {/* Generate Titles Modal */}
       {showTitleModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-card border rounded-lg p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md animate-fade-in">
+          <div className="glass-modal vibrancy rounded-2xl p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto animate-scale-in">
             <h3 className="text-lg font-semibold mb-4">{t('titleModal.title')}</h3>
 
             <div className="space-y-4">
@@ -969,8 +969,8 @@ export default function AssistantPage() {
 
       {/* Generate Ideas Modal */}
       {showIdeasModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-card border rounded-lg p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 backdrop-blur-md animate-fade-in">
+          <div className="glass-modal vibrancy rounded-2xl p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto animate-scale-in">
             <h3 className="text-lg font-semibold mb-4">{t('ideasModal.title')}</h3>
 
             {generating ? (

@@ -213,7 +213,7 @@ export default function SettingsPage() {
           </div>
 
           {/* Content skeleton */}
-          <div className="flex-1 p-6 rounded-2xl border bg-card">
+          <div className="flex-1 p-6 rounded-2xl card">
             <Skeleton className="h-6 w-48 mb-6" />
             <div className="space-y-4">
               <Skeleton className="h-20 w-20 rounded-full" />
@@ -248,7 +248,7 @@ export default function SettingsPage() {
 
       <div className="flex flex-col lg:flex-row gap-6 animate-fade-in animation-delay-100">
         {/* Sidebar */}
-        <nav className="lg:w-64 space-y-1.5 p-4 rounded-2xl border bg-card/50 backdrop-blur-sm">
+        <nav className="lg:w-64 space-y-1.5 p-4 rounded-2xl card/50 backdrop-blur-sm">
           {tabs.map((tab, index) => (
             <button
               key={tab.id}
@@ -287,7 +287,7 @@ export default function SettingsPage() {
         <div className="flex-1 min-w-0">
           {/* Profile Tab */}
           {activeTab === 'profile' && (
-            <div className="p-6 rounded-2xl border bg-card space-y-6 animate-fade-in">
+            <div className="p-6 rounded-2xl card space-y-6 animate-fade-in">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-900/30">
                   <User className="w-4 h-4 text-blue-500" />
@@ -374,7 +374,7 @@ export default function SettingsPage() {
 
           {/* Channels Tab */}
           {activeTab === 'channels' && (
-            <div className="p-6 rounded-2xl border bg-card space-y-6 animate-fade-in">
+            <div className="p-6 rounded-2xl card space-y-6 animate-fade-in">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-xl bg-red-100 dark:bg-red-900/30">
@@ -445,7 +445,7 @@ export default function SettingsPage() {
 
           {/* Notifications Tab */}
           {activeTab === 'notifications' && (
-            <div className="p-6 rounded-2xl border bg-card space-y-6 animate-fade-in">
+            <div className="p-6 rounded-2xl card space-y-6 animate-fade-in">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-3">
                   <div className="p-2 rounded-xl bg-amber-100 dark:bg-amber-900/30">
@@ -567,7 +567,7 @@ export default function SettingsPage() {
 
           {/* Appearance Tab */}
           {activeTab === 'appearance' && (
-            <div className="p-6 rounded-2xl border bg-card space-y-8 animate-fade-in">
+            <div className="p-6 rounded-2xl card space-y-8 animate-fade-in">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-900/30">
                   <Palette className="w-4 h-4 text-purple-500" />
@@ -651,7 +651,7 @@ export default function SettingsPage() {
 
           {/* Security Tab */}
           {activeTab === 'security' && (
-            <div className="p-6 rounded-2xl border bg-card space-y-6 animate-fade-in">
+            <div className="p-6 rounded-2xl card space-y-6 animate-fade-in">
               <div className="flex items-center gap-3">
                 <div className="p-2 rounded-xl bg-green-100 dark:bg-green-900/30">
                   <Shield className="w-4 h-4 text-green-500" />
