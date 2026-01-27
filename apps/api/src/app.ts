@@ -14,6 +14,7 @@ import { videosRoutes } from './modules/videos/videos.routes.js';
 import { analyticsRoutes } from './modules/analytics/analytics.routes.js';
 import { ideasRoutes } from './modules/ideas/ideas.routes.js';
 import { calendarRoutes } from './modules/calendar/calendar.routes.js';
+import { aiRoutes } from './modules/ai/ai.routes.js';
 
 export function createApp(db: DbClient): Express {
   const app = express();
@@ -51,8 +52,8 @@ export function createApp(db: DbClient): Express {
   app.get('/', (req, res) => {
     res.json({
       name: 'CreatorOps API',
-      version: '0.1.0',
-      endpoints: ['/health', '/auth', '/channels', '/videos', '/analytics', '/ideas', '/calendar'],
+      version: '0.2.0',
+      endpoints: ['/health', '/auth', '/channels', '/videos', '/analytics', '/ideas', '/calendar', '/ai'],
     });
   });
 
@@ -68,6 +69,7 @@ export function createApp(db: DbClient): Express {
   app.use('/analytics', analyticsRoutes);
   app.use('/ideas', ideasRoutes);
   app.use('/calendar', calendarRoutes);
+  app.use('/ai', aiRoutes);
 
   // Error handler
   app.use(errorHandler);

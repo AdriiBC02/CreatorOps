@@ -54,6 +54,19 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 - [x] Gestión de canales conectados
 - [x] Zona de peligro (eliminar cuenta)
 
+### AI Assistant
+- [x] AI Engine con abstracción multi-proveedor
+- [x] Routing inteligente por tipo de tarea
+- [x] Página dedicada del asistente
+- [x] Widget flotante en todas las páginas
+- [x] Generador de títulos con IA
+- [x] Sugerencias de descripciones
+- [x] Ideas de contenido basadas en canal
+- [x] Análisis de rendimiento de videos
+- [x] Chat conversacional integrado
+- [x] Integración con página de Ideas
+- [x] Integración con página de Videos
+
 ---
 
 ## Backlog - Por Implementar
@@ -156,14 +169,15 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 
 ## Funcionalidades Avanzadas (Futuro)
 
-### AI Assistant
-- [ ] Generador de títulos con IA
-- [ ] Sugerencias de descripciones
-- [ ] Ideas de contenido basadas en trends
+### AI Assistant (Avanzado)
+- [x] Generador de títulos con IA
+- [x] Sugerencias de descripciones
+- [x] Ideas de contenido basadas en canal
+- [x] Chat assistant integrado
 - [ ] Optimización SEO automática
 - [ ] Análisis de competencia
 - [ ] Predicción de rendimiento
-- [ ] Chat assistant integrado
+- [ ] Ideas basadas en trends externos
 
 ### Colaboración en Equipo
 - [ ] Invitar colaboradores
@@ -275,7 +289,20 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 
 ## Changelog
 
-### v0.1.0 (Current)
+### v0.3.0 (Current)
+- AI Assistant with multi-provider support
+- Title generation, idea suggestions, video analysis
+- Floating widget + dedicated page
+- AI integrations in Ideas and Videos pages
+
+### v0.2.0
+- Dashboard improvements with mini stats
+- Videos: sorting, date filter, export CSV
+- Calendar: editing, duplication, navigation
+- Ideas: drag & drop kanban, export CSV
+- Settings: language selector
+
+### v0.1.0
 - Initial release
 - Core features: Dashboard, Videos, Calendar, Ideas, Settings
 - YouTube sync

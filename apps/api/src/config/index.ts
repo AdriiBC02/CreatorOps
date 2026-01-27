@@ -40,4 +40,16 @@ export const config = {
 
   // App URLs
   appUrl: process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000',
+
+  // AI Providers
+  openaiApiKey: process.env.OPENAI_API_KEY || '',
+  anthropicApiKey: process.env.ANTHROPIC_API_KEY || '',
+  groqApiKey: process.env.GROQ_API_KEY || '',
+
+  // AI Configuration
+  ai: {
+    defaultProvider: process.env.AI_DEFAULT_PROVIDER || 'openai',
+    maxTokens: parseInt(process.env.AI_MAX_TOKENS || '2000', 10),
+    temperature: parseFloat(process.env.AI_TEMPERATURE || '0.7'),
+  },
 } as const;

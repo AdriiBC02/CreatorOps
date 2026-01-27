@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Search, RefreshCw, Play, Edit, Download, Copy, ExternalLink, X, ChevronUp, ChevronDown, Calendar } from 'lucide-react';
+import { Plus, Search, RefreshCw, Play, Edit, Download, Copy, ExternalLink, X, ChevronUp, ChevronDown, Calendar, Sparkles, BarChart3, Lightbulb, Target, Users } from 'lucide-react';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -52,6 +52,11 @@ export default function VideosPage() {
   const [dateTo, setDateTo] = useState<string>('');
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [previewVideo, setPreviewVideo] = useState<Video | null>(null);
+
+  // AI Analysis states
+  const [analyzingVideo, setAnalyzingVideo] = useState<Video | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<{ analysis: string; suggestions: string[] } | null>(null);
+  const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -184,6 +189,33 @@ export default function VideosPage() {
     } else {
       setSortField(field);
       setSortOrder('desc');
+    }
+  };
+
+  const analyzeVideoWithAI = async (video: Video) => {
+    setAnalyzingVideo(video);
+    setAiAnalysis(null);
+    setAiLoading(true);
+
+    try {
+      const res = await fetch('http://localhost:4000/ai/analyze/video', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          videoId: video.id,
+          aspects: ['title', 'performance', 'audience'],
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setAiAnalysis(data.data);
+      }
+    } catch (err) {
+      console.error('Failed to analyze video:', err);
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -491,6 +523,13 @@ export default function VideosPage() {
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => analyzeVideoWithAI(video)}
+                        className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg text-purple-500"
+                        title="Analyze with AI"
+                      >
+                        <Sparkles className="w-4 h-4" />
+                      </button>
                       {video.youtubeVideoId && (
                         <button
                           onClick={() => copyToClipboard(`https://youtube.com/watch?v=${video.youtubeVideoId}`)}
@@ -593,6 +632,117 @@ export default function VideosPage() {
                 {formatNumber(previewVideo.viewCount)} views · {formatNumber(previewVideo.likeCount)} likes
                 {previewVideo.publishedAt && ` · ${new Date(previewVideo.publishedAt).toLocaleDateString()}`}
               </p>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Analysis Modal */}
+      {analyzingVideo && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-card border rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-purple-500" />
+                <h3 className="text-lg font-semibold">AI Video Analysis</h3>
+              </div>
+              <button
+                onClick={() => {
+                  setAnalyzingVideo(null);
+                  setAiAnalysis(null);
+                }}
+                className="p-1 hover:bg-muted rounded"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Video Info */}
+            <div className="flex items-start gap-4 p-4 bg-muted/30 rounded-lg mb-4">
+              {analyzingVideo.thumbnailUrl && (
+                <img
+                  src={analyzingVideo.thumbnailUrl}
+                  alt={analyzingVideo.title}
+                  className="w-32 h-auto rounded"
+                />
+              )}
+              <div>
+                <h4 className="font-medium line-clamp-2">{analyzingVideo.title}</h4>
+                <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
+                  <span className="flex items-center gap-1">
+                    <BarChart3 className="w-4 h-4" />
+                    {formatNumber(analyzingVideo.viewCount)} views
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Users className="w-4 h-4" />
+                    {formatNumber(analyzingVideo.likeCount)} likes
+                  </span>
+                </div>
+              </div>
+            </div>
+
+            {aiLoading ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <RefreshCw className="w-8 h-8 animate-spin text-purple-500 mb-4" />
+                <p className="text-muted-foreground">Analyzing video performance...</p>
+              </div>
+            ) : aiAnalysis ? (
+              <div className="space-y-4">
+                <div>
+                  <div className="flex items-center gap-2 mb-2">
+                    <Target className="w-4 h-4 text-purple-500" />
+                    <h4 className="font-medium">Analysis</h4>
+                  </div>
+                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                    {aiAnalysis.analysis}
+                  </p>
+                </div>
+
+                {aiAnalysis.suggestions && aiAnalysis.suggestions.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Lightbulb className="w-4 h-4 text-yellow-500" />
+                      <h4 className="font-medium">Suggestions</h4>
+                    </div>
+                    <ul className="space-y-2">
+                      {aiAnalysis.suggestions.map((suggestion, index) => (
+                        <li
+                          key={index}
+                          className="flex items-start gap-2 text-sm text-muted-foreground"
+                        >
+                          <span className="text-primary mt-0.5">•</span>
+                          {suggestion}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>Analysis failed. Please try again.</p>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
+              <button
+                onClick={() => {
+                  setAnalyzingVideo(null);
+                  setAiAnalysis(null);
+                }}
+                className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg"
+              >
+                Close
+              </button>
+              <button
+                onClick={() => analyzeVideoWithAI(analyzingVideo)}
+                disabled={aiLoading}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:opacity-90 disabled:opacity-50"
+              >
+                <RefreshCw className={cn('w-4 h-4', aiLoading && 'animate-spin')} />
+                Reanalyze
+              </button>
             </div>
           </div>
         </div>

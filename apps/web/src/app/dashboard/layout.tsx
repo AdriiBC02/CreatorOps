@@ -16,9 +16,11 @@ import {
   Users,
   Play,
   RefreshCw,
+  Sparkles,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { cn } from '@/lib/utils';
+import { AIWidget } from '@/components/ai/AIWidget';
 
 interface User {
   id: string;
@@ -36,6 +38,7 @@ interface ChannelStats {
 
 const navigation = [
   { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { name: 'AI Assistant', href: '/dashboard/assistant', icon: Sparkles },
   { name: 'Videos', href: '/dashboard/videos', icon: Video },
   { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
   { name: 'Calendar', href: '/dashboard/calendar', icon: Calendar },
@@ -241,6 +244,9 @@ export default function DashboardLayout({
       <main className="lg:pl-64">
         <div className="p-6 lg:p-8">{children}</div>
       </main>
+
+      {/* AI Widget */}
+      <AIWidget channelId={stats?.channelId || undefined} />
     </div>
   );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Plus, RefreshCw, Lightbulb, GripVertical, Trash2, ExternalLink, Search, X, Copy, Download } from 'lucide-react';
+import { Plus, RefreshCw, Lightbulb, GripVertical, Trash2, ExternalLink, Search, X, Copy, Download, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import {
   DndContext,
@@ -186,6 +186,12 @@ export default function IdeasPage() {
     status: 'new',
     inspirationUrl: '',
   });
+
+  // AI states
+  const [aiLoading, setAiLoading] = useState(false);
+  const [showAiSuggestions, setShowAiSuggestions] = useState(false);
+  const [aiSuggestions, setAiSuggestions] = useState<Array<{ title: string; description: string; reason: string }>>([]);
+  const [generatingDescription, setGeneratingDescription] = useState(false);
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -440,6 +446,73 @@ export default function IdeasPage() {
     }
   };
 
+  // AI Functions
+  const generateAiSuggestions = async () => {
+    if (!channel) return;
+
+    try {
+      setAiLoading(true);
+      setShowAiSuggestions(true);
+
+      const res = await fetch('http://localhost:4000/ai/generate/ideas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          channelId: channel.id,
+          count: 5,
+          basedOn: 'performance',
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setAiSuggestions(data.data.ideas);
+      }
+    } catch (err) {
+      console.error('Failed to generate AI suggestions:', err);
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const generateAiDescription = async () => {
+    if (!formData.title) return;
+
+    try {
+      setGeneratingDescription(true);
+
+      const res = await fetch('http://localhost:4000/ai/generate/description', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          title: formData.title,
+          length: 'short',
+        }),
+      });
+
+      const data = await res.json();
+      if (data.success) {
+        setFormData({ ...formData, description: data.data.description });
+      }
+    } catch (err) {
+      console.error('Failed to generate description:', err);
+    } finally {
+      setGeneratingDescription(false);
+    }
+  };
+
+  const useAiSuggestion = (suggestion: { title: string; description: string }) => {
+    setFormData({
+      ...formData,
+      title: suggestion.title,
+      description: suggestion.description,
+    });
+    setShowAiSuggestions(false);
+    setShowModal(true);
+  };
+
   const exportToCSV = () => {
     const headers = ['Title', 'Description', 'Status', 'Priority', 'Content Type', 'Created At'];
     const rows = ideas.map((idea) => [
@@ -526,6 +599,15 @@ export default function IdeasPage() {
             title="Export to CSV"
           >
             <Download className="w-4 h-4" />
+          </button>
+          <button
+            onClick={generateAiSuggestions}
+            disabled={aiLoading}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50"
+            title="Get AI suggestions"
+          >
+            <Sparkles className={cn('w-4 h-4', aiLoading && 'animate-spin')} />
+            Suggest with AI
           </button>
           <button
             onClick={openAddModal}
@@ -662,7 +744,18 @@ export default function IdeasPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Description</label>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="block text-sm font-medium">Description</label>
+                  <button
+                    type="button"
+                    onClick={generateAiDescription}
+                    disabled={generatingDescription || !formData.title}
+                    className="flex items-center gap-1 text-xs text-purple-500 hover:text-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    <Sparkles className={cn('w-3 h-3', generatingDescription && 'animate-spin')} />
+                    {generatingDescription ? 'Generating...' : 'Generate with AI'}
+                  </button>
+                </div>
                 <textarea
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
@@ -766,6 +859,77 @@ export default function IdeasPage() {
                   {saving ? 'Saving...' : editingIdea ? 'Save Changes' : 'Add Idea'}
                 </button>
               </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Suggestions Modal */}
+      {showAiSuggestions && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
+          <div className="bg-card border rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-purple-500" />
+                <h3 className="text-lg font-semibold">AI-Suggested Ideas</h3>
+              </div>
+              <button
+                onClick={() => setShowAiSuggestions(false)}
+                className="p-1 hover:bg-muted rounded"
+              >
+                <X className="w-5 h-5" />
+              </button>
+            </div>
+
+            {aiLoading ? (
+              <div className="flex flex-col items-center justify-center py-12">
+                <RefreshCw className="w-8 h-8 animate-spin text-purple-500 mb-4" />
+                <p className="text-muted-foreground">Generating ideas based on your channel...</p>
+              </div>
+            ) : aiSuggestions.length > 0 ? (
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Based on your channel performance, here are some content ideas:
+                </p>
+                {aiSuggestions.map((suggestion, index) => (
+                  <div
+                    key={index}
+                    className="p-4 border rounded-lg hover:border-purple-500/50 transition-colors"
+                  >
+                    <h4 className="font-medium mb-1">{suggestion.title}</h4>
+                    <p className="text-sm text-muted-foreground mb-2">{suggestion.description}</p>
+                    <p className="text-xs text-purple-500 mb-3">{suggestion.reason}</p>
+                    <button
+                      onClick={() => useAiSuggestion(suggestion)}
+                      className="text-sm text-primary hover:underline"
+                    >
+                      Use this idea
+                    </button>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="text-center py-12 text-muted-foreground">
+                <Lightbulb className="w-12 h-12 mx-auto mb-4 opacity-50" />
+                <p>No suggestions available. Try again later.</p>
+              </div>
+            )}
+
+            <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
+              <button
+                onClick={() => setShowAiSuggestions(false)}
+                className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg"
+              >
+                Close
+              </button>
+              <button
+                onClick={generateAiSuggestions}
+                disabled={aiLoading}
+                className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:opacity-90 disabled:opacity-50"
+              >
+                <RefreshCw className={cn('w-4 h-4', aiLoading && 'animate-spin')} />
+                Regenerate
+              </button>
             </div>
           </div>
         </div>
