@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, RefreshCw, Lightbulb, GripVertical, Trash2, ExternalLink, Search, X, Copy, Download, Sparkles, Check, Filter, ChevronDown } from 'lucide-react';
+import { Plus, RefreshCw, Lightbulb, GripVertical, Trash2, ExternalLink, Search, X, Copy, Download, Sparkles, Check, Filter, ChevronDown, LayoutGrid, List } from 'lucide-react';
 import { SkeletonKanban } from '@/components/ui/skeleton';
 import { FloatingShapes, GlowingBadge } from '@/components/ui/decorative';
 import { cn } from '@/lib/utils';
@@ -263,6 +263,7 @@ export default function IdeasPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState<number | 'all'>('all');
   const [contentTypeFilter, setContentTypeFilter] = useState<string | 'all'>('all');
+  const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -831,6 +832,33 @@ export default function IdeasPage() {
           </p>
         </div>
         <div className="flex gap-2">
+          {/* View Toggle */}
+          <div className="flex rounded-xl border bg-muted/50 p-1">
+            <button
+              onClick={() => setViewMode('kanban')}
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                viewMode === 'kanban'
+                  ? 'bg-background shadow text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+              title={t('view.kanban')}
+            >
+              <LayoutGrid className="w-4 h-4" />
+            </button>
+            <button
+              onClick={() => setViewMode('list')}
+              className={cn(
+                'px-3 py-1.5 rounded-lg text-sm font-medium transition-all',
+                viewMode === 'list'
+                  ? 'bg-background shadow text-foreground'
+                  : 'text-muted-foreground hover:text-foreground'
+              )}
+              title={t('view.list')}
+            >
+              <List className="w-4 h-4" />
+            </button>
+          </div>
           <button
             onClick={exportToCSV}
             className="btn-glass px-3 py-2 rounded-xl"
@@ -948,46 +976,143 @@ export default function IdeasPage() {
         )}
       </div>
 
-      {/* Kanban Board with Drag and Drop */}
-      <DndContext
-        sensors={sensors}
-        collisionDetection={collisionDetection}
-        onDragStart={handleDragStart}
-        onDragOver={handleDragOver}
-        onDragEnd={handleDragEnd}
-      >
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {statusColumns.map((column) => (
-            <DroppableColumn
-              key={column.id}
-              column={column}
-              ideas={getIdeasByStatus(column.id)}
-              onEdit={openEditModal}
-              onDelete={deleteIdea}
-              onDuplicate={duplicateIdea}
-              onCopy={copyToClipboard}
-              t={t}
-            />
-          ))}
-        </div>
+      {/* View: Kanban or List */}
+      {viewMode === 'kanban' ? (
+        <DndContext
+          sensors={sensors}
+          collisionDetection={collisionDetection}
+          onDragStart={handleDragStart}
+          onDragOver={handleDragOver}
+          onDragEnd={handleDragEnd}
+        >
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            {statusColumns.map((column) => (
+              <DroppableColumn
+                key={column.id}
+                column={column}
+                ideas={getIdeasByStatus(column.id)}
+                onEdit={openEditModal}
+                onDelete={deleteIdea}
+                onDuplicate={duplicateIdea}
+                onCopy={copyToClipboard}
+                t={t}
+              />
+            ))}
+          </div>
 
-        <DragOverlay>
-          {activeIdea ? (
-            <div className="p-4 rounded-xl border bg-card shadow-2xl w-72 rotate-3">
-              <h4 className="font-semibold text-sm truncate">{activeIdea.title}</h4>
-              <div className="flex items-center gap-2 mt-3">
-                <span className={cn(
-                  'inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium',
-                  priorityConfig[activeIdea.priority].color
-                )}>
-                  <span className={cn('w-1.5 h-1.5 rounded-full', priorityConfig[activeIdea.priority].dot)} />
-                  {t(priorityConfig[activeIdea.priority].labelKey)}
-                </span>
+          <DragOverlay>
+            {activeIdea ? (
+              <div className="p-4 rounded-xl border bg-card shadow-2xl w-72 rotate-3">
+                <h4 className="font-semibold text-sm truncate">{activeIdea.title}</h4>
+                <div className="flex items-center gap-2 mt-3">
+                  <span className={cn(
+                    'inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium',
+                    priorityConfig[activeIdea.priority].color
+                  )}>
+                    <span className={cn('w-1.5 h-1.5 rounded-full', priorityConfig[activeIdea.priority].dot)} />
+                    {t(priorityConfig[activeIdea.priority].labelKey)}
+                  </span>
+                </div>
               </div>
-            </div>
-          ) : null}
-        </DragOverlay>
-      </DndContext>
+            ) : null}
+          </DragOverlay>
+        </DndContext>
+      ) : (
+        /* List View */
+        <div className="glass-card rounded-2xl overflow-hidden">
+          <table className="w-full">
+            <thead>
+              <tr className="border-b bg-muted/30">
+                <th className="text-left px-4 py-3 text-sm font-semibold">{t('idea.title')}</th>
+                <th className="text-left px-4 py-3 text-sm font-semibold hidden md:table-cell">{t('idea.status')}</th>
+                <th className="text-left px-4 py-3 text-sm font-semibold hidden sm:table-cell">{t('idea.priority')}</th>
+                <th className="text-left px-4 py-3 text-sm font-semibold hidden lg:table-cell">{t('idea.contentType')}</th>
+                <th className="text-left px-4 py-3 text-sm font-semibold hidden lg:table-cell">{t('list.created')}</th>
+                <th className="text-right px-4 py-3 text-sm font-semibold">{t('actions.delete')}</th>
+              </tr>
+            </thead>
+            <tbody>
+              {filteredIdeas.length === 0 ? (
+                <tr>
+                  <td colSpan={6} className="text-center py-12 text-muted-foreground">
+                    <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-50" />
+                    <p>{t('empty.noIdeas')}</p>
+                  </td>
+                </tr>
+              ) : (
+                filteredIdeas.map((idea) => {
+                  const priority = priorityConfig[idea.priority];
+                  const statusColumn = statusColumns.find(c => c.id === idea.status);
+                  return (
+                    <tr
+                      key={idea.id}
+                      className="border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
+                      onClick={() => openEditModal(idea)}
+                    >
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          <div className={cn('w-1 h-8 rounded-full bg-gradient-to-b', statusColumn?.color || 'from-gray-400 to-gray-500')} />
+                          <div className="min-w-0">
+                            <p className="font-medium truncate">{idea.title}</p>
+                            {idea.description && (
+                              <p className="text-sm text-muted-foreground truncate max-w-md">{idea.description}</p>
+                            )}
+                          </div>
+                        </div>
+                      </td>
+                      <td className="px-4 py-3 hidden md:table-cell">
+                        <span className="text-sm">{t(`status.${idea.status}`)}</span>
+                      </td>
+                      <td className="px-4 py-3 hidden sm:table-cell">
+                        <span className={cn(
+                          'inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium',
+                          priority.color
+                        )}>
+                          <span className={cn('w-1.5 h-1.5 rounded-full', priority.dot)} />
+                          {t(priority.labelKey)}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 hidden lg:table-cell">
+                        <span className="px-2 py-1 rounded-md text-xs font-medium bg-secondary text-secondary-foreground">
+                          {idea.contentType === 'short' ? t('contentType.short') : t('contentType.video')}
+                        </span>
+                      </td>
+                      <td className="px-4 py-3 hidden lg:table-cell text-sm text-muted-foreground">
+                        {new Date(idea.createdAt).toLocaleDateString()}
+                      </td>
+                      <td className="px-4 py-3 text-right">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={(e) => { e.stopPropagation(); copyToClipboard(idea.title); }}
+                            className="p-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+                            title={t('actions.copyTitle')}
+                          >
+                            <Copy className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); duplicateIdea(idea); }}
+                            className="p-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+                            title={t('actions.duplicate')}
+                          >
+                            <Plus className="w-4 h-4" />
+                          </button>
+                          <button
+                            onClick={(e) => { e.stopPropagation(); deleteIdea(idea.id); }}
+                            className="p-2 hover:bg-destructive/10 rounded-lg text-muted-foreground hover:text-destructive transition-colors"
+                            title={t('actions.delete')}
+                          >
+                            <Trash2 className="w-4 h-4" />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })
+              )}
+            </tbody>
+          </table>
+        </div>
+      )}
 
       {/* Add/Edit Idea Modal */}
       {showModal && (

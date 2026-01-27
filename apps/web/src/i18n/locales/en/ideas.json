@@ -90,6 +90,13 @@
     "generatingDescription": "Generating..."
   },
   "copied": "Copied to clipboard!",
+  "view": {
+    "kanban": "Kanban",
+    "list": "List"
+  },
+  "list": {
+    "created": "Created"
+  },
   "confirm": {
     "unsavedChanges": "You have unsaved changes. Are you sure you want to close?",
     "unsavedCancel": "You have unsaved changes. Are you sure you want to cancel?",

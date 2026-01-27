@@ -90,6 +90,13 @@
     "generatingDescription": "Generando..."
   },
   "copied": "¡Copiado al portapapeles!",
+  "view": {
+    "kanban": "Kanban",
+    "list": "Lista"
+  },
+  "list": {
+    "created": "Creada"
+  },
   "confirm": {
     "unsavedChanges": "Tienes cambios sin guardar. ¿Estás seguro de que quieres cerrar?",
     "unsavedCancel": "Tienes cambios sin guardar. ¿Estás seguro de que quieres cancelar?",
