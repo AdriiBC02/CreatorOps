@@ -19,6 +19,7 @@ import {
   Sparkles,
   ChevronRight,
   Keyboard,
+  Search,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -28,6 +29,7 @@ import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { ToastProvider } from '@/components/ui/toast';
 import { NotificationBell } from '@/components/notifications/NotificationBell';
 import { NotificationToastContainer } from '@/components/notifications/NotificationToast';
+import { GlobalSearch } from '@/components/search/GlobalSearch';
 
 interface User {
   id: string;
@@ -67,6 +69,7 @@ export default function DashboardLayout({
   const [stats, setStats] = useState<ChannelStats | null>(null);
   const [refreshingStats, setRefreshingStats] = useState(false);
   const [showShortcuts, setShowShortcuts] = useState(false);
+  const [showSearch, setShowSearch] = useState(false);
 
   const formatNumber = (num: number): string => {
     if (num >= 1000000) return (num / 1000000).toFixed(1) + 'M';
@@ -138,6 +141,11 @@ export default function DashboardLayout({
   // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
+      // Global search with Cmd+K
+      if ((e.metaKey || e.ctrlKey) && e.key === 'k') {
+        e.preventDefault();
+        setShowSearch(true);
+      }
       // Show shortcuts modal with ?
       if (e.key === '?' && !e.metaKey && !e.ctrlKey) {
         const target = e.target as HTMLElement;
@@ -146,15 +154,16 @@ export default function DashboardLayout({
           setShowShortcuts(true);
         }
       }
-      // Close modal with Escape
-      if (e.key === 'Escape' && showShortcuts) {
-        setShowShortcuts(false);
+      // Close modals with Escape
+      if (e.key === 'Escape') {
+        if (showSearch) setShowSearch(false);
+        if (showShortcuts) setShowShortcuts(false);
       }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showShortcuts]);
+  }, [showShortcuts, showSearch]);
 
   return (
     <ToastProvider>
@@ -266,6 +275,18 @@ export default function DashboardLayout({
             </div>
           )}
 
+          {/* Search Bar */}
+          <div className="px-4 py-2 border-t">
+            <button
+              onClick={() => setShowSearch(true)}
+              className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl bg-muted/50 hover:bg-muted text-muted-foreground hover:text-foreground transition-colors"
+            >
+              <Search className="w-4 h-4" />
+              <span className="text-sm flex-1 text-left">{t('actions.search')}...</span>
+              <kbd className="px-1.5 py-0.5 rounded bg-background text-[10px] font-mono">⌘K</kbd>
+            </button>
+          </div>
+
           {/* Theme, Notifications & Shortcuts */}
           <div className="px-4 py-3 border-t">
             <div className="flex items-center justify-between">
@@ -337,6 +358,13 @@ export default function DashboardLayout({
       {/* Notification Toasts */}
       <NotificationToastContainer />
 
+      {/* Global Search */}
+      <GlobalSearch
+        isOpen={showSearch}
+        onClose={() => setShowSearch(false)}
+        channelId={stats?.channelId || undefined}
+      />
+
       {/* Keyboard Shortcuts Modal - Glass style */}
       {showShortcuts && (
         <div
@@ -366,6 +394,7 @@ export default function DashboardLayout({
               <div>
                 <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{t('keyboard.general')}</h4>
                 <div className="space-y-2">
+                  <ShortcutRow keys={['⌘', 'K']} description={t('keyboard.globalSearch')} />
                   <ShortcutRow keys={['?']} description={t('keyboard.showShortcuts')} />
                   <ShortcutRow keys={['Esc']} description={t('keyboard.closeModal')} />
                 </div>

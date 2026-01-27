@@ -111,6 +111,24 @@
     "search": "Búsqueda",
     "sync": "Sincronizar",
     "closeModal": "Cerrar modal",
-    "showShortcuts": "Mostrar atajos"
+    "showShortcuts": "Mostrar atajos",
+    "globalSearch": "Búsqueda global"
+  },
+  "search": {
+    "placeholder": "Buscar videos, ideas, eventos...",
+    "searching": "Buscando...",
+    "noResults": "No se encontraron resultados",
+    "startTyping": "Escribe para buscar",
+    "recent": "Búsquedas recientes",
+    "quickLinks": "Accesos rápidos",
+    "views": "vistas",
+    "navigate": "navegar",
+    "select": "seleccionar",
+    "toOpen": "para abrir",
+    "types": {
+      "video": "Videos",
+      "idea": "Ideas",
+      "calendar": "Calendario"
+    }
   }
 }

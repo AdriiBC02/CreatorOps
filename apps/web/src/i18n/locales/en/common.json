@@ -111,6 +111,24 @@
     "search": "Search",
     "sync": "Sync",
     "closeModal": "Close modal",
-    "showShortcuts": "Show shortcuts"
+    "showShortcuts": "Show shortcuts",
+    "globalSearch": "Global search"
+  },
+  "search": {
+    "placeholder": "Search videos, ideas, events...",
+    "searching": "Searching...",
+    "noResults": "No results found",
+    "startTyping": "Start typing to search",
+    "recent": "Recent searches",
+    "quickLinks": "Quick links",
+    "views": "views",
+    "navigate": "navigate",
+    "select": "select",
+    "toOpen": "to open",
+    "types": {
+      "video": "Videos",
+      "idea": "Ideas",
+      "calendar": "Calendar"
+    }
   }
 }
