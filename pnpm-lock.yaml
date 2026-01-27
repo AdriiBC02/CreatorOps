@@ -38,6 +38,9 @@ importers:
       '@creatorops/shared-types':
         specifier: workspace:*
         version: link:../../packages/shared-types
+      bullmq:
+        specifier: ^5.0.0
+        version: 5.67.1
       cookie-parser:
         specifier: ^1.4.6
         version: 1.4.7

@@ -9,6 +9,7 @@ export const QUEUE_NAMES = {
   CROSS_POST: 'cross-post',
   NOTIFICATIONS: 'notifications',
   SCHEDULER: 'scheduler',
+  CHANNEL_SYNC: 'channel-sync',
 } as const;
 
 export type QueueName = typeof QUEUE_NAMES[keyof typeof QUEUE_NAMES];
@@ -82,6 +83,12 @@ export interface SchedulerJobData {
   channelId?: string;
 }
 
+export interface ChannelSyncJobData {
+  channelId: string;
+  userId: string;
+  syncType: 'full' | 'stats_only';
+}
+
 // Union type for all job data
 export type JobData =
   | VideoProcessJobData
@@ -89,7 +96,8 @@ export type JobData =
   | AnalyticsSyncJobData
   | CrossPostJobData
   | NotificationJobData
-  | SchedulerJobData;
+  | SchedulerJobData
+  | ChannelSyncJobData;
 
 // Job result types
 export interface VideoProcessResult {
@@ -161,6 +169,12 @@ export const DEFAULT_JOB_OPTIONS: Record<QueueName, {
     backoff: { type: 'fixed', delay: 60000 },
     removeOnComplete: 50,
     removeOnFail: 20,
+  },
+  [QUEUE_NAMES.CHANNEL_SYNC]: {
+    attempts: 3,
+    backoff: { type: 'exponential', delay: 30000 },
+    removeOnComplete: 100,
+    removeOnFail: 50,
   },
 };
 

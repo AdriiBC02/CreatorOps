@@ -226,3 +226,6 @@ export class ChannelsService {
     return oauth2Client;
   }
 }
+
+// Export singleton instance for use by scheduler
+export const channelsService = new ChannelsService();
