@@ -3,10 +3,12 @@
 import { Moon, Sun, Monitor } from 'lucide-react';
 import { useTheme } from 'next-themes';
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 
 export function ThemeToggle() {
   const { theme, setTheme } = useTheme();
+  const { t } = useTranslation('common');
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
@@ -29,7 +31,7 @@ export function ThemeToggle() {
             ? 'bg-background shadow-sm text-foreground'
             : 'text-muted-foreground hover:text-foreground'
         )}
-        title="Light mode"
+        title={t('theme.light')}
       >
         <Sun className="w-4 h-4" />
       </button>
@@ -41,7 +43,7 @@ export function ThemeToggle() {
             ? 'bg-background shadow-sm text-foreground'
             : 'text-muted-foreground hover:text-foreground'
         )}
-        title="Dark mode"
+        title={t('theme.dark')}
       >
         <Moon className="w-4 h-4" />
       </button>
@@ -53,7 +55,7 @@ export function ThemeToggle() {
             ? 'bg-background shadow-sm text-foreground'
             : 'text-muted-foreground hover:text-foreground'
         )}
-        title="System"
+        title={t('theme.system')}
       >
         <Monitor className="w-4 h-4" />
       </button>

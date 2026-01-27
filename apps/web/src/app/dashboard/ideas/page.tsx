@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, RefreshCw, Lightbulb, GripVertical, Trash2, ExternalLink, Search, X, Copy, Download, Sparkles, Check, Filter, ChevronDown } from 'lucide-react';
 import { SkeletonKanban } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
@@ -42,17 +43,17 @@ interface Channel {
 }
 
 const statusColumns = [
-  { id: 'new', title: 'New Ideas', color: 'from-gray-400 to-gray-500', bgColor: 'bg-gray-50 dark:bg-gray-900/20' },
-  { id: 'researching', title: 'Researching', color: 'from-blue-400 to-blue-500', bgColor: 'bg-blue-50 dark:bg-blue-900/20' },
-  { id: 'approved', title: 'Approved', color: 'from-green-400 to-green-500', bgColor: 'bg-green-50 dark:bg-green-900/20' },
-  { id: 'in_production', title: 'In Production', color: 'from-purple-400 to-purple-500', bgColor: 'bg-purple-50 dark:bg-purple-900/20' },
+  { id: 'new', titleKey: 'columns.new', color: 'from-gray-400 to-gray-500', bgColor: 'bg-gray-50 dark:bg-gray-900/20' },
+  { id: 'researching', titleKey: 'columns.researching', color: 'from-blue-400 to-blue-500', bgColor: 'bg-blue-50 dark:bg-blue-900/20' },
+  { id: 'approved', titleKey: 'columns.approved', color: 'from-green-400 to-green-500', bgColor: 'bg-green-50 dark:bg-green-900/20' },
+  { id: 'in_production', titleKey: 'columns.in_production', color: 'from-purple-400 to-purple-500', bgColor: 'bg-purple-50 dark:bg-purple-900/20' },
 ];
 
-const priorityConfig: Record<number, { label: string; color: string; dot: string }> = {
-  0: { label: 'Low', color: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400', dot: 'bg-gray-400' },
-  1: { label: 'Medium', color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400', dot: 'bg-blue-400' },
-  2: { label: 'High', color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400', dot: 'bg-amber-400' },
-  3: { label: 'Urgent', color: 'bg-red-100 text-red-600 dark:bg-red-900/50 dark:text-red-400', dot: 'bg-red-400' },
+const priorityConfig: Record<number, { labelKey: string; color: string; dot: string }> = {
+  0: { labelKey: 'priority.low', color: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400', dot: 'bg-gray-400' },
+  1: { labelKey: 'priority.medium', color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400', dot: 'bg-blue-400' },
+  2: { labelKey: 'priority.high', color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400', dot: 'bg-amber-400' },
+  3: { labelKey: 'priority.urgent', color: 'bg-red-100 text-red-600 dark:bg-red-900/50 dark:text-red-400', dot: 'bg-red-400' },
 };
 
 // Draggable Idea Card Component
@@ -62,12 +63,14 @@ function DraggableIdeaCard({
   onDelete,
   onDuplicate,
   onCopy,
+  t,
 }: {
   idea: Idea;
   onEdit: (idea: Idea) => void;
   onDelete: (id: string) => void;
   onDuplicate: (idea: Idea) => void;
   onCopy: (text: string) => void;
+  t: (key: string) => string;
 }) {
   const {
     attributes,
@@ -118,21 +121,21 @@ function DraggableIdeaCard({
               <button
                 onClick={() => onCopy(idea.title)}
                 className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors"
-                title="Copy title"
+                title={t('actions.copyTitle')}
               >
                 <Copy className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => onDuplicate(idea)}
                 className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors"
-                title="Duplicate"
+                title={t('actions.duplicate')}
               >
                 <Plus className="w-3.5 h-3.5" />
               </button>
               <button
                 onClick={() => onDelete(idea.id)}
                 className="p-1.5 hover:bg-destructive/10 rounded-lg text-muted-foreground hover:text-destructive transition-colors"
-                title="Delete"
+                title={t('actions.delete')}
               >
                 <Trash2 className="w-3.5 h-3.5" />
               </button>
@@ -151,10 +154,10 @@ function DraggableIdeaCard({
               priority.color
             )}>
               <span className={cn('w-1.5 h-1.5 rounded-full', priority.dot)} />
-              {priority.label}
+              {t(priority.labelKey)}
             </span>
             <span className="px-2 py-1 rounded-md text-xs font-medium bg-secondary text-secondary-foreground">
-              {idea.contentType === 'short' ? 'Short' : 'Video'}
+              {idea.contentType === 'short' ? t('contentType.short') : t('contentType.video')}
             </span>
           </div>
 
@@ -166,7 +169,7 @@ function DraggableIdeaCard({
               className="inline-flex items-center gap-1 mt-3 text-xs text-primary hover:underline"
             >
               <ExternalLink className="w-3 h-3" />
-              Reference
+              {t('actions.reference')}
             </a>
           )}
         </div>
@@ -183,6 +186,7 @@ function DroppableColumn({
   onDelete,
   onDuplicate,
   onCopy,
+  t,
 }: {
   column: typeof statusColumns[0];
   ideas: Idea[];
@@ -190,6 +194,7 @@ function DroppableColumn({
   onDelete: (id: string) => void;
   onDuplicate: (idea: Idea) => void;
   onCopy: (text: string) => void;
+  t: (key: string) => string;
 }) {
   const { setNodeRef, isOver } = useDroppable({
     id: column.id,
@@ -200,7 +205,7 @@ function DroppableColumn({
     <div className="flex flex-col h-full">
       <div className="flex items-center gap-3 mb-4">
         <div className={cn('w-1 h-6 rounded-full bg-gradient-to-b', column.color)} />
-        <h3 className="font-semibold text-sm">{column.title}</h3>
+        <h3 className="font-semibold text-sm">{t(column.titleKey)}</h3>
         <span className="ml-auto px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
           {ideas.length}
         </span>
@@ -223,6 +228,7 @@ function DroppableColumn({
               onDelete={onDelete}
               onDuplicate={onDuplicate}
               onCopy={onCopy}
+              t={t}
             />
           ))}
         </SortableContext>
@@ -233,8 +239,8 @@ function DroppableColumn({
             isOver ? 'border-primary bg-primary/5' : 'border-muted'
           )}>
             <Lightbulb className={cn('w-8 h-8 mb-2', isOver && 'text-primary')} />
-            <p className="text-sm font-medium">{isOver ? 'Drop here!' : 'No ideas yet'}</p>
-            <p className="text-xs mt-1">Drag ideas here</p>
+            <p className="text-sm font-medium">{isOver ? t('empty.dropHere') : t('empty.noIdeas')}</p>
+            <p className="text-xs mt-1">{t('empty.dragHere')}</p>
           </div>
         )}
       </div>
@@ -243,6 +249,7 @@ function DroppableColumn({
 }
 
 export default function IdeasPage() {
+  const { t } = useTranslation('ideas');
   const [channel, setChannel] = useState<Channel | null>(null);
   const [ideas, setIdeas] = useState<Idea[]>([]);
   const [loading, setLoading] = useState(true);
@@ -343,7 +350,7 @@ export default function IdeasPage() {
       }
       if (e.key === 'Escape' && showModal) {
         if (hasUnsavedChanges) {
-          if (confirm('You have unsaved changes. Are you sure you want to close?')) {
+          if (confirm(t('confirm.unsavedChanges'))) {
             setShowModal(false);
             resetForm();
           }
@@ -521,7 +528,7 @@ export default function IdeasPage() {
   };
 
   const deleteIdea = async (ideaId: string) => {
-    if (!confirm('Are you sure you want to delete this idea?')) return;
+    if (!confirm(t('confirm.deleteIdea'))) return;
 
     try {
       const res = await fetch(`http://localhost:4000/ideas/${ideaId}`, {
@@ -654,13 +661,13 @@ export default function IdeasPage() {
   };
 
   const exportToCSV = () => {
-    const headers = ['Title', 'Description', 'Status', 'Priority', 'Content Type', 'Created At'];
+    const headers = [t('idea.title'), t('idea.description'), t('idea.status'), t('idea.priority'), t('idea.contentType'), 'Created At'];
     const rows = ideas.map((idea) => [
       idea.title,
       idea.description || '',
-      idea.status,
-      priorityConfig[idea.priority].label,
-      idea.contentType,
+      t(`status.${idea.status}`),
+      t(priorityConfig[idea.priority].labelKey),
+      idea.contentType === 'short' ? t('contentType.short') : t('contentType.long_form'),
       new Date(idea.createdAt).toLocaleDateString(),
     ]);
 
@@ -794,8 +801,8 @@ export default function IdeasPage() {
       <div className="space-y-6 animate-fade-in">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
-            <h1 className="text-3xl font-bold">Content Ideas</h1>
-            <p className="text-muted-foreground mt-1">Organize and track your video ideas</p>
+            <h1 className="text-3xl font-bold">{t('header.title')}</h1>
+            <p className="text-muted-foreground mt-1">{t('header.subtitle')}</p>
           </div>
         </div>
         <SkeletonKanban columns={4} cardsPerColumn={3} />
@@ -808,34 +815,34 @@ export default function IdeasPage() {
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Content Ideas</h1>
+          <h1 className="text-3xl font-bold">{t('header.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            Organize and track your video ideas
-            <span className="hidden sm:inline"> · Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">N</kbd> for new idea</span>
+            {t('header.subtitle')}
+            <span className="hidden sm:inline"> · <span dangerouslySetInnerHTML={{ __html: t('header.pressN') }} /></span>
           </p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={exportToCSV}
             className="btn-secondary px-3 py-2"
-            title="Export to CSV"
+            title={t('actions.export')}
           >
             <Download className="w-4 h-4" />
           </button>
           <button
             onClick={openAiSuggestionsModal}
             className="btn px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-[1.02] active:scale-[0.98]"
-            title="Get AI suggestions"
+            title={t('actions.suggestAI')}
           >
             <Sparkles className="w-4 h-4" />
-            <span className="hidden sm:inline">Suggest with AI</span>
+            <span className="hidden sm:inline">{t('actions.suggestAI')}</span>
           </button>
           <button
             onClick={openAddModal}
             className="btn-primary px-4 py-2 shadow-lg shadow-primary/25"
           >
             <Plus size={20} />
-            <span className="hidden sm:inline">New Idea</span>
+            <span className="hidden sm:inline">{t('actions.newIdea')}</span>
           </button>
         </div>
       </div>
@@ -844,7 +851,7 @@ export default function IdeasPage() {
       {copied && (
         <div className="fixed top-4 right-4 flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 rounded-xl shadow-lg z-50 animate-slide-in-right">
           <Check className="w-4 h-4" />
-          Copied to clipboard!
+          {t('copied')}
         </div>
       )}
 
@@ -855,7 +862,7 @@ export default function IdeasPage() {
             <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search ideas..."
+              placeholder={t('filters.search')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="input pl-11 pr-10 w-full"
@@ -878,7 +885,7 @@ export default function IdeasPage() {
             )}
           >
             <Filter className="w-4 h-4" />
-            Filters
+            {t('filters.filters')}
             {hasActiveFilters && (
               <span className="w-2 h-2 rounded-full bg-primary" />
             )}
@@ -889,30 +896,30 @@ export default function IdeasPage() {
         {showFilters && (
           <div className="flex flex-wrap items-center gap-4 p-4 rounded-xl bg-muted/30 border animate-fade-in">
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">Priority:</label>
+              <label className="text-sm font-medium">{t('priority.label')}</label>
               <select
                 value={priorityFilter === 'all' ? 'all' : priorityFilter.toString()}
                 onChange={(e) => setPriorityFilter(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
                 className="input py-1.5 px-3 min-w-[120px]"
               >
-                <option value="all">All</option>
-                <option value="0">Low</option>
-                <option value="1">Medium</option>
-                <option value="2">High</option>
-                <option value="3">Urgent</option>
+                <option value="all">{t('filters.all')}</option>
+                <option value="0">{t('priority.low')}</option>
+                <option value="1">{t('priority.medium')}</option>
+                <option value="2">{t('priority.high')}</option>
+                <option value="3">{t('priority.urgent')}</option>
               </select>
             </div>
 
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">Type:</label>
+              <label className="text-sm font-medium">{t('filters.type')}</label>
               <select
                 value={contentTypeFilter}
                 onChange={(e) => setContentTypeFilter(e.target.value)}
                 className="input py-1.5 px-3 min-w-[120px]"
               >
-                <option value="all">All</option>
-                <option value="long_form">Video</option>
-                <option value="short">Short</option>
+                <option value="all">{t('filters.all')}</option>
+                <option value="long_form">{t('contentType.video')}</option>
+                <option value="short">{t('contentType.short')}</option>
               </select>
             </div>
 
@@ -921,12 +928,12 @@ export default function IdeasPage() {
                 onClick={clearAllFilters}
                 className="text-sm text-muted-foreground hover:text-foreground transition-colors"
               >
-                Clear all
+                {t('filters.clearAll')}
               </button>
             )}
 
             <div className="ml-auto text-sm text-muted-foreground">
-              {filteredIdeas.length} idea{filteredIdeas.length !== 1 ? 's' : ''} found
+              {filteredIdeas.length === 1 ? t('filters.found', { count: filteredIdeas.length }) : t('filters.found_plural', { count: filteredIdeas.length })}
             </div>
           </div>
         )}
@@ -950,6 +957,7 @@ export default function IdeasPage() {
               onDelete={deleteIdea}
               onDuplicate={duplicateIdea}
               onCopy={copyToClipboard}
+              t={t}
             />
           ))}
         </div>
@@ -964,7 +972,7 @@ export default function IdeasPage() {
                   priorityConfig[activeIdea.priority].color
                 )}>
                   <span className={cn('w-1.5 h-1.5 rounded-full', priorityConfig[activeIdea.priority].dot)} />
-                  {priorityConfig[activeIdea.priority].label}
+                  {t(priorityConfig[activeIdea.priority].labelKey)}
                 </span>
               </div>
             </div>
@@ -977,11 +985,11 @@ export default function IdeasPage() {
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
           <div className="bg-card border rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in">
             <div className="flex items-center justify-between mb-6">
-              <h3 className="text-xl font-bold">{editingIdea ? 'Edit Idea' : 'New Content Idea'}</h3>
+              <h3 className="text-xl font-bold">{editingIdea ? t('idea.edit') : t('idea.new')}</h3>
               <button
                 onClick={() => {
                   if (hasUnsavedChanges) {
-                    if (confirm('You have unsaved changes. Are you sure you want to close?')) {
+                    if (confirm(t('confirm.unsavedChanges'))) {
                       setShowModal(false);
                       resetForm();
                     }
@@ -998,20 +1006,20 @@ export default function IdeasPage() {
 
             <div className="space-y-5">
               <div>
-                <label className="block text-sm font-medium mb-2">Title *</label>
+                <label className="block text-sm font-medium mb-2">{t('idea.title')} *</label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="input"
-                  placeholder="Video idea title..."
+                  placeholder={t('idea.titlePlaceholder')}
                   autoFocus
                 />
               </div>
 
               <div>
                 <div className="flex items-center justify-between mb-2">
-                  <label className="block text-sm font-medium">Description</label>
+                  <label className="block text-sm font-medium">{t('idea.description')}</label>
                   <button
                     type="button"
                     onClick={generateAiDescription}
@@ -1019,7 +1027,7 @@ export default function IdeasPage() {
                     className="flex items-center gap-1.5 text-xs font-medium text-purple-500 hover:text-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
                     <Sparkles className={cn('w-3.5 h-3.5', generatingDescription && 'animate-spin')} />
-                    {generatingDescription ? 'Generating...' : 'Generate with AI'}
+                    {generatingDescription ? t('ai.generatingDescription') : t('ai.generateDescription')}
                   </button>
                 </div>
                 <textarea
@@ -1027,64 +1035,64 @@ export default function IdeasPage() {
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
                   className="input resize-none"
-                  placeholder="Describe your idea..."
+                  placeholder={t('idea.descriptionPlaceholder')}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Content Type</label>
+                  <label className="block text-sm font-medium mb-2">{t('idea.contentType')}</label>
                   <select
                     value={formData.contentType}
                     onChange={(e) => setFormData({ ...formData, contentType: e.target.value })}
                     className="input"
                   >
-                    <option value="long_form">Long Form Video</option>
-                    <option value="short">Short</option>
+                    <option value="long_form">{t('contentType.long_form')}</option>
+                    <option value="short">{t('contentType.short')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Priority</label>
+                  <label className="block text-sm font-medium mb-2">{t('idea.priority')}</label>
                   <select
                     value={formData.priority}
                     onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
                     className="input"
                   >
-                    <option value={0}>Low</option>
-                    <option value={1}>Medium</option>
-                    <option value={2}>High</option>
-                    <option value={3}>Urgent</option>
+                    <option value={0}>{t('priority.low')}</option>
+                    <option value={1}>{t('priority.medium')}</option>
+                    <option value={2}>{t('priority.high')}</option>
+                    <option value={3}>{t('priority.urgent')}</option>
                   </select>
                 </div>
               </div>
 
               {editingIdea && (
                 <div>
-                  <label className="block text-sm font-medium mb-2">Status</label>
+                  <label className="block text-sm font-medium mb-2">{t('idea.status')}</label>
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                     className="input"
                   >
-                    <option value="new">New</option>
-                    <option value="researching">Researching</option>
-                    <option value="approved">Approved</option>
-                    <option value="in_production">In Production</option>
-                    <option value="completed">Completed</option>
-                    <option value="archived">Archived</option>
+                    <option value="new">{t('status.new')}</option>
+                    <option value="researching">{t('status.researching')}</option>
+                    <option value="approved">{t('status.approved')}</option>
+                    <option value="in_production">{t('status.in_production')}</option>
+                    <option value="completed">{t('status.completed')}</option>
+                    <option value="archived">{t('status.archived')}</option>
                   </select>
                 </div>
               )}
 
               <div>
-                <label className="block text-sm font-medium mb-2">Inspiration URL</label>
+                <label className="block text-sm font-medium mb-2">{t('idea.inspirationUrl')}</label>
                 <input
                   type="url"
                   value={formData.inspirationUrl}
                   onChange={(e) => setFormData({ ...formData, inspirationUrl: e.target.value })}
                   className="input"
-                  placeholder="https://..."
+                  placeholder={t('idea.inspirationUrlPlaceholder')}
                 />
               </div>
             </div>
@@ -1096,7 +1104,7 @@ export default function IdeasPage() {
                     onClick={() => deleteIdea(editingIdea.id)}
                     className="btn-ghost px-4 py-2.5 text-destructive hover:bg-destructive/10"
                   >
-                    Delete
+                    {t('actions.delete')}
                   </button>
                 )}
               </div>
@@ -1104,7 +1112,7 @@ export default function IdeasPage() {
                 <button
                   onClick={() => {
                     if (hasUnsavedChanges) {
-                      if (confirm('You have unsaved changes. Are you sure you want to cancel?')) {
+                      if (confirm(t('confirm.unsavedCancel'))) {
                         setShowModal(false);
                         resetForm();
                       }
@@ -1115,7 +1123,7 @@ export default function IdeasPage() {
                   }}
                   className="btn-ghost px-4 py-2.5"
                 >
-                  Cancel
+                  {t('actions.cancel')}
                 </button>
                 <button
                   onClick={handleSaveIdea}
@@ -1125,9 +1133,9 @@ export default function IdeasPage() {
                   {saving ? (
                     <RefreshCw className="w-4 h-4 animate-spin" />
                   ) : editingIdea ? (
-                    'Save Changes'
+                    t('actions.saveChanges')
                   ) : (
-                    'Add Idea'
+                    t('actions.addIdea')
                   )}
                 </button>
               </div>
@@ -1146,8 +1154,8 @@ export default function IdeasPage() {
                   <Sparkles className="w-5 h-5 text-white" />
                 </div>
                 <div>
-                  <h3 className="text-xl font-bold">AI-Suggested Ideas</h3>
-                  <p className="text-sm text-muted-foreground">Get personalized content suggestions</p>
+                  <h3 className="text-xl font-bold">{t('ai.title')}</h3>
+                  <p className="text-sm text-muted-foreground">{t('ai.subtitle')}</p>
                 </div>
               </div>
               <button
@@ -1161,7 +1169,7 @@ export default function IdeasPage() {
             {/* Custom Prompt Input */}
             <div className="mb-6 p-4 bg-muted/30 rounded-xl">
               <label className="block text-sm font-medium mb-2">
-                What type of content do you want ideas for?
+                {t('ai.prompt')}
               </label>
               <div className="flex gap-2">
                 <input
@@ -1169,7 +1177,7 @@ export default function IdeasPage() {
                   value={aiPrompt}
                   onChange={(e) => setAiPrompt(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && !aiLoading && generateAiSuggestions()}
-                  placeholder="e.g., gameplay of Minecraft, tech reviews, cooking tutorials..."
+                  placeholder={t('ai.promptPlaceholder')}
                   className="input"
                   disabled={aiLoading}
                 />
@@ -1183,13 +1191,13 @@ export default function IdeasPage() {
                   ) : (
                     <>
                       <Sparkles className="w-4 h-4" />
-                      Generate
+                      {t('ai.generate')}
                     </>
                   )}
                 </button>
               </div>
               <p className="text-xs text-muted-foreground mt-2">
-                Leave empty for general ideas based on your channel performance
+                {t('ai.leaveEmpty')}
               </p>
             </div>
 
@@ -1199,7 +1207,7 @@ export default function IdeasPage() {
                   <Sparkles className="w-6 h-6 text-white" />
                 </div>
                 <p className="text-muted-foreground">
-                  {aiPrompt ? `Generating ideas about "${aiPrompt}"...` : 'Analyzing your channel...'}
+                  {aiPrompt ? t('ai.generating', { topic: aiPrompt }) : t('ai.analyzingChannel')}
                 </p>
               </div>
             ) : aiSuggestions.length > 0 ? (
@@ -1216,7 +1224,7 @@ export default function IdeasPage() {
                       onClick={() => useAiSuggestion(suggestion)}
                       className="btn-ghost text-sm text-primary hover:bg-primary/10"
                     >
-                      Use this idea
+                      {t('ai.useSuggestion')}
                     </button>
                   </div>
                 ))}
@@ -1226,8 +1234,8 @@ export default function IdeasPage() {
                 <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
                   <Lightbulb className="w-8 h-8 text-muted-foreground" />
                 </div>
-                <p className="font-medium mb-1">Ready to generate ideas</p>
-                <p className="text-sm text-muted-foreground">Enter a topic above and click Generate</p>
+                <p className="font-medium mb-1">{t('ai.readyToGenerate')}</p>
+                <p className="text-sm text-muted-foreground">{t('ai.enterTopic')}</p>
               </div>
             )}
 
@@ -1236,7 +1244,7 @@ export default function IdeasPage() {
                 onClick={() => setShowAiSuggestions(false)}
                 className="btn-ghost px-4 py-2.5"
               >
-                Close
+                {t('actions.close')}
               </button>
             </div>
           </div>

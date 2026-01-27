@@ -1,0 +1,116 @@
+{
+  "nav": {
+    "dashboard": "Panel",
+    "videos": "Videos",
+    "calendar": "Calendario",
+    "ideas": "Ideas",
+    "analytics": "Analíticas",
+    "assistant": "Asistente IA",
+    "settings": "Ajustes"
+  },
+  "actions": {
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "delete": "Eliminar",
+    "edit": "Editar",
+    "create": "Crear",
+    "close": "Cerrar",
+    "refresh": "Actualizar",
+    "refreshData": "Actualizar datos",
+    "refreshStats": "Actualizar estadísticas",
+    "search": "Buscar",
+    "filter": "Filtrar",
+    "export": "Exportar",
+    "import": "Importar",
+    "copy": "Copiar",
+    "duplicate": "Duplicar",
+    "add": "Añadir",
+    "remove": "Quitar",
+    "clear": "Limpiar",
+    "reset": "Restablecer",
+    "apply": "Aplicar",
+    "confirm": "Confirmar",
+    "back": "Volver",
+    "next": "Siguiente",
+    "previous": "Anterior",
+    "viewAll": "Ver todo",
+    "showMore": "Ver más",
+    "showLess": "Ver menos",
+    "selectAll": "Seleccionar todo",
+    "deselectAll": "Deseleccionar todo",
+    "watchOnYouTube": "Ver en YouTube"
+  },
+  "status": {
+    "loading": "Cargando...",
+    "saving": "Guardando...",
+    "deleting": "Eliminando...",
+    "error": "Error",
+    "success": "Éxito",
+    "pending": "Pendiente",
+    "active": "Activo",
+    "inactive": "Inactivo",
+    "completed": "Completado",
+    "cancelled": "Cancelado"
+  },
+  "time": {
+    "now": "Ahora",
+    "today": "Hoy",
+    "yesterday": "Ayer",
+    "tomorrow": "Mañana",
+    "thisWeek": "Esta semana",
+    "lastWeek": "Semana pasada",
+    "thisMonth": "Este mes",
+    "lastMonth": "Mes pasado",
+    "ago": "hace",
+    "minutes": "minutos",
+    "hours": "horas",
+    "days": "días",
+    "weeks": "semanas",
+    "months": "meses"
+  },
+  "errors": {
+    "generic": "Algo salió mal",
+    "notFound": "No encontrado",
+    "unauthorized": "No autorizado",
+    "forbidden": "Acceso denegado",
+    "networkError": "Error de conexión",
+    "tryAgain": "Inténtalo de nuevo"
+  },
+  "empty": {
+    "noData": "No hay datos",
+    "noResults": "Sin resultados"
+  },
+  "quickStats": {
+    "title": "Estadísticas Rápidas",
+    "subs": "Subs",
+    "views": "Vistas",
+    "videos": "Videos",
+    "total": "total"
+  },
+  "user": {
+    "signOut": "Cerrar sesión",
+    "profile": "Perfil",
+    "account": "Cuenta"
+  },
+  "theme": {
+    "light": "Modo claro",
+    "dark": "Modo oscuro",
+    "system": "Sistema"
+  },
+  "keyboard": {
+    "title": "Atajos de Teclado",
+    "general": "General",
+    "navigation": "Navegación",
+    "actions": "Acciones",
+    "goToDashboard": "Ir al Panel",
+    "goToVideos": "Ir a Videos",
+    "goToCalendar": "Ir a Calendario",
+    "goToIdeas": "Ir a Ideas",
+    "goToSettings": "Ir a Ajustes",
+    "newIdea": "Nueva Idea",
+    "search": "Búsqueda",
+    "sync": "Sincronizar",
+    "closeModal": "Cerrar modal",
+    "showShortcuts": "Mostrar atajos"
+  }
+}

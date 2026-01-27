@@ -1,0 +1,93 @@
+{
+  "header": {
+    "title": "Calendario de Contenido",
+    "subtitle": "Planifica y programa tu contenido",
+    "items": "{{count}} elementos"
+  },
+  "months": {
+    "january": "Enero",
+    "february": "Febrero",
+    "march": "Marzo",
+    "april": "Abril",
+    "may": "Mayo",
+    "june": "Junio",
+    "july": "Julio",
+    "august": "Agosto",
+    "september": "Septiembre",
+    "october": "Octubre",
+    "november": "Noviembre",
+    "december": "Diciembre"
+  },
+  "monthsShort": ["Ene", "Feb", "Mar", "Abr", "May", "Jun", "Jul", "Ago", "Sep", "Oct", "Nov", "Dic"],
+  "monthsFull": ["Enero", "Febrero", "Marzo", "Abril", "Mayo", "Junio", "Julio", "Agosto", "Septiembre", "Octubre", "Noviembre", "Diciembre"],
+  "weekdays": {
+    "sunday": "Dom",
+    "monday": "Lun",
+    "tuesday": "Mar",
+    "wednesday": "Mié",
+    "thursday": "Jue",
+    "friday": "Vie",
+    "saturday": "Sáb"
+  },
+  "weekdaysShort": ["Dom", "Lun", "Mar", "Mié", "Jue", "Vie", "Sáb"],
+  "navigation": {
+    "today": "Hoy",
+    "goToToday": "Ir a Hoy",
+    "previousMonth": "Mes anterior",
+    "nextMonth": "Mes siguiente",
+    "year": "Año",
+    "month": "Mes"
+  },
+  "actions": {
+    "addContent": "Añadir Contenido",
+    "export": "Exportar a CSV",
+    "duplicate": "Duplicar",
+    "delete": "Eliminar",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "saving": "Guardando...",
+    "saveChanges": "Guardar Cambios",
+    "addToCalendar": "Añadir al Calendario"
+  },
+  "event": {
+    "new": "Añadir Contenido al Calendario",
+    "edit": "Editar Elemento del Calendario",
+    "delete": "Eliminar",
+    "duplicate": "Duplicar",
+    "title": "Título",
+    "titlePlaceholder": "Título del video...",
+    "date": "Fecha",
+    "time": "Hora",
+    "type": "Tipo de Contenido",
+    "status": "Estado",
+    "notes": "Notas",
+    "notesPlaceholder": "Notas adicionales..."
+  },
+  "contentType": {
+    "long_form": "Video Largo",
+    "short": "Short"
+  },
+  "status": {
+    "label": "Estado:",
+    "idea": "Idea",
+    "scripting": "Guión",
+    "filming": "Grabación",
+    "editing": "Edición",
+    "ready": "Listo",
+    "scheduled": "Programado",
+    "published": "Publicado"
+  },
+  "empty": {
+    "noEvents": "No hay eventos este día",
+    "addEvent": "Añade tu primer evento"
+  },
+  "export": {
+    "button": "Exportar CSV",
+    "success": "Calendario exportado"
+  },
+  "confirm": {
+    "unsavedChanges": "Tienes cambios sin guardar. ¿Estás seguro de que quieres cerrar?",
+    "unsavedCancel": "Tienes cambios sin guardar. ¿Estás seguro de que quieres cancelar?",
+    "deleteItem": "¿Estás seguro de que quieres eliminar este elemento?"
+  }
+}

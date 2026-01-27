@@ -1,0 +1,79 @@
+{
+  "header": {
+    "title": "Analytics",
+    "subtitle": "Real data from your YouTube channel",
+    "liveData": "Live Data"
+  },
+  "stats": {
+    "totalViews": "Total Channel Views",
+    "totalViewsDesc": "Lifetime views on your channel",
+    "subscribers": "Subscribers",
+    "subscribersDesc": "Current subscriber count",
+    "totalVideos": "Total Videos",
+    "totalVideosDesc": "Videos on your channel",
+    "totalLikes": "Total Likes",
+    "totalLikesDesc": "Across all synced videos",
+    "avgViews": "Avg. Views per Video",
+    "avgLikes": "Avg. Likes per Video",
+    "avgComments": "Avg. Comments per Video",
+    "engagementRate": "Engagement Rate"
+  },
+  "sections": {
+    "overview": "Overview",
+    "performance": "Performance",
+    "engagement": "Engagement",
+    "topVideos": "Top Performing Videos",
+    "growth": "Growth"
+  },
+  "engagement": {
+    "title": "Engagement",
+    "rate": "Rate",
+    "likesRate": "Likes Rate"
+  },
+  "videoStats": {
+    "syncedVideos": "Synced Videos",
+    "avgViewsPerVideo": "Avg. Views/Video",
+    "totalComments": "Total Comments",
+    "totalSyncedViews": "Total Synced Views",
+    "fromVideos": "from {{count}} synced videos"
+  },
+  "chart": {
+    "views": "Views",
+    "likes": "Likes",
+    "comments": "Comments",
+    "subscribers": "Subscribers"
+  },
+  "period": {
+    "7days": "Last 7 days",
+    "30days": "Last 30 days",
+    "90days": "Last 90 days",
+    "year": "This year",
+    "allTime": "All time"
+  },
+  "comparison": {
+    "vsLastPeriod": "vs last period",
+    "increase": "increase",
+    "decrease": "decrease",
+    "noChange": "no change"
+  },
+  "empty": {
+    "noChannel": "No Channel Connected",
+    "noChannelDesc": "Connect your YouTube channel to see your analytics.",
+    "noVideos": "No videos synced yet",
+    "noVideosDesc": "Go to Videos and click \"Sync from YouTube\" to import your videos."
+  },
+  "topVideos": {
+    "title": "Top Performing Videos",
+    "topByViews": "Top {{count}} by views",
+    "views": "views",
+    "notPublished": "Not published"
+  },
+  "about": {
+    "title": "About Analytics",
+    "description": "This page shows real data from your YouTube channel. Historical analytics and charts require YouTube Analytics API integration, which provides detailed metrics over time."
+  },
+  "refresh": {
+    "button": "Refresh data",
+    "lastUpdated": "Last updated"
+  }
+}

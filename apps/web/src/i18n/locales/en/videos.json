@@ -1,0 +1,90 @@
+{
+  "header": {
+    "title": "Videos",
+    "subtitle": "Manage your YouTube videos",
+    "lastSynced": "Last synced",
+    "pressToSync": "Press <kbd>⌘S</kbd> to sync"
+  },
+  "sync": {
+    "button": "Sync",
+    "syncing": "Syncing...",
+    "lastSync": "Last sync",
+    "never": "Never",
+    "success": "Videos synced successfully",
+    "error": "Sync failed. Please try again.",
+    "updatedAt": "Videos updated at {{time}}",
+    "syncFromYouTube": "Sync from YouTube"
+  },
+  "filters": {
+    "all": "All",
+    "public": "Public",
+    "private": "Private",
+    "unlisted": "Unlisted",
+    "search": "Search videos...",
+    "date": "Date",
+    "dateFrom": "From",
+    "dateTo": "To",
+    "clearFilters": "Clear filters",
+    "clearDates": "Clear dates"
+  },
+  "table": {
+    "video": "Video",
+    "thumbnail": "Thumbnail",
+    "title": "Title",
+    "status": "Status",
+    "views": "Views",
+    "likes": "Likes",
+    "comments": "Comments",
+    "duration": "Duration",
+    "published": "Published",
+    "date": "Date",
+    "actions": "Actions"
+  },
+  "actions": {
+    "openInYoutube": "Watch on YouTube",
+    "openInStudio": "Edit in YouTube Studio",
+    "copyUrl": "Copy video URL",
+    "analyze": "Analyze with AI",
+    "urlCopied": "Copied to clipboard!",
+    "exportCSV": "Export to CSV",
+    "uploadVideo": "Upload Video",
+    "editMetadata": "Edit metadata",
+    "clickToEnlarge": "Click to enlarge"
+  },
+  "stats": {
+    "totalVideos": "Total Videos",
+    "totalViews": "Total Views",
+    "totalLikes": "Total Likes",
+    "totalComments": "Total Comments"
+  },
+  "empty": {
+    "noVideos": "No videos yet",
+    "noVideosDesc": "Sync your videos from YouTube or upload a new one",
+    "noResults": "No videos match your search",
+    "connectChannel": "Connect your channel first",
+    "syncFirst": "Sync your videos to see them here"
+  },
+  "export": {
+    "button": "Export CSV",
+    "success": "Videos exported successfully"
+  },
+  "preview": {
+    "views": "views",
+    "likes": "likes"
+  },
+  "analysis": {
+    "aiAnalysis": "AI Video Analysis",
+    "title": "Video Analysis",
+    "analyzing": "Analyzing video performance...",
+    "insights": "Insights",
+    "suggestions": "Suggestions",
+    "recommendations": "Recommendations",
+    "performance": "Performance",
+    "performanceInsights": "Performance Insights",
+    "audience": "Audience",
+    "titleScore": "Title Score",
+    "analysisFailed": "Analysis failed. Please try again.",
+    "close": "Close",
+    "reanalyze": "Reanalyze"
+  }
+}

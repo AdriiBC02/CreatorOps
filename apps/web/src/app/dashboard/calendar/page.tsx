@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
+import { useTranslation } from 'react-i18next';
 import { ChevronLeft, ChevronRight, Plus, RefreshCw, Video, Clock, Trash2, Edit2, X, ChevronDown, Copy, Download, Calendar, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { onCalendarUpdate } from '@/lib/events';
@@ -32,15 +33,11 @@ const statusColors: Record<string, string> = {
   published: 'bg-emerald-100 text-emerald-700 border-emerald-300 dark:bg-emerald-900 dark:text-emerald-300',
 };
 
-const months = [
-  'January', 'February', 'March', 'April', 'May', 'June',
-  'July', 'August', 'September', 'October', 'November', 'December'
-];
-
 // Generate years from 2020 to 2030
 const years = Array.from({ length: 11 }, (_, i) => 2020 + i);
 
 export default function CalendarPage() {
+  const { t } = useTranslation('calendar');
   const [channel, setChannel] = useState<Channel | null>(null);
   const [items, setItems] = useState<CalendarItem[]>([]);
   const [loading, setLoading] = useState(true);
@@ -99,7 +96,7 @@ export default function CalendarPage() {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape' && showModal) {
         if (hasUnsavedChanges) {
-          if (confirm('You have unsaved changes. Are you sure you want to close?')) {
+          if (confirm(t('confirm.unsavedChanges'))) {
             setShowModal(false);
             resetForm();
           }
@@ -112,7 +109,7 @@ export default function CalendarPage() {
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showModal, hasUnsavedChanges]);
+  }, [showModal, hasUnsavedChanges, t]);
 
   // Warn before leaving page with unsaved changes
   useEffect(() => {
@@ -316,7 +313,7 @@ export default function CalendarPage() {
   const handleDeleteItem = async (itemId: string, e?: React.MouseEvent) => {
     e?.stopPropagation();
 
-    if (!confirm('Are you sure you want to delete this item?')) return;
+    if (!confirm(t('confirm.deleteItem'))) return;
 
     try {
       const res = await fetch(`http://localhost:4000/calendar/${itemId}`, {
@@ -388,7 +385,10 @@ export default function CalendarPage() {
   };
 
   const days = getDaysInMonth(currentDate);
-  const monthName = months[currentDate.getMonth()];
+  const monthsFull = t('monthsFull', { returnObjects: true }) as string[];
+  const monthsShort = t('monthsShort', { returnObjects: true }) as string[];
+  const weekdaysShort = t('weekdaysShort', { returnObjects: true }) as string[];
+  const monthName = monthsFull[currentDate.getMonth()];
   const year = currentDate.getFullYear();
   const today = new Date();
   const isToday = (day: number) =>
@@ -447,14 +447,14 @@ export default function CalendarPage() {
       <div className="relative flex items-center justify-between animate-fade-in">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-3xl font-bold">Content Calendar</h1>
+            <h1 className="text-3xl font-bold">{t('header.title')}</h1>
             <GlowingBadge color="purple">
               <Calendar className="w-3 h-3 mr-1" />
-              {items.length} items
+              {t('header.items', { count: items.length })}
             </GlowingBadge>
           </div>
           <p className="text-muted-foreground">
-            Plan and schedule your content
+            {t('header.subtitle')}
           </p>
         </div>
         <div className="flex gap-2">
@@ -462,7 +462,7 @@ export default function CalendarPage() {
             onClick={exportToCSV}
             disabled={items.length === 0}
             className="flex items-center gap-2 px-3 py-2.5 bg-secondary text-secondary-foreground rounded-xl font-medium hover:bg-secondary/80 hover:scale-105 transition-all disabled:opacity-50"
-            title="Export to CSV"
+            title={t('actions.export')}
           >
             <Download className="w-4 h-4" />
           </button>
@@ -471,7 +471,7 @@ export default function CalendarPage() {
             className="group flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 hover:scale-105 hover:shadow-lg hover:shadow-primary/25 transition-all"
           >
             <Plus size={20} className="group-hover:rotate-90 transition-transform" />
-            Add Content
+            {t('actions.addContent')}
           </button>
         </div>
       </div>
@@ -499,7 +499,7 @@ export default function CalendarPage() {
             <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-card border rounded-2xl shadow-xl p-5 z-50 min-w-[320px] animate-fade-in">
               {/* Year selector */}
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-2 text-muted-foreground">Year</label>
+                <label className="block text-sm font-medium mb-2 text-muted-foreground">{t('navigation.year')}</label>
                 <div className="flex flex-wrap gap-2">
                   {years.map((y) => (
                     <button
@@ -520,11 +520,11 @@ export default function CalendarPage() {
 
               {/* Month selector */}
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-2 text-muted-foreground">Month</label>
+                <label className="block text-sm font-medium mb-2 text-muted-foreground">{t('navigation.month')}</label>
                 <div className="grid grid-cols-3 gap-2">
-                  {months.map((m, idx) => (
+                  {monthsShort.map((m, idx) => (
                     <button
-                      key={m}
+                      key={idx}
                       onClick={() => goToMonth(idx)}
                       className={cn(
                         "px-3 py-2 text-sm rounded-lg transition-all hover:scale-105",
@@ -533,7 +533,7 @@ export default function CalendarPage() {
                           : "hover:bg-muted"
                       )}
                     >
-                      {m.slice(0, 3)}
+                      {m}
                     </button>
                   ))}
                 </div>
@@ -545,7 +545,7 @@ export default function CalendarPage() {
                 className="w-full px-4 py-2.5 text-sm font-medium bg-gradient-to-r from-primary/10 to-purple-500/10 hover:from-primary/20 hover:to-purple-500/20 border border-primary/20 rounded-xl transition-all hover:scale-[1.02]"
               >
                 <Sparkles className="w-4 h-4 inline mr-2" />
-                Go to Today
+                {t('navigation.goToToday')}
               </button>
             </div>
           )}
@@ -562,9 +562,9 @@ export default function CalendarPage() {
       {/* Calendar Grid */}
       <div className="border rounded-2xl overflow-hidden shadow-sm animate-fade-in animation-delay-200">
         <div className="grid grid-cols-7 bg-gradient-to-r from-muted/80 via-muted/50 to-muted/80">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => (
+          {weekdaysShort.map((day, i) => (
             <div
-              key={day}
+              key={i}
               className={cn(
                 'p-3 text-center font-semibold text-sm border-b',
                 (i === 0 || i === 6) && 'text-muted-foreground'
@@ -635,14 +635,14 @@ export default function CalendarPage() {
                               <button
                                 onClick={(e) => handleDuplicateItem(item, e)}
                                 className="p-1 hover:bg-black/10 rounded-md transition-colors"
-                                title="Duplicate"
+                                title={t('actions.duplicate')}
                               >
                                 <Copy className="w-3 h-3" />
                               </button>
                               <button
                                 onClick={(e) => handleDeleteItem(item.id, e)}
                                 className="p-1 hover:bg-red-500/20 rounded-md transition-colors"
-                                title="Delete"
+                                title={t('actions.delete')}
                               >
                                 <Trash2 className="w-3 h-3" />
                               </button>
@@ -661,14 +661,14 @@ export default function CalendarPage() {
 
       {/* Legend */}
       <div className="flex flex-wrap gap-3 p-4 bg-card border rounded-2xl animate-fade-in animation-delay-300">
-        <span className="text-sm font-medium text-muted-foreground mr-2">Status:</span>
+        <span className="text-sm font-medium text-muted-foreground mr-2">{t('status.label')}</span>
         {Object.entries(statusColors).map(([status, color]) => (
           <div
             key={status}
             className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-default"
           >
             <div className={cn('w-2.5 h-2.5 rounded-full', color.split(' ')[0])} />
-            <span className="text-sm capitalize font-medium">{status}</span>
+            <span className="text-sm font-medium">{t(`status.${status}`)}</span>
           </div>
         ))}
       </div>
@@ -683,13 +683,13 @@ export default function CalendarPage() {
                   <Calendar className="w-5 h-5 text-primary" />
                 </div>
                 <h3 className="text-lg font-semibold">
-                  {editingItem ? 'Edit Calendar Item' : 'Add Content to Calendar'}
+                  {editingItem ? t('event.edit') : t('event.new')}
                 </h3>
               </div>
               <button
                 onClick={() => {
                   if (hasUnsavedChanges) {
-                    if (confirm('You have unsaved changes. Are you sure you want to close?')) {
+                    if (confirm(t('confirm.unsavedChanges'))) {
                       setShowModal(false);
                       resetForm();
                     }
@@ -706,19 +706,19 @@ export default function CalendarPage() {
 
             <div className="space-y-5">
               <div>
-                <label className="block text-sm font-medium mb-2">Title *</label>
+                <label className="block text-sm font-medium mb-2">{t('event.title')} *</label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
                   className="w-full px-4 py-2.5 border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-primary transition-all"
-                  placeholder="Video title..."
+                  placeholder={t('event.titlePlaceholder')}
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Date *</label>
+                  <label className="block text-sm font-medium mb-2">{t('event.date')} *</label>
                   <input
                     type="date"
                     value={formData.scheduledDate}
@@ -728,7 +728,7 @@ export default function CalendarPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Time</label>
+                  <label className="block text-sm font-medium mb-2">{t('event.time')}</label>
                   <input
                     type="time"
                     value={formData.scheduledTime}
@@ -740,43 +740,43 @@ export default function CalendarPage() {
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Status</label>
+                  <label className="block text-sm font-medium mb-2">{t('event.status')}</label>
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
                     className="w-full px-4 py-2.5 border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   >
-                    <option value="idea">Idea</option>
-                    <option value="scripting">Scripting</option>
-                    <option value="filming">Filming</option>
-                    <option value="editing">Editing</option>
-                    <option value="ready">Ready</option>
-                    <option value="scheduled">Scheduled</option>
-                    <option value="published">Published</option>
+                    <option value="idea">{t('status.idea')}</option>
+                    <option value="scripting">{t('status.scripting')}</option>
+                    <option value="filming">{t('status.filming')}</option>
+                    <option value="editing">{t('status.editing')}</option>
+                    <option value="ready">{t('status.ready')}</option>
+                    <option value="scheduled">{t('status.scheduled')}</option>
+                    <option value="published">{t('status.published')}</option>
                   </select>
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Content Type</label>
+                  <label className="block text-sm font-medium mb-2">{t('event.type')}</label>
                   <select
                     value={formData.contentType}
                     onChange={(e) => setFormData({ ...formData, contentType: e.target.value })}
                     className="w-full px-4 py-2.5 border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   >
-                    <option value="long_form">Long Form Video</option>
-                    <option value="short">Short</option>
+                    <option value="long_form">{t('contentType.long_form')}</option>
+                    <option value="short">{t('contentType.short')}</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-2">Notes</label>
+                <label className="block text-sm font-medium mb-2">{t('event.notes')}</label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   rows={3}
                   className="w-full px-4 py-2.5 border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none transition-all"
-                  placeholder="Additional notes..."
+                  placeholder={t('event.notesPlaceholder')}
                 />
               </div>
             </div>
@@ -789,7 +789,7 @@ export default function CalendarPage() {
                       onClick={() => handleDeleteItem(editingItem.id)}
                       className="px-4 py-2.5 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-xl transition-all"
                     >
-                      Delete
+                      {t('actions.delete')}
                     </button>
                     <button
                       onClick={(e) => {
@@ -799,7 +799,7 @@ export default function CalendarPage() {
                       }}
                       className="px-4 py-2.5 text-sm font-medium hover:bg-muted rounded-xl transition-all"
                     >
-                      Duplicate
+                      {t('actions.duplicate')}
                     </button>
                   </>
                 )}
@@ -808,7 +808,7 @@ export default function CalendarPage() {
                 <button
                   onClick={() => {
                     if (hasUnsavedChanges) {
-                      if (confirm('You have unsaved changes. Are you sure you want to cancel?')) {
+                      if (confirm(t('confirm.unsavedCancel'))) {
                         setShowModal(false);
                         resetForm();
                       }
@@ -819,7 +819,7 @@ export default function CalendarPage() {
                   }}
                   className="px-4 py-2.5 text-sm font-medium hover:bg-muted rounded-xl transition-all"
                 >
-                  Cancel
+                  {t('actions.cancel')}
                 </button>
                 <button
                   onClick={handleSaveItem}
@@ -829,9 +829,9 @@ export default function CalendarPage() {
                   {saving ? (
                     <span className="flex items-center gap-2">
                       <RefreshCw className="w-4 h-4 animate-spin" />
-                      Saving...
+                      {t('actions.saving')}
                     </span>
-                  ) : editingItem ? 'Save Changes' : 'Add to Calendar'}
+                  ) : editingItem ? t('actions.saveChanges') : t('actions.addToCalendar')}
                 </button>
               </div>
             </div>

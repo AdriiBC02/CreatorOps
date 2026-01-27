@@ -1,0 +1,65 @@
+{
+  "header": {
+    "title": "Dashboard",
+    "welcome": "Welcome back! Here's your channel overview."
+  },
+  "stats": {
+    "totalViews": "Total Views",
+    "subscribers": "Subscribers",
+    "syncedVideos": "Synced Videos",
+    "engagementRate": "Engagement Rate",
+    "avgViews": "Avg. Views",
+    "totalLikes": "Total Likes",
+    "activeIdeas": "Active Ideas",
+    "scheduled": "Scheduled"
+  },
+  "sections": {
+    "engagement": "Engagement",
+    "topVideos": "Top Performing Videos",
+    "upcomingContent": "Upcoming Content",
+    "recentIdeas": "Recent Ideas"
+  },
+  "engagement": {
+    "rate": "Rate",
+    "likesViews": "Likes / Views",
+    "comments": "Comments"
+  },
+  "empty": {
+    "noVideos": "No videos synced yet",
+    "syncVideos": "Sync your videos",
+    "noUpcoming": "No upcoming content",
+    "scheduleContent": "Schedule something",
+    "noIdeas": "No ideas yet",
+    "addFirstIdea": "Add your first idea"
+  },
+  "connect": {
+    "title": "Connect Your Channel",
+    "description": "Link your YouTube channel to start tracking your content performance and managing your videos.",
+    "button": "Connect YouTube Channel",
+    "connected": "Connected"
+  },
+  "video": {
+    "views": "views",
+    "likes": "likes",
+    "comments": "comments",
+    "published": "Published",
+    "live": "Live"
+  },
+  "calendar": {
+    "today": "Today",
+    "tomorrow": "Tomorrow",
+    "viewCalendar": "View calendar"
+  },
+  "ideas": {
+    "priority": {
+      "low": "Low",
+      "medium": "Medium",
+      "high": "High",
+      "urgent": "Urgent"
+    }
+  },
+  "contentType": {
+    "short": "Short",
+    "video": "Video"
+  }
+}

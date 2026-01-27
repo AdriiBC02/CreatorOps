@@ -1,0 +1,98 @@
+{
+  "header": {
+    "title": "Content Ideas",
+    "subtitle": "Organize and track your video ideas",
+    "pressN": "Press <kbd>N</kbd> for new idea"
+  },
+  "columns": {
+    "new": "New Ideas",
+    "researching": "Researching",
+    "approved": "Approved",
+    "in_production": "In Production"
+  },
+  "actions": {
+    "newIdea": "New Idea",
+    "suggestAI": "Suggest with AI",
+    "export": "Export to CSV",
+    "copyTitle": "Copy title",
+    "duplicate": "Duplicate",
+    "delete": "Delete",
+    "reference": "Reference",
+    "cancel": "Cancel",
+    "close": "Close",
+    "save": "Save",
+    "saveChanges": "Save Changes",
+    "addIdea": "Add Idea"
+  },
+  "idea": {
+    "new": "New Content Idea",
+    "edit": "Edit Idea",
+    "delete": "Delete",
+    "duplicate": "Duplicate",
+    "title": "Title",
+    "titlePlaceholder": "Video idea title...",
+    "description": "Description",
+    "descriptionPlaceholder": "Describe your idea...",
+    "contentType": "Content Type",
+    "priority": "Priority",
+    "status": "Status",
+    "inspirationUrl": "Inspiration URL",
+    "inspirationUrlPlaceholder": "https://..."
+  },
+  "contentType": {
+    "long_form": "Long Form Video",
+    "short": "Short",
+    "video": "Video"
+  },
+  "priority": {
+    "label": "Priority:",
+    "low": "Low",
+    "medium": "Medium",
+    "high": "High",
+    "urgent": "Urgent",
+    "all": "All"
+  },
+  "status": {
+    "new": "New",
+    "researching": "Researching",
+    "approved": "Approved",
+    "in_production": "In Production",
+    "completed": "Completed",
+    "archived": "Archived"
+  },
+  "filters": {
+    "search": "Search ideas...",
+    "filters": "Filters",
+    "type": "Type:",
+    "all": "All",
+    "clearAll": "Clear all",
+    "found": "{{count}} idea found",
+    "found_plural": "{{count}} ideas found"
+  },
+  "empty": {
+    "noIdeas": "No ideas yet",
+    "dragHere": "Drag ideas here",
+    "dropHere": "Drop here!"
+  },
+  "ai": {
+    "title": "AI-Suggested Ideas",
+    "subtitle": "Get personalized content suggestions",
+    "prompt": "What type of content do you want ideas for?",
+    "promptPlaceholder": "e.g., gameplay of Minecraft, tech reviews, cooking tutorials...",
+    "generate": "Generate",
+    "generating": "Generating ideas about \"{{topic}}\"...",
+    "analyzingChannel": "Analyzing your channel...",
+    "leaveEmpty": "Leave empty for general ideas based on your channel performance",
+    "useSuggestion": "Use this idea",
+    "readyToGenerate": "Ready to generate ideas",
+    "enterTopic": "Enter a topic above and click Generate",
+    "generateDescription": "Generate with AI",
+    "generatingDescription": "Generating..."
+  },
+  "copied": "Copied to clipboard!",
+  "confirm": {
+    "unsavedChanges": "You have unsaved changes. Are you sure you want to close?",
+    "unsavedCancel": "You have unsaved changes. Are you sure you want to cancel?",
+    "deleteIdea": "Are you sure you want to delete this idea?"
+  }
+}

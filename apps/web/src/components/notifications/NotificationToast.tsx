@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { X, PartyPopper, CheckCircle, MessageCircle, Info, Sparkles, Bell } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { useTranslation } from 'react-i18next';
 
 const TOAST_DURATION = 4000; // 4 seconds
 
@@ -106,6 +107,7 @@ interface ToastItemProps {
 }
 
 function ToastItem({ notification, onDismiss }: ToastItemProps) {
+  const { t } = useTranslation('notifications');
   const [isLeaving, setIsLeaving] = useState(false);
   const [isSavingToBell, setIsSavingToBell] = useState(false);
   const [shouldCollapse, setShouldCollapse] = useState(false);
@@ -197,7 +199,7 @@ function ToastItem({ notification, onDismiss }: ToastItemProps) {
         <button
           onClick={() => handleDismiss(!notification.fromAPI)}
           className="absolute top-3 right-3 p-1.5 rounded-lg hover:bg-black/10 dark:hover:bg-white/10 transition-all"
-          title="Cerrar y guardar en notificaciones"
+          title={t('closeAndSave')}
         >
           <X className="w-4 h-4 text-gray-400 hover:text-gray-600" />
         </button>
@@ -208,7 +210,7 @@ function ToastItem({ notification, onDismiss }: ToastItemProps) {
         <div className="absolute inset-0 flex items-center justify-center bg-white/80 dark:bg-gray-900/80 rounded-2xl">
           <div className="flex items-center gap-2 text-primary animate-pulse">
             <Bell className="w-5 h-5" />
-            <span className="text-sm font-medium">Guardando...</span>
+            <span className="text-sm font-medium">{t('saving')}</span>
           </div>
         </div>
       )}

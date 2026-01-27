@@ -1,0 +1,90 @@
+{
+  "header": {
+    "title": "Videos",
+    "subtitle": "Gestiona tus videos de YouTube",
+    "lastSynced": "Última sincronización",
+    "pressToSync": "Presiona <kbd>⌘S</kbd> para sincronizar"
+  },
+  "sync": {
+    "button": "Sincronizar",
+    "syncing": "Sincronizando...",
+    "lastSync": "Última sincronización",
+    "never": "Nunca",
+    "success": "Videos sincronizados correctamente",
+    "error": "Error al sincronizar. Intenta de nuevo.",
+    "updatedAt": "Videos actualizados a las {{time}}",
+    "syncFromYouTube": "Sincronizar desde YouTube"
+  },
+  "filters": {
+    "all": "Todos",
+    "public": "Públicos",
+    "private": "Privados",
+    "unlisted": "No listados",
+    "search": "Buscar videos...",
+    "date": "Fecha",
+    "dateFrom": "Desde",
+    "dateTo": "Hasta",
+    "clearFilters": "Limpiar filtros",
+    "clearDates": "Limpiar fechas"
+  },
+  "table": {
+    "video": "Video",
+    "thumbnail": "Miniatura",
+    "title": "Título",
+    "status": "Estado",
+    "views": "Vistas",
+    "likes": "Me gusta",
+    "comments": "Comentarios",
+    "duration": "Duración",
+    "published": "Publicado",
+    "date": "Fecha",
+    "actions": "Acciones"
+  },
+  "actions": {
+    "openInYoutube": "Ver en YouTube",
+    "openInStudio": "Editar en YouTube Studio",
+    "copyUrl": "Copiar URL del video",
+    "analyze": "Analizar con IA",
+    "urlCopied": "¡Copiado al portapapeles!",
+    "exportCSV": "Exportar a CSV",
+    "uploadVideo": "Subir Video",
+    "editMetadata": "Editar metadatos",
+    "clickToEnlarge": "Clic para ampliar"
+  },
+  "stats": {
+    "totalVideos": "Total de Videos",
+    "totalViews": "Vistas Totales",
+    "totalLikes": "Me Gusta Totales",
+    "totalComments": "Comentarios Totales"
+  },
+  "empty": {
+    "noVideos": "No hay videos aún",
+    "noVideosDesc": "Sincroniza tus videos desde YouTube o sube uno nuevo",
+    "noResults": "No hay videos que coincidan con tu búsqueda",
+    "connectChannel": "Conecta tu canal primero",
+    "syncFirst": "Sincroniza tus videos para verlos aquí"
+  },
+  "export": {
+    "button": "Exportar CSV",
+    "success": "Videos exportados correctamente"
+  },
+  "preview": {
+    "views": "vistas",
+    "likes": "me gusta"
+  },
+  "analysis": {
+    "aiAnalysis": "Análisis de Video con IA",
+    "title": "Análisis de Video",
+    "analyzing": "Analizando rendimiento del video...",
+    "insights": "Insights",
+    "suggestions": "Sugerencias",
+    "recommendations": "Recomendaciones",
+    "performance": "Rendimiento",
+    "performanceInsights": "Insights de Rendimiento",
+    "audience": "Audiencia",
+    "titleScore": "Puntuación del Título",
+    "analysisFailed": "Análisis fallido. Por favor, intenta de nuevo.",
+    "close": "Cerrar",
+    "reanalyze": "Reanalizar"
+  }
+}

@@ -2,11 +2,13 @@
 
 import { useEffect, useState } from 'react';
 import { useTheme } from 'next-themes';
+import { useTranslation } from 'react-i18next';
 import { RefreshCw, User, Bell, Shield, Palette, LogOut, Trash2, Youtube, Sun, Moon, Monitor, Globe, Settings, Check, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FloatingShapes, GlowingBadge } from '@/components/ui/decorative';
 import { Skeleton } from '@/components/ui/skeleton';
 import { showToast, requestNotificationPermission } from '@/components/notifications';
+import { useLanguage, type Language } from '@/i18n/LanguageProvider';
 
 interface User {
   id: string;
@@ -31,26 +33,23 @@ const languages = [
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
+  const { t, i18n } = useTranslation('settings');
+  const { t: tc } = useTranslation('common');
+  const { language, setLanguage } = useLanguage();
   const [mounted, setMounted] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [channels, setChannels] = useState<Channel[]>([]);
   const [loading, setLoading] = useState(true);
   const [activeTab, setActiveTab] = useState('profile');
   const [saving, setSaving] = useState(false);
-  const [language, setLanguage] = useState('en');
 
-  // Avoid hydration mismatch and load language preference
+  // Avoid hydration mismatch
   useEffect(() => {
     setMounted(true);
-    const savedLang = localStorage.getItem('language');
-    if (savedLang) {
-      setLanguage(savedLang);
-    }
   }, []);
 
-  const handleLanguageChange = (langId: string) => {
+  const handleLanguageChange = (langId: Language) => {
     setLanguage(langId);
-    localStorage.setItem('language', langId);
   };
 
   const [formData, setFormData] = useState({
@@ -176,11 +175,11 @@ export default function SettingsPage() {
   };
 
   const tabs = [
-    { id: 'profile', label: 'Profile', icon: User },
-    { id: 'channels', label: 'Channels', icon: Youtube },
-    { id: 'notifications', label: 'Notifications', icon: Bell },
-    { id: 'appearance', label: 'Appearance', icon: Palette },
-    { id: 'security', label: 'Security', icon: Shield },
+    { id: 'profile', icon: User },
+    { id: 'channels', icon: Youtube },
+    { id: 'notifications', icon: Bell },
+    { id: 'appearance', icon: Palette },
+    { id: 'security', icon: Shield },
   ];
 
   const timezones = [
@@ -236,14 +235,14 @@ export default function SettingsPage() {
       {/* Header */}
       <div className="relative animate-fade-in">
         <div className="flex items-center gap-3 mb-1">
-          <h1 className="text-3xl font-bold">Settings</h1>
+          <h1 className="text-3xl font-bold">{t('header.title')}</h1>
           <GlowingBadge color="purple">
             <Settings className="w-3 h-3 mr-1" />
-            Preferences
+            {tc('nav.settings')}
           </GlowingBadge>
         </div>
         <p className="text-muted-foreground">
-          Manage your account and preferences
+          {t('header.subtitle')}
         </p>
       </div>
 
@@ -266,7 +265,7 @@ export default function SettingsPage() {
                 'w-5 h-5 transition-transform',
                 activeTab === tab.id && 'scale-110'
               )} />
-              {tab.label}
+              {t(`tabs.${tab.id}`)}
               {activeTab === tab.id && (
                 <Check className="w-4 h-4 ml-auto" />
               )}
@@ -280,7 +279,7 @@ export default function SettingsPage() {
             className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-left text-destructive hover:bg-destructive/10 hover:translate-x-1 transition-all"
           >
             <LogOut className="w-5 h-5" />
-            Sign Out
+            {t('security.signOut')}
           </button>
         </nav>
 
@@ -293,7 +292,7 @@ export default function SettingsPage() {
                 <div className="p-2 rounded-xl bg-blue-100 dark:bg-blue-900/30">
                   <User className="w-4 h-4 text-blue-500" />
                 </div>
-                <h2 className="text-lg font-semibold">Profile Information</h2>
+                <h2 className="text-lg font-semibold">{t('profile.title')}</h2>
               </div>
 
               <div className="flex items-center gap-4 p-4 rounded-xl bg-muted/50">
@@ -320,7 +319,7 @@ export default function SettingsPage() {
 
               <div className="grid gap-5">
                 <div>
-                  <label className="block text-sm font-medium mb-2">Display Name</label>
+                  <label className="block text-sm font-medium mb-2">{t('profile.displayName')}</label>
                   <input
                     type="text"
                     value={formData.name}
@@ -330,7 +329,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Email</label>
+                  <label className="block text-sm font-medium mb-2">{t('profile.email')}</label>
                   <input
                     type="email"
                     value={user?.email || ''}
@@ -343,7 +342,7 @@ export default function SettingsPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-2">Timezone</label>
+                  <label className="block text-sm font-medium mb-2">{t('profile.timezone')}</label>
                   <select
                     value={formData.timezone}
                     onChange={(e) => setFormData({ ...formData, timezone: e.target.value })}
@@ -366,9 +365,9 @@ export default function SettingsPage() {
                 {saving ? (
                   <span className="flex items-center gap-2">
                     <RefreshCw className="w-4 h-4 animate-spin" />
-                    Saving...
+                    {t('profile.saving')}
                   </span>
-                ) : 'Save Changes'}
+                ) : t('profile.save')}
               </button>
             </div>
           )}
@@ -381,14 +380,14 @@ export default function SettingsPage() {
                   <div className="p-2 rounded-xl bg-red-100 dark:bg-red-900/30">
                     <Youtube className="w-4 h-4 text-red-500" />
                   </div>
-                  <h2 className="text-lg font-semibold">Connected Channels</h2>
+                  <h2 className="text-lg font-semibold">{t('channels.title')}</h2>
                 </div>
                 <a
                   href="http://localhost:4000/auth/google"
                   className="group flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25 transition-all text-sm"
                 >
                   <Sparkles className="w-4 h-4 group-hover:rotate-12 transition-transform" />
-                  Connect Channel
+                  {t('channels.connect')}
                 </a>
               </div>
 
@@ -397,8 +396,8 @@ export default function SettingsPage() {
                   <div className="w-20 h-20 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4 animate-float">
                     <Youtube className="w-10 h-10 text-red-500" />
                   </div>
-                  <p className="font-medium mb-1">No channels connected</p>
-                  <p className="text-sm">Connect your YouTube channel to get started</p>
+                  <p className="font-medium mb-1">{t('channels.noChannels')}</p>
+                  <p className="text-sm">{t('channels.connectFirst')}</p>
                 </div>
               ) : (
                 <div className="space-y-3 stagger-children">
@@ -426,14 +425,14 @@ export default function SettingsPage() {
                         <div>
                           <p className="font-semibold group-hover:text-primary transition-colors">{channel.title}</p>
                           <p className="text-sm text-muted-foreground">
-                            {channel.subscriberCount.toLocaleString()} subscribers
+                            {channel.subscriberCount.toLocaleString()} {t('channels.subscribers')}
                           </p>
                         </div>
                       </div>
                       <button
                         onClick={() => handleDisconnectChannel(channel.id)}
                         className="p-2.5 text-muted-foreground hover:text-destructive hover:bg-destructive/10 rounded-xl transition-all"
-                        title="Disconnect channel"
+                        title={t('channels.disconnect')}
                       >
                         <Trash2 className="w-5 h-5" />
                       </button>
@@ -452,7 +451,7 @@ export default function SettingsPage() {
                   <div className="p-2 rounded-xl bg-amber-100 dark:bg-amber-900/30">
                     <Bell className="w-4 h-4 text-amber-500" />
                   </div>
-                  <h2 className="text-lg font-semibold">Notification Preferences</h2>
+                  <h2 className="text-lg font-semibold">{t('notifications.title')}</h2>
                 </div>
                 {savingNotifications && (
                   <span className="text-xs text-muted-foreground flex items-center gap-1">
@@ -464,11 +463,11 @@ export default function SettingsPage() {
 
               <div className="space-y-2 stagger-children">
                 {[
-                  { key: 'emailDigest', label: 'Weekly Email Digest', desc: 'Receive a weekly summary of your channel performance', icon: '📊' },
-                  { key: 'uploadComplete', label: 'Upload Complete', desc: 'Get notified when video uploads finish processing', icon: '✅' },
-                  { key: 'newComment', label: 'New Comments', desc: 'Get notified when someone comments on your videos', icon: '💬' },
-                  { key: 'milestones', label: 'Milestone Alerts', desc: 'Celebrate when you reach subscriber or view milestones', icon: '🎉' },
-                  { key: 'aiSuggestions', label: 'AI Suggestions', desc: 'Get notified when the AI has new suggestions for you', icon: '✨' },
+                  { key: 'emailDigest', labelKey: 'emailDigest', descKey: 'emailDigestDesc', icon: '📊' },
+                  { key: 'uploadComplete', labelKey: 'uploadComplete', descKey: 'uploadCompleteDesc', icon: '✅' },
+                  { key: 'newComment', labelKey: 'newComments', descKey: 'newCommentsDesc', icon: '💬' },
+                  { key: 'milestones', labelKey: 'milestones', descKey: 'milestonesDesc', icon: '🎉' },
+                  { key: 'aiSuggestions', labelKey: 'aiSuggestions', descKey: 'aiSuggestionsDesc', icon: '✨' },
                 ].map((item) => (
                   <div
                     key={item.key}
@@ -477,8 +476,8 @@ export default function SettingsPage() {
                     <div className="flex items-start gap-3">
                       <span className="text-xl">{item.icon}</span>
                       <div>
-                        <p className="font-medium group-hover:text-primary transition-colors">{item.label}</p>
-                        <p className="text-sm text-muted-foreground">{item.desc}</p>
+                        <p className="font-medium group-hover:text-primary transition-colors">{t(`notifications.${item.labelKey}`)}</p>
+                        <p className="text-sm text-muted-foreground">{t(`notifications.${item.descKey}`)}</p>
                       </div>
                     </div>
                     <label className="relative inline-flex items-center cursor-pointer">
@@ -498,16 +497,16 @@ export default function SettingsPage() {
 
               {/* Desktop Notifications */}
               <div className="mt-6 pt-6 border-t">
-                <h3 className="font-medium mb-4">Notificaciones de escritorio</h3>
+                <h3 className="font-medium mb-4">{t('notifications.desktopNotifications')}</h3>
                 {mounted && (
                   <p className="text-sm text-muted-foreground mb-4">
-                    Estado: {'Notification' in window
+                    {t('notifications.status')}: {'Notification' in window
                       ? Notification.permission === 'granted'
-                        ? '✅ Activadas'
+                        ? `✅ ${t('notifications.statusEnabled')}`
                         : Notification.permission === 'denied'
-                          ? '❌ Bloqueadas (revisa configuración del navegador)'
-                          : '⏳ Pendiente de activar'
-                      : '❌ No soportadas'}
+                          ? `❌ ${t('notifications.statusBlocked')}`
+                          : `⏳ ${t('notifications.statusPending')}`
+                      : `❌ ${t('notifications.statusNotSupported')}`}
                   </p>
                 )}
                 <div className="flex flex-wrap items-center gap-3">
@@ -517,51 +516,50 @@ export default function SettingsPage() {
                       if (granted) {
                         showToast({
                           type: 'system',
-                          title: 'Permisos activados',
-                          message: 'Recibirás notificaciones de escritorio'
-                        }, true); // true = también mostrar desktop notification
+                          title: t('notifications.permissionsEnabled'),
+                          message: t('notifications.permissionsEnabledDesc')
+                        }, true);
                       } else {
                         showToast({
                           type: 'system',
-                          title: 'Permisos denegados',
-                          message: 'Revisa la configuración de tu navegador'
+                          title: t('notifications.permissionsNotGranted'),
+                          message: t('notifications.permissionsNotGrantedDesc')
                         }, false);
                       }
                     }}
                     className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:bg-primary/90 transition-all"
                   >
-                    Activar notificaciones de escritorio
+                    {t('notifications.enableNotifications')}
                   </button>
                   <button
                     onClick={() => {
-                      const timestamp = new Date().toLocaleTimeString('es-ES');
-                      // Mostrar toast primero, se guardará en la campana cuando termine (4 segundos)
+                      const timestamp = new Date().toLocaleTimeString(i18n.language === 'es' ? 'es-ES' : 'en-US');
                       showToast({
                         type: 'ai_suggestion',
-                        title: 'Sugerencia de IA',
-                        message: `Prueba creada a las ${timestamp} - se guardará en 4s`
-                      }, false); // false = sin notificación de escritorio
+                        title: t('toast.aiSuggestionTitle'),
+                        message: t('toast.testCreatedAt', { time: timestamp })
+                      }, false);
                     }}
                     className="px-4 py-2 bg-muted text-foreground rounded-xl text-sm font-medium hover:bg-muted/80 transition-all"
                   >
-                    Solo Toast (guarda en 4s)
+                    {t('toast.soloToast')}
                   </button>
                   <button
                     onClick={() => {
-                      const timestamp = new Date().toLocaleTimeString('es-ES');
+                      const timestamp = new Date().toLocaleTimeString(i18n.language === 'es' ? 'es-ES' : 'en-US');
                       showToast({
                         type: 'milestone',
-                        title: '¡Nuevo hito alcanzado!',
-                        message: `Prueba creada a las ${timestamp} - se guardará en 4s`
-                      }, true); // true = también muestra notificación de escritorio
+                        title: t('toast.milestoneTitle'),
+                        message: t('toast.testCreatedAt', { time: timestamp })
+                      }, true);
                     }}
                     className="px-4 py-2 bg-green-600 text-white rounded-xl text-sm font-medium hover:bg-green-700 transition-all"
                   >
-                    Toast + Desktop (guarda en 4s)
+                    {t('toast.milestone')}
                   </button>
                 </div>
                 <p className="text-xs text-muted-foreground mt-2">
-                  Las notificaciones de escritorio te avisan incluso cuando no tienes la app abierta
+                  {t('desktopInfo')}
                 </p>
               </div>
             </div>
@@ -574,17 +572,17 @@ export default function SettingsPage() {
                 <div className="p-2 rounded-xl bg-purple-100 dark:bg-purple-900/30">
                   <Palette className="w-4 h-4 text-purple-500" />
                 </div>
-                <h2 className="text-lg font-semibold">Appearance</h2>
+                <h2 className="text-lg font-semibold">{t('appearance.title')}</h2>
               </div>
 
               {/* Theme Section */}
               <div>
-                <label className="block text-sm font-medium mb-4">Theme</label>
+                <label className="block text-sm font-medium mb-4">{t('appearance.theme')}</label>
                 <div className="grid grid-cols-3 gap-4">
                   {[
-                    { id: 'light', label: 'Light', icon: Sun, color: 'from-amber-400 to-orange-500' },
-                    { id: 'dark', label: 'Dark', icon: Moon, color: 'from-indigo-500 to-purple-600' },
-                    { id: 'system', label: 'System', icon: Monitor, color: 'from-gray-400 to-gray-600' },
+                    { id: 'light', labelKey: 'light', icon: Sun, color: 'from-amber-400 to-orange-500' },
+                    { id: 'dark', labelKey: 'dark', icon: Moon, color: 'from-indigo-500 to-purple-600' },
+                    { id: 'system', labelKey: 'system', icon: Monitor, color: 'from-gray-400 to-gray-600' },
                   ].map((themeOption) => (
                     <button
                       key={themeOption.id}
@@ -602,7 +600,7 @@ export default function SettingsPage() {
                       )}>
                         <themeOption.icon className="w-6 h-6 text-white" />
                       </div>
-                      <span className="font-medium">{themeOption.label}</span>
+                      <span className="font-medium">{t(`appearance.${themeOption.labelKey}`)}</span>
                       {mounted && theme === themeOption.id && (
                         <Check className="w-5 h-5 text-primary" />
                       )}
@@ -620,13 +618,13 @@ export default function SettingsPage() {
               <div>
                 <label className="text-sm font-medium mb-4 flex items-center gap-2">
                   <Globe className="w-4 h-4" />
-                  Language
+                  {t('appearance.language')}
                 </label>
                 <div className="grid grid-cols-2 gap-4">
                   {languages.map((lang) => (
                     <button
                       key={lang.id}
-                      onClick={() => handleLanguageChange(lang.id)}
+                      onClick={() => handleLanguageChange(lang.id as Language)}
                       className={cn(
                         'group p-5 rounded-2xl border-2 transition-all duration-300 text-center flex items-center justify-center gap-4 hover:scale-105',
                         mounted && language === lang.id
@@ -644,7 +642,7 @@ export default function SettingsPage() {
                 </div>
                 {mounted && (
                   <p className="text-sm text-muted-foreground mt-4">
-                    {language === 'en' ? 'Current language: English' : 'Idioma actual: Español'}
+                    {t('appearance.currentLanguage')}: {language === 'en' ? 'English' : 'Español'}
                   </p>
                 )}
               </div>
@@ -658,7 +656,7 @@ export default function SettingsPage() {
                 <div className="p-2 rounded-xl bg-green-100 dark:bg-green-900/30">
                   <Shield className="w-4 h-4 text-green-500" />
                 </div>
-                <h2 className="text-lg font-semibold">Security</h2>
+                <h2 className="text-lg font-semibold">{t('security.title')}</h2>
               </div>
 
               <div className="space-y-4">
@@ -668,9 +666,9 @@ export default function SettingsPage() {
                       <Check className="w-5 h-5 text-green-500" />
                     </div>
                     <div>
-                      <h3 className="font-semibold">Connected Services</h3>
+                      <h3 className="font-semibold">{t('security.connectedServices')}</h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        You signed in with Google. Your password is managed by Google.
+                        {t('security.googleSignIn')}
                       </p>
                     </div>
                   </div>
@@ -682,12 +680,12 @@ export default function SettingsPage() {
                       <Trash2 className="w-5 h-5 text-red-500" />
                     </div>
                     <div className="flex-1">
-                      <h3 className="font-semibold text-destructive">Danger Zone</h3>
+                      <h3 className="font-semibold text-destructive">{t('security.dangerZone')}</h3>
                       <p className="text-sm text-muted-foreground mt-1">
-                        Permanently delete your account and all associated data. This action cannot be undone.
+                        {t('security.deleteAccountDesc')}
                       </p>
                       <button className="mt-4 px-5 py-2.5 bg-destructive text-destructive-foreground rounded-xl font-medium hover:bg-destructive/90 hover:shadow-lg hover:shadow-destructive/25 transition-all">
-                        Delete Account
+                        {t('security.deleteAccount')}
                       </button>
                     </div>
                   </div>

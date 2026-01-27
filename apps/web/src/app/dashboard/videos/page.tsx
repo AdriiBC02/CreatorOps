@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { Plus, Search, RefreshCw, Play, Edit, Download, Copy, ExternalLink, X, ChevronUp, ChevronDown, Calendar, Sparkles, BarChart3, Lightbulb, Target, Users, TrendingUp } from 'lucide-react';
 import { Skeleton, SkeletonTable } from '@/components/ui/skeleton';
 import Link from 'next/link';
@@ -39,6 +40,7 @@ const statusColors: Record<string, string> = {
 };
 
 export default function VideosPage() {
+  const { t } = useTranslation('videos');
   const [videos, setVideos] = useState<Video[]>([]);
   const [channel, setChannel] = useState<Channel | null>(null);
   const [loading, setLoading] = useState(true);
@@ -132,12 +134,12 @@ export default function VideosPage() {
       if (res.ok) {
         await fetchData();
         const now = new Date().toLocaleTimeString();
-        setSyncMessage(`Videos updated at ${now}`);
+        setSyncMessage(t('sync.updatedAt', { time: now }));
         setTimeout(() => setSyncMessage(null), 5000);
       }
     } catch (err) {
       console.error('Failed to sync:', err);
-      setSyncMessage('Sync failed. Please try again.');
+      setSyncMessage(t('sync.error'));
     } finally {
       setSyncing(false);
     }
@@ -171,7 +173,7 @@ export default function VideosPage() {
   };
 
   const exportToCSV = () => {
-    const headers = ['Title', 'Status', 'Views', 'Likes', 'Comments', 'Duration', 'Published'];
+    const headers = [t('table.title'), t('table.status'), t('table.views'), t('table.likes'), t('table.comments'), t('table.duration'), t('table.published')];
     const rows = videos.map((video) => [
       video.title,
       video.privacyStatus,
@@ -284,7 +286,7 @@ export default function VideosPage() {
       <div className="space-y-6 animate-fade-in">
         <div className="flex items-center justify-between">
           <div>
-            <h1 className="text-3xl font-bold">Videos</h1>
+            <h1 className="text-3xl font-bold">{t('header.title')}</h1>
             <Skeleton className="h-4 w-48 mt-2" />
           </div>
           <div className="flex gap-2">
@@ -319,22 +321,22 @@ export default function VideosPage() {
       {copied && (
         <div className="fixed top-4 right-4 flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 rounded-xl shadow-lg z-50 animate-slide-in-right">
           <TrendingUp className="w-4 h-4" />
-          Copied to clipboard!
+          {t('actions.urlCopied')}
         </div>
       )}
 
       {/* Header */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="text-3xl font-bold">Videos</h1>
+          <h1 className="text-3xl font-bold">{t('header.title')}</h1>
           <p className="text-muted-foreground mt-1">
-            Manage your YouTube videos
+            {t('header.subtitle')}
             {channel?.lastSyncedAt && (
               <span className="ml-2 text-xs">
-                · Last synced: {new Date(channel.lastSyncedAt).toLocaleString()}
+                · {t('header.lastSynced')}: {new Date(channel.lastSyncedAt).toLocaleString()}
               </span>
             )}
-            <span className="hidden sm:inline"> · Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">⌘S</kbd> to sync</span>
+            <span className="hidden sm:inline"> · <span dangerouslySetInnerHTML={{ __html: t('header.pressToSync') }} /></span>
           </p>
         </div>
         <div className="flex gap-2">
@@ -342,7 +344,7 @@ export default function VideosPage() {
             onClick={exportToCSV}
             disabled={videos.length === 0}
             className="btn-secondary px-3 py-2"
-            title="Export to CSV"
+            title={t('actions.exportCSV')}
           >
             <Download className="w-4 h-4" />
           </button>
@@ -352,14 +354,14 @@ export default function VideosPage() {
             className="btn-secondary px-4 py-2"
           >
             <RefreshCw className={cn('w-4 h-4', syncing && 'animate-spin')} />
-            <span className="hidden sm:inline">{syncing ? 'Syncing...' : 'Sync'}</span>
+            <span className="hidden sm:inline">{syncing ? t('sync.syncing') : t('sync.button')}</span>
           </button>
           <Link
             href="/dashboard/videos/upload"
             className="btn-primary px-4 py-2 shadow-lg shadow-primary/25"
           >
             <Plus size={20} />
-            <span className="hidden sm:inline">Upload Video</span>
+            <span className="hidden sm:inline">{t('actions.uploadVideo')}</span>
           </Link>
         </div>
       </div>
@@ -381,7 +383,7 @@ export default function VideosPage() {
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <input
               type="text"
-              placeholder="Search videos..."
+              placeholder={t('filters.search')}
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               className="w-full pl-10 pr-10 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
@@ -406,7 +408,7 @@ export default function VideosPage() {
               )}
             >
               <Calendar className="w-4 h-4" />
-              Date
+              {t('filters.date')}
               {(dateFrom || dateTo) && <span className="text-xs">*</span>}
             </button>
             {(['all', 'public', 'private', 'unlisted'] as const).map((status) => (
@@ -414,13 +416,13 @@ export default function VideosPage() {
                 key={status}
                 onClick={() => setFilter(status as VideoFilter)}
                 className={cn(
-                  'px-4 py-2 rounded-lg text-sm font-medium capitalize transition-colors',
+                  'px-4 py-2 rounded-lg text-sm font-medium transition-colors',
                   filter === status
                     ? 'bg-primary text-primary-foreground'
                     : 'bg-secondary text-secondary-foreground hover:bg-secondary/80'
                 )}
               >
-                {status}
+                {t(`filters.${status}`)}
                 {status !== 'all' && (
                   <span className="ml-1 text-xs opacity-70">
                     ({videos.filter((v) => v.privacyStatus === status).length})
@@ -435,7 +437,7 @@ export default function VideosPage() {
         {showDateFilter && (
           <div className="flex flex-wrap items-center gap-4 p-4 bg-muted/30 rounded-lg">
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">From:</label>
+              <label className="text-sm font-medium">{t('filters.dateFrom')}:</label>
               <input
                 type="date"
                 value={dateFrom}
@@ -444,7 +446,7 @@ export default function VideosPage() {
               />
             </div>
             <div className="flex items-center gap-2">
-              <label className="text-sm font-medium">To:</label>
+              <label className="text-sm font-medium">{t('filters.dateTo')}:</label>
               <input
                 type="date"
                 value={dateTo}
@@ -460,7 +462,7 @@ export default function VideosPage() {
                 }}
                 className="px-3 py-2 text-sm text-muted-foreground hover:text-foreground"
               >
-                Clear dates
+                {t('filters.clearDates')}
               </button>
             )}
           </div>
@@ -471,14 +473,14 @@ export default function VideosPage() {
       {videos.length === 0 ? (
         <div className="border rounded-lg p-12 text-center">
           <Play className="w-12 h-12 mx-auto mb-4 text-muted-foreground" />
-          <h3 className="text-lg font-medium mb-2">No videos yet</h3>
-          <p className="text-muted-foreground mb-4">Sync your videos from YouTube or upload a new one</p>
+          <h3 className="text-lg font-medium mb-2">{t('empty.noVideos')}</h3>
+          <p className="text-muted-foreground mb-4">{t('empty.noVideosDesc')}</p>
           <button
             onClick={syncVideos}
             disabled={syncing}
             className="px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium"
           >
-            {syncing ? 'Syncing...' : 'Sync from YouTube'}
+            {syncing ? t('sync.syncing') : t('sync.syncFromYouTube')}
           </button>
         </div>
       ) : (
@@ -488,30 +490,30 @@ export default function VideosPage() {
               <tr>
                 <th className="text-left p-4 font-medium">
                   <button onClick={() => handleSort('title')} className="hover:text-primary">
-                    Video
+                    {t('table.video')}
                     <SortIcon field="title" />
                   </button>
                 </th>
-                <th className="text-left p-4 font-medium hidden md:table-cell">Status</th>
+                <th className="text-left p-4 font-medium hidden md:table-cell">{t('table.status')}</th>
                 <th className="text-left p-4 font-medium hidden lg:table-cell">
                   <button onClick={() => handleSort('viewCount')} className="hover:text-primary">
-                    Views
+                    {t('table.views')}
                     <SortIcon field="viewCount" />
                   </button>
                 </th>
                 <th className="text-left p-4 font-medium hidden lg:table-cell">
                   <button onClick={() => handleSort('likeCount')} className="hover:text-primary">
-                    Likes
+                    {t('table.likes')}
                     <SortIcon field="likeCount" />
                   </button>
                 </th>
                 <th className="text-left p-4 font-medium hidden md:table-cell">
                   <button onClick={() => handleSort('publishedAt')} className="hover:text-primary">
-                    Date
+                    {t('table.date')}
                     <SortIcon field="publishedAt" />
                   </button>
                 </th>
-                <th className="text-right p-4 font-medium">Actions</th>
+                <th className="text-right p-4 font-medium">{t('table.actions')}</th>
               </tr>
             </thead>
             <tbody className="divide-y">
@@ -524,7 +526,7 @@ export default function VideosPage() {
                           <button
                             onClick={() => setPreviewVideo(video)}
                             className="block hover:opacity-80 transition-opacity"
-                            title="Click to enlarge"
+                            title={t('actions.clickToEnlarge')}
                           >
                             <img
                               src={video.thumbnailUrl}
@@ -567,7 +569,7 @@ export default function VideosPage() {
                       <button
                         onClick={() => analyzeVideoWithAI(video)}
                         className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg text-purple-500"
-                        title="Analyze with AI"
+                        title={t('actions.analyze')}
                       >
                         <Sparkles className="w-4 h-4" />
                       </button>
@@ -575,7 +577,7 @@ export default function VideosPage() {
                         <button
                           onClick={() => copyToClipboard(`https://youtube.com/watch?v=${video.youtubeVideoId}`)}
                           className="p-2 hover:bg-muted rounded-lg"
-                          title="Copy video URL"
+                          title={t('actions.copyUrl')}
                         >
                           <Copy className="w-4 h-4" />
                         </button>
@@ -587,7 +589,7 @@ export default function VideosPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-2 hover:bg-muted rounded-lg"
-                            title="Watch on YouTube"
+                            title={t('actions.openInYoutube')}
                           >
                             <Play className="w-4 h-4" />
                           </a>
@@ -596,13 +598,13 @@ export default function VideosPage() {
                             target="_blank"
                             rel="noopener noreferrer"
                             className="p-2 hover:bg-muted rounded-lg"
-                            title="Edit in YouTube Studio"
+                            title={t('actions.openInStudio')}
                           >
                             <ExternalLink className="w-4 h-4" />
                           </a>
                         </>
                       )}
-                      <button className="p-2 hover:bg-muted rounded-lg" title="Edit metadata">
+                      <button className="p-2 hover:bg-muted rounded-lg" title={t('actions.editMetadata')}>
                         <Edit className="w-4 h-4" />
                       </button>
                     </div>
@@ -613,7 +615,7 @@ export default function VideosPage() {
           </table>
 
           {filteredAndSortedVideos.length === 0 && (
-            <div className="p-12 text-center text-muted-foreground">No videos match your search</div>
+            <div className="p-12 text-center text-muted-foreground">{t('empty.noResults')}</div>
           )}
         </div>
       )}
@@ -626,28 +628,28 @@ export default function VideosPage() {
               <Play className="w-5 h-5 text-blue-500" />
             </div>
             <p className="text-2xl font-bold">{videos.length}</p>
-            <p className="text-sm text-muted-foreground">Total Videos</p>
+            <p className="text-sm text-muted-foreground">{t('stats.totalVideos')}</p>
           </div>
           <div className="text-center p-3 rounded-xl hover:bg-background/50 transition-colors">
             <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
               <BarChart3 className="w-5 h-5 text-green-500" />
             </div>
             <p className="text-2xl font-bold">{formatNumber(videos.reduce((acc, v) => acc + v.viewCount, 0))}</p>
-            <p className="text-sm text-muted-foreground">Total Views</p>
+            <p className="text-sm text-muted-foreground">{t('stats.totalViews')}</p>
           </div>
           <div className="text-center p-3 rounded-xl hover:bg-background/50 transition-colors">
             <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
               <Target className="w-5 h-5 text-red-500" />
             </div>
             <p className="text-2xl font-bold">{formatNumber(videos.reduce((acc, v) => acc + v.likeCount, 0))}</p>
-            <p className="text-sm text-muted-foreground">Total Likes</p>
+            <p className="text-sm text-muted-foreground">{t('stats.totalLikes')}</p>
           </div>
           <div className="text-center p-3 rounded-xl hover:bg-background/50 transition-colors">
             <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
               <Users className="w-5 h-5 text-purple-500" />
             </div>
             <p className="text-2xl font-bold">{formatNumber(videos.reduce((acc, v) => acc + v.commentCount, 0))}</p>
-            <p className="text-sm text-muted-foreground">Total Comments</p>
+            <p className="text-sm text-muted-foreground">{t('stats.totalComments')}</p>
           </div>
         </div>
       )}
@@ -683,7 +685,7 @@ export default function VideosPage() {
             <div className="mt-4 text-white">
               <h3 className="text-lg font-semibold">{previewVideo.title}</h3>
               <p className="text-sm text-gray-300 mt-1">
-                {formatNumber(previewVideo.viewCount)} views · {formatNumber(previewVideo.likeCount)} likes
+                {formatNumber(previewVideo.viewCount)} {t('preview.views')} · {formatNumber(previewVideo.likeCount)} {t('preview.likes')}
                 {previewVideo.publishedAt && ` · ${new Date(previewVideo.publishedAt).toLocaleDateString()}`}
               </p>
             </div>
@@ -698,7 +700,7 @@ export default function VideosPage() {
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center gap-2">
                 <Sparkles className="w-5 h-5 text-purple-500" />
-                <h3 className="text-lg font-semibold">AI Video Analysis</h3>
+                <h3 className="text-lg font-semibold">{t('analysis.aiAnalysis')}</h3>
               </div>
               <button
                 onClick={() => {
@@ -726,11 +728,11 @@ export default function VideosPage() {
                 <div className="flex items-center gap-4 mt-2 text-sm text-muted-foreground">
                   <span className="flex items-center gap-1">
                     <BarChart3 className="w-4 h-4" />
-                    {formatNumber(analyzingVideo.viewCount)} views
+                    {formatNumber(analyzingVideo.viewCount)} {t('preview.views')}
                   </span>
                   <span className="flex items-center gap-1">
                     <Users className="w-4 h-4" />
-                    {formatNumber(analyzingVideo.likeCount)} likes
+                    {formatNumber(analyzingVideo.likeCount)} {t('preview.likes')}
                   </span>
                 </div>
               </div>
@@ -739,7 +741,7 @@ export default function VideosPage() {
             {aiLoading ? (
               <div className="flex flex-col items-center justify-center py-12">
                 <RefreshCw className="w-8 h-8 animate-spin text-purple-500 mb-4" />
-                <p className="text-muted-foreground">Analyzing video performance...</p>
+                <p className="text-muted-foreground">{t('analysis.analyzing')}</p>
               </div>
             ) : aiAnalysis ? (
               <div className="space-y-4">
@@ -747,7 +749,7 @@ export default function VideosPage() {
                 {typeof aiAnalysis.analysis === 'object' && aiAnalysis.analysis?.titleScore !== undefined && (
                   <div className="p-3 bg-muted/30 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-medium">Title Score</h4>
+                      <h4 className="font-medium">{t('analysis.titleScore')}</h4>
                       <span className={cn(
                         'px-2 py-1 rounded text-sm font-bold',
                         (aiAnalysis.analysis.titleScore ?? 0) >= 8 ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' :
@@ -768,7 +770,7 @@ export default function VideosPage() {
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <Target className="w-4 h-4 text-purple-500" />
-                      <h4 className="font-medium">Performance Insights</h4>
+                      <h4 className="font-medium">{t('analysis.performanceInsights')}</h4>
                     </div>
                     <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                       {aiAnalysis.analysis.performanceInsights}
@@ -781,7 +783,7 @@ export default function VideosPage() {
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <Target className="w-4 h-4 text-purple-500" />
-                      <h4 className="font-medium">Analysis</h4>
+                      <h4 className="font-medium">{t('analysis.aiAnalysis')}</h4>
                     </div>
                     <p className="text-sm text-muted-foreground whitespace-pre-wrap">
                       {aiAnalysis.analysis}
@@ -794,7 +796,7 @@ export default function VideosPage() {
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <Lightbulb className="w-4 h-4 text-yellow-500" />
-                      <h4 className="font-medium">Suggestions</h4>
+                      <h4 className="font-medium">{t('analysis.suggestions')}</h4>
                     </div>
                     <ul className="space-y-2">
                       {aiAnalysis.suggestions.map((suggestion, index) => (
@@ -815,7 +817,7 @@ export default function VideosPage() {
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <Lightbulb className="w-4 h-4 text-yellow-500" />
-                      <h4 className="font-medium">Recommendations</h4>
+                      <h4 className="font-medium">{t('analysis.recommendations')}</h4>
                     </div>
                     <ul className="space-y-2">
                       {aiAnalysis.analysis.suggestions.map((suggestion: string, index: number) => (
@@ -834,7 +836,7 @@ export default function VideosPage() {
             ) : (
               <div className="text-center py-12 text-muted-foreground">
                 <Sparkles className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>Analysis failed. Please try again.</p>
+                <p>{t('analysis.analysisFailed')}</p>
               </div>
             )}
 
@@ -846,7 +848,7 @@ export default function VideosPage() {
                 }}
                 className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg"
               >
-                Close
+                {t('analysis.close')}
               </button>
               <button
                 onClick={() => analyzeVideoWithAI(analyzingVideo)}
@@ -854,7 +856,7 @@ export default function VideosPage() {
                 className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:opacity-90 disabled:opacity-50"
               >
                 <RefreshCw className={cn('w-4 h-4', aiLoading && 'animate-spin')} />
-                Reanalyze
+                {t('analysis.reanalyze')}
               </button>
             </div>
           </div>

@@ -5,6 +5,7 @@ import { Bot, X, Send, Sparkles, Calendar, Lightbulb, Minimize2, Check } from 'l
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { emitCalendarUpdate, emitIdeasUpdate } from '@/lib/events';
+import { useTranslation } from 'react-i18next';
 
 interface SmartIdea {
   title: string;
@@ -49,6 +50,7 @@ interface AIWidgetProps {
 }
 
 export function AIWidget({ channelId }: AIWidgetProps) {
+  const { t, i18n } = useTranslation('assistant');
   const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -410,7 +412,7 @@ export function AIWidget({ channelId }: AIWidgetProps) {
         {
           id: (Date.now() + 1).toString(),
           role: 'assistant',
-          content: 'Error de conexión. Inténtalo de nuevo.',
+          content: t('widget.connectionError'),
         },
       ]);
     } finally {
@@ -419,12 +421,13 @@ export function AIWidget({ channelId }: AIWidgetProps) {
   };
 
   const quickPrompts = [
-    { icon: Calendar, label: 'Ver calendario', prompt: 'Qué tengo programado en el calendario?' },
-    { icon: Lightbulb, label: 'Ver ideas', prompt: 'Muéstrame mis ideas de contenido' },
+    { icon: Calendar, label: t('widget.viewCalendar'), prompt: t('widget.viewCalendarPrompt') },
+    { icon: Lightbulb, label: t('widget.viewIdeas'), prompt: t('widget.viewIdeasPrompt') },
   ];
 
   const formatDate = (dateStr: string) => {
-    return new Date(dateStr).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+    const locale = i18n.language === 'es' ? 'es-ES' : 'en-US';
+    return new Date(dateStr).toLocaleDateString(locale, { day: 'numeric', month: 'short' });
   };
 
   if (!isOpen) {
@@ -432,7 +435,7 @@ export function AIWidget({ channelId }: AIWidgetProps) {
       <button
         onClick={() => setIsOpen(true)}
         className="fixed bottom-6 right-6 w-14 h-14 bg-primary text-primary-foreground rounded-full shadow-lg hover:bg-primary/90 transition-all hover:scale-105 flex items-center justify-center z-50"
-        title="Abrir AI Assistant"
+        title={t('widget.openButton')}
       >
         <Sparkles className="w-6 h-6" />
       </button>
@@ -445,13 +448,13 @@ export function AIWidget({ channelId }: AIWidgetProps) {
       <div className="flex items-center justify-between p-3 border-b bg-muted/30 rounded-t-lg">
         <div className="flex items-center gap-2">
           <Bot className="w-5 h-5 text-primary" />
-          <span className="font-medium">AI Assistant</span>
+          <span className="font-medium">{t('widget.title')}</span>
         </div>
         <div className="flex items-center gap-1">
           <Link
             href="/dashboard/assistant"
             className="p-1.5 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
-            title="Abrir asistente completo"
+            title={t('widget.openFull')}
           >
             <Minimize2 className="w-4 h-4" />
           </Link>
@@ -470,7 +473,7 @@ export function AIWidget({ channelId }: AIWidgetProps) {
           <div className="text-center py-6">
             <Bot className="w-12 h-12 mx-auto mb-3 text-muted-foreground" />
             <p className="text-sm text-muted-foreground mb-4">
-              ¿En qué puedo ayudarte?
+              {t('widget.emptyMessage')}
             </p>
             <div className="space-y-2">
               {quickPrompts.map((qp, i) => (
@@ -499,7 +502,7 @@ export function AIWidget({ channelId }: AIWidgetProps) {
                 {msg.content}
                 {msg.action && msg.actionExecuted && (
                   <div className="flex items-center gap-1 mt-1 text-xs text-green-600 dark:text-green-400">
-                    <Check className="w-3 h-3" /> Completado
+                    <Check className="w-3 h-3" /> {t('widget.completed')}
                   </div>
                 )}
               </div>
@@ -515,7 +518,7 @@ export function AIWidget({ channelId }: AIWidgetProps) {
                     ))
                   ) : (
                     <div className="text-xs p-2 bg-muted/50 rounded text-muted-foreground">
-                      No hay eventos próximos
+                      {t('messages.noUpcomingEvents')}
                     </div>
                   )}
                 </div>
@@ -531,7 +534,7 @@ export function AIWidget({ channelId }: AIWidgetProps) {
                     ))
                   ) : (
                     <div className="text-xs p-2 bg-muted/50 rounded text-muted-foreground">
-                      No tienes ideas guardadas
+                      {t('messages.noSavedIdeas')}
                     </div>
                   )}
                 </div>
@@ -576,14 +579,14 @@ export function AIWidget({ channelId }: AIWidgetProps) {
                                   ? 'bg-blue-500 text-white'
                                   : 'bg-muted hover:bg-blue-100 dark:hover:bg-blue-900/30'
                               )}
-                              title={idea.accepted ? 'Deseleccionar' : 'Seleccionar'}
+                              title={idea.accepted ? t('smartIdeas.deselect') : t('smartIdeas.select')}
                             >
                               <Check className="w-3 h-3" />
                             </button>
                             <button
                               onClick={() => rejectIdea(msg.id, idx)}
                               className="p-1 rounded bg-muted hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-600"
-                              title="Descartar"
+                              title={t('smartIdeas.discard')}
                             >
                               <X className="w-3 h-3" />
                             </button>
@@ -598,14 +601,14 @@ export function AIWidget({ channelId }: AIWidgetProps) {
                         onClick={() => acceptAllIdeas(msg.id)}
                         className="flex-1 text-xs py-1.5 px-2 bg-muted hover:bg-muted/80 rounded"
                       >
-                        Seleccionar todas
+                        {t('smartIdeas.selectAll')}
                       </button>
                       <button
                         onClick={() => createAcceptedIdeas(msg.id)}
                         disabled={!msg.pendingIdeas.some(i => i.accepted && !i.created)}
                         className="flex-1 text-xs py-1.5 px-2 bg-primary text-primary-foreground rounded hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed"
                       >
-                        Crear seleccionadas
+                        {t('smartIdeas.createSelected')}
                       </button>
                     </div>
                   )}
@@ -635,7 +638,7 @@ export function AIWidget({ channelId }: AIWidgetProps) {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && sendMessage()}
-            placeholder="Escribe algo..."
+            placeholder={t('widget.placeholder')}
             className="flex-1 px-3 py-2 text-sm border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
             disabled={loading}
           />

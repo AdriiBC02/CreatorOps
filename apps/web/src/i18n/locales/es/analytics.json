@@ -1,0 +1,79 @@
+{
+  "header": {
+    "title": "Analíticas",
+    "subtitle": "Datos reales de tu canal de YouTube",
+    "liveData": "Datos en vivo"
+  },
+  "stats": {
+    "totalViews": "Vistas Totales del Canal",
+    "totalViewsDesc": "Vistas totales de tu canal",
+    "subscribers": "Suscriptores",
+    "subscribersDesc": "Suscriptores actuales",
+    "totalVideos": "Total de Videos",
+    "totalVideosDesc": "Videos en tu canal",
+    "totalLikes": "Me Gusta Totales",
+    "totalLikesDesc": "En todos los videos sincronizados",
+    "avgViews": "Vistas Promedio por Video",
+    "avgLikes": "Me Gusta Promedio por Video",
+    "avgComments": "Comentarios Promedio por Video",
+    "engagementRate": "Tasa de Engagement"
+  },
+  "sections": {
+    "overview": "Resumen",
+    "performance": "Rendimiento",
+    "engagement": "Engagement",
+    "topVideos": "Videos con Mejor Rendimiento",
+    "growth": "Crecimiento"
+  },
+  "engagement": {
+    "title": "Engagement",
+    "rate": "Tasa",
+    "likesRate": "Tasa de Me Gusta"
+  },
+  "videoStats": {
+    "syncedVideos": "Videos Sincronizados",
+    "avgViewsPerVideo": "Vistas Prom./Video",
+    "totalComments": "Comentarios Totales",
+    "totalSyncedViews": "Vistas Sincronizadas Totales",
+    "fromVideos": "de {{count}} videos sincronizados"
+  },
+  "chart": {
+    "views": "Vistas",
+    "likes": "Me Gusta",
+    "comments": "Comentarios",
+    "subscribers": "Suscriptores"
+  },
+  "period": {
+    "7days": "Últimos 7 días",
+    "30days": "Últimos 30 días",
+    "90days": "Últimos 90 días",
+    "year": "Este año",
+    "allTime": "Todo el tiempo"
+  },
+  "comparison": {
+    "vsLastPeriod": "vs período anterior",
+    "increase": "aumento",
+    "decrease": "disminución",
+    "noChange": "sin cambios"
+  },
+  "empty": {
+    "noChannel": "No hay canal conectado",
+    "noChannelDesc": "Conecta tu canal de YouTube para ver tus analíticas.",
+    "noVideos": "No hay videos sincronizados aún",
+    "noVideosDesc": "Ve a Videos y haz clic en \"Sincronizar desde YouTube\" para importar tus videos."
+  },
+  "topVideos": {
+    "title": "Videos con Mejor Rendimiento",
+    "topByViews": "Top {{count}} por vistas",
+    "views": "vistas",
+    "notPublished": "No publicado"
+  },
+  "about": {
+    "title": "Acerca de las Analíticas",
+    "description": "Esta página muestra datos reales de tu canal de YouTube. Las analíticas históricas y gráficos requieren integración con la API de YouTube Analytics, que proporciona métricas detalladas a lo largo del tiempo."
+  },
+  "refresh": {
+    "button": "Actualizar datos",
+    "lastUpdated": "Última actualización"
+  }
+}

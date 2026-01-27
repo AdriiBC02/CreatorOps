@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useTranslation } from 'react-i18next';
 import { RefreshCw, Eye, Users, Video, ThumbsUp, Play, TrendingUp, MessageCircle, BarChart3, Sparkles, ExternalLink } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { FloatingShapes, GlowingBadge } from '@/components/ui/decorative';
@@ -28,6 +29,8 @@ interface VideoData {
 }
 
 export default function AnalyticsPage() {
+  const { t } = useTranslation('analytics');
+  const { t: tc } = useTranslation('common');
   const [channel, setChannel] = useState<Channel | null>(null);
   const [videos, setVideos] = useState<VideoData[]>([]);
   const [loading, setLoading] = useState(true);
@@ -120,9 +123,9 @@ export default function AnalyticsPage() {
         <div className="w-20 h-20 rounded-2xl bg-muted flex items-center justify-center mb-6 animate-float">
           <BarChart3 className="w-10 h-10 text-muted-foreground" />
         </div>
-        <h3 className="text-xl font-semibold mb-2">No Channel Connected</h3>
+        <h3 className="text-xl font-semibold mb-2">{t('empty.noChannel')}</h3>
         <p className="text-muted-foreground max-w-md">
-          Connect your YouTube channel to see your analytics.
+          {t('empty.noChannelDesc')}
         </p>
       </div>
     );
@@ -130,37 +133,37 @@ export default function AnalyticsPage() {
 
   const stats = [
     {
-      name: 'Total Channel Views',
+      name: t('stats.totalViews'),
       value: channel.viewCount,
       icon: Eye,
-      description: 'Lifetime views on your channel',
+      description: t('stats.totalViewsDesc'),
       color: 'from-blue-500 to-cyan-500',
       bgColor: 'bg-blue-100 dark:bg-blue-900/30',
       iconColor: 'text-blue-500',
     },
     {
-      name: 'Subscribers',
+      name: t('stats.subscribers'),
       value: channel.subscriberCount,
       icon: Users,
-      description: 'Current subscriber count',
+      description: t('stats.subscribersDesc'),
       color: 'from-purple-500 to-pink-500',
       bgColor: 'bg-purple-100 dark:bg-purple-900/30',
       iconColor: 'text-purple-500',
     },
     {
-      name: 'Total Videos',
+      name: t('stats.totalVideos'),
       value: channel.videoCount,
       icon: Video,
-      description: 'Videos on your channel',
+      description: t('stats.totalVideosDesc'),
       color: 'from-green-500 to-emerald-500',
       bgColor: 'bg-green-100 dark:bg-green-900/30',
       iconColor: 'text-green-500',
     },
     {
-      name: 'Total Likes',
+      name: t('stats.totalLikes'),
       value: totalLikes,
       icon: ThumbsUp,
-      description: 'Across all synced videos',
+      description: t('stats.totalLikesDesc'),
       color: 'from-red-500 to-rose-500',
       bgColor: 'bg-red-100 dark:bg-red-900/30',
       iconColor: 'text-red-500',
@@ -176,20 +179,20 @@ export default function AnalyticsPage() {
       <div className="relative flex items-center justify-between animate-fade-in">
         <div>
           <div className="flex items-center gap-3 mb-1">
-            <h1 className="text-3xl font-bold">Analytics</h1>
+            <h1 className="text-3xl font-bold">{t('header.title')}</h1>
             <GlowingBadge color="primary">
               <BarChart3 className="w-3 h-3 mr-1" />
-              Live Data
+              {t('header.liveData')}
             </GlowingBadge>
           </div>
           <p className="text-muted-foreground">
-            Real data from your YouTube channel
+            {t('header.subtitle')}
           </p>
         </div>
         <button
           onClick={fetchData}
           className="p-2.5 rounded-xl border bg-card hover:bg-muted hover:rotate-180 transition-all duration-500"
-          title="Refresh data"
+          title={t('refresh.button')}
         >
           <RefreshCw className="w-5 h-5" />
         </button>
@@ -242,7 +245,7 @@ export default function AnalyticsPage() {
               <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
                 <Sparkles className="w-4 h-4 text-purple-500" />
               </div>
-              <h3 className="font-semibold">Engagement</h3>
+              <h3 className="font-semibold">{t('engagement.title')}</h3>
             </div>
 
             <div className="flex flex-col items-center">
@@ -255,14 +258,14 @@ export default function AnalyticsPage() {
               >
                 <div className="text-center">
                   <p className="text-3xl font-bold text-purple-500">{engagementRate}%</p>
-                  <p className="text-xs text-muted-foreground">Rate</p>
+                  <p className="text-xs text-muted-foreground">{t('engagement.rate')}</p>
                 </div>
               </ProgressRing>
 
               <div className="w-full mt-6 space-y-4">
                 <div>
                   <div className="flex items-center justify-between text-sm mb-1">
-                    <span className="text-muted-foreground">Likes Rate</span>
+                    <span className="text-muted-foreground">{t('engagement.likesRate')}</span>
                     <span className="font-medium">{engagementRate}%</span>
                   </div>
                   <MiniProgress value={parseFloat(engagementRate) * 10} color="bg-purple-500" />
@@ -277,7 +280,7 @@ export default function AnalyticsPage() {
               <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30 group-hover:scale-110 transition-transform">
                 <Video className="w-4 h-4 text-indigo-500" />
               </div>
-              <span className="text-sm text-muted-foreground">Synced Videos</span>
+              <span className="text-sm text-muted-foreground">{t('videoStats.syncedVideos')}</span>
             </div>
             <p className="text-3xl font-bold tabular-nums">
               <AnimatedCounter value={videos.length} />
@@ -289,7 +292,7 @@ export default function AnalyticsPage() {
               <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30 group-hover:scale-110 transition-transform">
                 <Eye className="w-4 h-4 text-amber-500" />
               </div>
-              <span className="text-sm text-muted-foreground">Avg. Views/Video</span>
+              <span className="text-sm text-muted-foreground">{t('videoStats.avgViewsPerVideo')}</span>
             </div>
             <p className="text-3xl font-bold tabular-nums">
               <AnimatedCounter value={avgViewsPerVideo} formatter={formatNumber} />
@@ -301,7 +304,7 @@ export default function AnalyticsPage() {
               <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 group-hover:scale-110 transition-transform">
                 <MessageCircle className="w-4 h-4 text-green-500" />
               </div>
-              <span className="text-sm text-muted-foreground">Total Comments</span>
+              <span className="text-sm text-muted-foreground">{t('videoStats.totalComments')}</span>
             </div>
             <p className="text-3xl font-bold tabular-nums">
               <AnimatedCounter value={totalComments} formatter={formatNumber} />
@@ -313,13 +316,13 @@ export default function AnalyticsPage() {
               <div className="p-2 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 group-hover:scale-110 transition-transform">
                 <TrendingUp className="w-4 h-4 text-cyan-500" />
               </div>
-              <span className="text-sm text-muted-foreground">Total Synced Views</span>
+              <span className="text-sm text-muted-foreground">{t('videoStats.totalSyncedViews')}</span>
             </div>
             <p className="text-3xl font-bold tabular-nums">
               <AnimatedCounter value={totalViews} formatter={formatNumber} />
             </p>
             <p className="text-xs text-muted-foreground mt-1">
-              from {videos.length} synced videos
+              {t('videoStats.fromVideos', { count: videos.length })}
             </p>
           </div>
         </div>
@@ -332,11 +335,11 @@ export default function AnalyticsPage() {
             <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30">
               <TrendingUp className="w-4 h-4 text-green-500" />
             </div>
-            <h2 className="text-lg font-semibold">Top Performing Videos</h2>
+            <h2 className="text-lg font-semibold">{t('topVideos.title')}</h2>
           </div>
           {topVideos.length > 0 && (
             <span className="text-sm text-muted-foreground">
-              Top {topVideos.length} by views
+              {t('topVideos.topByViews', { count: topVideos.length })}
             </span>
           )}
         </div>
@@ -345,9 +348,9 @@ export default function AnalyticsPage() {
             <div className="w-20 h-20 rounded-2xl bg-muted flex items-center justify-center mb-4 animate-float">
               <Video className="w-10 h-10" />
             </div>
-            <p className="font-medium mb-1">No videos synced yet</p>
+            <p className="font-medium mb-1">{t('empty.noVideos')}</p>
             <p className="text-sm text-center max-w-md">
-              Go to Videos and click "Sync from YouTube" to import your videos.
+              {t('empty.noVideosDesc')}
             </p>
           </div>
         ) : (
@@ -385,11 +388,11 @@ export default function AnalyticsPage() {
                   <p className="text-sm text-muted-foreground">
                     {video.publishedAt
                       ? new Date(video.publishedAt).toLocaleDateString()
-                      : 'Not published'}
+                      : t('topVideos.notPublished')}
                   </p>
                 </div>
                 <div className="text-right space-y-1">
-                  <p className="font-semibold tabular-nums">{formatNumber(video.viewCount)} views</p>
+                  <p className="font-semibold tabular-nums">{formatNumber(video.viewCount)} {t('topVideos.views')}</p>
                   <div className="flex items-center gap-3 text-sm text-muted-foreground">
                     <span className="flex items-center gap-1">
                       <ThumbsUp className="w-3 h-3" />
@@ -407,7 +410,7 @@ export default function AnalyticsPage() {
                     target="_blank"
                     rel="noopener noreferrer"
                     className="p-2.5 hover:bg-primary/10 rounded-xl text-muted-foreground hover:text-primary transition-colors"
-                    title="Watch on YouTube"
+                    title={tc('actions.watchOnYouTube')}
                   >
                     <ExternalLink className="w-4 h-4" />
                   </a>
@@ -425,11 +428,9 @@ export default function AnalyticsPage() {
             <Sparkles className="w-4 h-4 text-amber-500" />
           </div>
           <div>
-            <p className="font-medium text-foreground mb-1">About Analytics</p>
+            <p className="font-medium text-foreground mb-1">{t('about.title')}</p>
             <p>
-              This page shows real data from your YouTube channel.
-              Historical analytics and charts require YouTube Analytics API integration,
-              which provides detailed metrics over time.
+              {t('about.description')}
             </p>
           </div>
         </div>

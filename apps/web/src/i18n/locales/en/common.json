@@ -1,0 +1,116 @@
+{
+  "nav": {
+    "dashboard": "Dashboard",
+    "videos": "Videos",
+    "calendar": "Calendar",
+    "ideas": "Ideas",
+    "analytics": "Analytics",
+    "assistant": "AI Assistant",
+    "settings": "Settings"
+  },
+  "actions": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "edit": "Edit",
+    "create": "Create",
+    "close": "Close",
+    "refresh": "Refresh",
+    "refreshData": "Refresh data",
+    "refreshStats": "Refresh stats",
+    "search": "Search",
+    "filter": "Filter",
+    "export": "Export",
+    "import": "Import",
+    "copy": "Copy",
+    "duplicate": "Duplicate",
+    "add": "Add",
+    "remove": "Remove",
+    "clear": "Clear",
+    "reset": "Reset",
+    "apply": "Apply",
+    "confirm": "Confirm",
+    "back": "Back",
+    "next": "Next",
+    "previous": "Previous",
+    "viewAll": "View all",
+    "showMore": "Show more",
+    "showLess": "Show less",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect all",
+    "watchOnYouTube": "Watch on YouTube"
+  },
+  "status": {
+    "loading": "Loading...",
+    "saving": "Saving...",
+    "deleting": "Deleting...",
+    "error": "Error",
+    "success": "Success",
+    "pending": "Pending",
+    "active": "Active",
+    "inactive": "Inactive",
+    "completed": "Completed",
+    "cancelled": "Cancelled"
+  },
+  "time": {
+    "now": "Now",
+    "today": "Today",
+    "yesterday": "Yesterday",
+    "tomorrow": "Tomorrow",
+    "thisWeek": "This week",
+    "lastWeek": "Last week",
+    "thisMonth": "This month",
+    "lastMonth": "Last month",
+    "ago": "ago",
+    "minutes": "minutes",
+    "hours": "hours",
+    "days": "days",
+    "weeks": "weeks",
+    "months": "months"
+  },
+  "errors": {
+    "generic": "Something went wrong",
+    "notFound": "Not found",
+    "unauthorized": "Unauthorized",
+    "forbidden": "Access denied",
+    "networkError": "Connection error",
+    "tryAgain": "Try again"
+  },
+  "empty": {
+    "noData": "No data",
+    "noResults": "No results"
+  },
+  "quickStats": {
+    "title": "Quick Stats",
+    "subs": "Subs",
+    "views": "Views",
+    "videos": "Videos",
+    "total": "total"
+  },
+  "user": {
+    "signOut": "Sign out",
+    "profile": "Profile",
+    "account": "Account"
+  },
+  "theme": {
+    "light": "Light mode",
+    "dark": "Dark mode",
+    "system": "System"
+  },
+  "keyboard": {
+    "title": "Keyboard Shortcuts",
+    "general": "General",
+    "navigation": "Navigation",
+    "actions": "Actions",
+    "goToDashboard": "Go to Dashboard",
+    "goToVideos": "Go to Videos",
+    "goToCalendar": "Go to Calendar",
+    "goToIdeas": "Go to Ideas",
+    "goToSettings": "Go to Settings",
+    "newIdea": "New Idea",
+    "search": "Search",
+    "sync": "Sync",
+    "closeModal": "Close modal",
+    "showShortcuts": "Show shortcuts"
+  }
+}

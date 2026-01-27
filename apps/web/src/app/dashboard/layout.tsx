@@ -21,6 +21,7 @@ import {
   Keyboard,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { AIWidget } from '@/components/ai/AIWidget';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
@@ -45,13 +46,13 @@ interface ChannelStats {
 }
 
 const navigation = [
-  { name: 'Dashboard', href: '/dashboard', icon: LayoutDashboard },
-  { name: 'AI Assistant', href: '/dashboard/assistant', icon: Sparkles, gradient: true },
-  { name: 'Videos', href: '/dashboard/videos', icon: Video },
-  { name: 'Analytics', href: '/dashboard/analytics', icon: BarChart3 },
-  { name: 'Calendar', href: '/dashboard/calendar', icon: Calendar },
-  { name: 'Ideas', href: '/dashboard/ideas', icon: Lightbulb },
-  { name: 'Settings', href: '/dashboard/settings', icon: Settings },
+  { key: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
+  { key: 'assistant', href: '/dashboard/assistant', icon: Sparkles, gradient: true },
+  { key: 'videos', href: '/dashboard/videos', icon: Video },
+  { key: 'analytics', href: '/dashboard/analytics', icon: BarChart3 },
+  { key: 'calendar', href: '/dashboard/calendar', icon: Calendar },
+  { key: 'ideas', href: '/dashboard/ideas', icon: Lightbulb },
+  { key: 'settings', href: '/dashboard/settings', icon: Settings },
 ];
 
 export default function DashboardLayout({
@@ -60,6 +61,7 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const { t } = useTranslation('common');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState<User | null>(null);
   const [stats, setStats] = useState<ChannelStats | null>(null);
@@ -193,7 +195,7 @@ export default function DashboardLayout({
                 (item.href !== '/dashboard' && pathname.startsWith(item.href));
               return (
                 <Link
-                  key={item.name}
+                  key={item.key}
                   href={item.href}
                   className={cn(
                     'group flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200',
@@ -209,7 +211,7 @@ export default function DashboardLayout({
                     'transition-transform duration-200',
                     isActive ? '' : 'group-hover:scale-110'
                   )} />
-                  <span className="flex-1">{item.name}</span>
+                  <span className="flex-1">{t(`nav.${item.key}`)}</span>
                   {isActive && (
                     <ChevronRight size={16} className="opacity-70" />
                   )}
@@ -222,7 +224,7 @@ export default function DashboardLayout({
           {stats && (
             <div className="px-4 py-4 border-t mx-3 mb-3 rounded-xl bg-muted/30">
               <div className="flex items-center justify-between mb-3">
-                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Quick Stats</p>
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">{t('quickStats.title')}</p>
                 <button
                   onClick={fetchStats}
                   disabled={refreshingStats}
@@ -230,7 +232,7 @@ export default function DashboardLayout({
                     "p-1.5 hover:bg-background rounded-lg text-muted-foreground hover:text-foreground transition-all duration-500",
                     !refreshingStats && "hover:rotate-180"
                   )}
-                  title="Refresh stats"
+                  title={t('actions.refreshStats')}
                 >
                   <RefreshCw className={cn("w-3.5 h-3.5", refreshingStats && "animate-spin")} />
                 </button>
@@ -244,21 +246,21 @@ export default function DashboardLayout({
                     <Users className="w-4 h-4 text-blue-600 dark:text-blue-400" />
                   </div>
                   <p className="text-sm font-bold">{formatNumber(stats.subscriberCount)}</p>
-                  <p className="text-[10px] text-muted-foreground">Subs</p>
+                  <p className="text-[10px] text-muted-foreground">{t('quickStats.subs')}</p>
                 </div>
                 <div className="group text-center p-3 rounded-xl bg-background/50 hover:bg-background transition-all duration-200 cursor-default">
                   <div className="w-8 h-8 mx-auto mb-2 rounded-lg bg-green-100 dark:bg-green-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                     <Eye className="w-4 h-4 text-green-600 dark:text-green-400" />
                   </div>
                   <p className="text-sm font-bold">{formatNumber(stats.viewCount)}</p>
-                  <p className="text-[10px] text-muted-foreground">Views</p>
+                  <p className="text-[10px] text-muted-foreground">{t('quickStats.views')}</p>
                 </div>
                 <div className="group text-center p-3 rounded-xl bg-background/50 hover:bg-background transition-all duration-200 cursor-default">
                   <div className="w-8 h-8 mx-auto mb-2 rounded-lg bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center group-hover:scale-110 transition-transform duration-200">
                     <Play className="w-4 h-4 text-purple-600 dark:text-purple-400" />
                   </div>
                   <p className="text-sm font-bold">{stats.videoCount}</p>
-                  <p className="text-[10px] text-muted-foreground">Videos</p>
+                  <p className="text-[10px] text-muted-foreground">{t('quickStats.videos')}</p>
                 </div>
               </div>
             </div>
@@ -273,7 +275,7 @@ export default function DashboardLayout({
                 <button
                   onClick={() => setShowShortcuts(true)}
                   className="p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-                  title="Keyboard shortcuts (?)"
+                  title={t('keyboard.showShortcuts') + ' (?)'}
                 >
                   <Keyboard className="w-4 h-4" />
                 </button>
@@ -310,7 +312,7 @@ export default function DashboardLayout({
               className="w-full mt-3 flex items-center justify-center gap-2 px-4 py-2.5 rounded-xl text-sm font-medium text-muted-foreground hover:bg-destructive/10 hover:text-destructive transition-all duration-200"
             >
               <LogOut size={18} />
-              Sign out
+              {t('user.signOut')}
             </button>
           </div>
         </div>
@@ -350,7 +352,7 @@ export default function DashboardLayout({
                 <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-primary to-rose-500 flex items-center justify-center">
                   <Keyboard className="w-5 h-5 text-white" />
                 </div>
-                <h3 className="text-xl font-bold">Keyboard Shortcuts</h3>
+                <h3 className="text-xl font-bold">{t('keyboard.title')}</h3>
               </div>
               <button
                 onClick={() => setShowShortcuts(false)}
@@ -362,40 +364,40 @@ export default function DashboardLayout({
 
             <div className="space-y-6">
               <div>
-                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Global</h4>
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{t('keyboard.general')}</h4>
                 <div className="space-y-2">
-                  <ShortcutRow keys={['?']} description="Show this help" />
-                  <ShortcutRow keys={['Esc']} description="Close modal / Cancel" />
+                  <ShortcutRow keys={['?']} description={t('keyboard.showShortcuts')} />
+                  <ShortcutRow keys={['Esc']} description={t('keyboard.closeModal')} />
                 </div>
               </div>
 
               <div>
-                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Ideas Page</h4>
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{t('nav.ideas')}</h4>
                 <div className="space-y-2">
-                  <ShortcutRow keys={['N']} description="Create new idea" />
+                  <ShortcutRow keys={['N']} description={t('keyboard.newIdea')} />
                 </div>
               </div>
 
               <div>
-                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Videos Page</h4>
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{t('nav.videos')}</h4>
                 <div className="space-y-2">
-                  <ShortcutRow keys={['⌘', 'S']} description="Sync videos from YouTube" />
+                  <ShortcutRow keys={['⌘', 'S']} description={t('keyboard.sync')} />
                 </div>
               </div>
 
               <div>
-                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">Calendar Page</h4>
+                <h4 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider mb-3">{t('nav.calendar')}</h4>
                 <div className="space-y-2">
-                  <ShortcutRow keys={['←']} description="Previous month" />
-                  <ShortcutRow keys={['→']} description="Next month" />
-                  <ShortcutRow keys={['T']} description="Go to today" />
+                  <ShortcutRow keys={['←']} description={t('navigation.previousMonth', { ns: 'calendar' })} />
+                  <ShortcutRow keys={['→']} description={t('navigation.nextMonth', { ns: 'calendar' })} />
+                  <ShortcutRow keys={['T']} description={t('navigation.today', { ns: 'calendar' })} />
                 </div>
               </div>
             </div>
 
             <div className="mt-6 pt-4 border-t">
               <p className="text-xs text-muted-foreground text-center">
-                Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono mx-1">?</kbd> anytime to show shortcuts
+                {t('keyboard.showShortcuts')}
               </p>
             </div>
           </div>

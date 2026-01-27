@@ -1,0 +1,103 @@
+{
+  "header": {
+    "title": "Settings",
+    "subtitle": "Configure your account and preferences"
+  },
+  "tabs": {
+    "profile": "Profile",
+    "channels": "Channels",
+    "notifications": "Notifications",
+    "appearance": "Appearance",
+    "security": "Security"
+  },
+  "profile": {
+    "title": "Profile",
+    "displayName": "Display Name",
+    "displayNamePlaceholder": "Your name",
+    "email": "Email",
+    "timezone": "Timezone",
+    "save": "Save changes",
+    "saving": "Saving...",
+    "saved": "Changes saved"
+  },
+  "channels": {
+    "title": "Connected Channels",
+    "description": "Manage your connected YouTube channels",
+    "connect": "Connect Channel",
+    "disconnect": "Disconnect",
+    "disconnectConfirm": "Are you sure you want to disconnect this channel?",
+    "noChannels": "No channels connected",
+    "connectFirst": "Connect your first YouTube channel",
+    "subscribers": "subscribers",
+    "videos": "videos",
+    "lastSync": "Last sync"
+  },
+  "notifications": {
+    "title": "Notification Preferences",
+    "description": "Choose which notifications you want to receive",
+    "emailDigest": "Weekly Email Digest",
+    "emailDigestDesc": "Receive a summary of your activity every week",
+    "uploadComplete": "Upload Complete",
+    "uploadCompleteDesc": "When a video finishes processing",
+    "newComments": "New Comments",
+    "newCommentsDesc": "When someone comments on your videos",
+    "milestones": "Milestones",
+    "milestonesDesc": "When you reach subscriber or view milestones",
+    "aiSuggestions": "AI Suggestions",
+    "aiSuggestionsDesc": "Receive suggestions from the AI assistant",
+    "desktopNotifications": "Desktop Notifications",
+    "desktopNotificationsDesc": "Receive notifications in your browser",
+    "testNotification": "Test notification",
+    "permissionDenied": "Permission denied",
+    "permissionGranted": "Permission granted",
+    "statusEnabled": "Enabled",
+    "statusBlocked": "Blocked (check browser settings)",
+    "statusPending": "Pending activation",
+    "statusNotSupported": "Not supported",
+    "status": "Status",
+    "enableNotifications": "Enable notifications",
+    "permissionsEnabled": "Permissions enabled",
+    "permissionsEnabledDesc": "You will receive desktop notifications",
+    "permissionsNotGranted": "Permissions not granted",
+    "permissionsNotGrantedDesc": "Could not enable notifications"
+  },
+  "appearance": {
+    "title": "Appearance",
+    "theme": "Theme",
+    "themeDesc": "Select the application theme",
+    "light": "Light",
+    "dark": "Dark",
+    "system": "System",
+    "language": "Language",
+    "languageDesc": "Select the interface language",
+    "currentLanguage": "Current language"
+  },
+  "security": {
+    "title": "Security",
+    "signOut": "Sign Out",
+    "signOutDesc": "Sign out from all devices",
+    "signOutConfirm": "Are you sure you want to sign out?",
+    "connectedServices": "Connected Services",
+    "googleSignIn": "You signed in with Google. Your password is managed by Google.",
+    "dangerZone": "Danger Zone",
+    "deleteAccount": "Delete Account",
+    "deleteAccountDesc": "Permanently delete your account and all your data. This action cannot be undone.",
+    "deleteAccountConfirm": "This action cannot be undone. Are you sure?"
+  },
+  "toast": {
+    "soloToast": "Solo Toast (saves in 4s)",
+    "soloToastDesc": "Show notification without saving",
+    "milestone": "Toast + Desktop (saves in 4s)",
+    "milestoneDesc": "Test a milestone notification",
+    "milestoneTitle": "New milestone reached!",
+    "testCreatedAt": "Test created at {{time}} - will save in 4s",
+    "aiSuggestionTitle": "AI Suggestion",
+    "uploadComplete": "Upload Complete",
+    "uploadCompleteDesc": "Test upload notification",
+    "newComment": "New Comment",
+    "newCommentDesc": "Test comment notification",
+    "aiSuggestion": "AI Suggestion",
+    "aiSuggestionDesc": "Test AI notification"
+  },
+  "desktopInfo": "Desktop notifications alert you even when you don't have the app open"
+}

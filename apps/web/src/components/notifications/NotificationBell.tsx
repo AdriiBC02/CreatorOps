@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from 'react';
 import { Bell, Trash2, X, PartyPopper, CheckCircle, MessageCircle, Info, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { showToastFromAPI, requestNotificationPermission, wasRecentlyShown, NOTIFICATION_SAVED_EVENT } from './NotificationToast';
+import { useTranslation } from 'react-i18next';
 
 interface Notification {
   id: string;
@@ -28,6 +29,7 @@ const typeIcons: Record<string, { icon: React.ElementType; color: string }> = {
 const POLL_INTERVAL = 5000;
 
 export function NotificationBell() {
+  const { t, i18n } = useTranslation('notifications');
   const [isOpen, setIsOpen] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
@@ -199,11 +201,12 @@ export function NotificationBell() {
     const diffHours = Math.floor(diffMs / 3600000);
     const diffDays = Math.floor(diffMs / 86400000);
 
-    if (diffMins < 1) return 'Ahora';
-    if (diffMins < 60) return `Hace ${diffMins}m`;
-    if (diffHours < 24) return `Hace ${diffHours}h`;
-    if (diffDays < 7) return `Hace ${diffDays}d`;
-    return date.toLocaleDateString('es-ES', { day: 'numeric', month: 'short' });
+    if (diffMins < 1) return t('time.now');
+    if (diffMins < 60) return t('time.minutesAgo', { count: diffMins });
+    if (diffHours < 24) return t('time.hoursAgo', { count: diffHours });
+    if (diffDays < 7) return t('time.daysAgo', { count: diffDays });
+    const locale = i18n.language === 'es' ? 'es-ES' : 'en-US';
+    return date.toLocaleDateString(locale, { day: 'numeric', month: 'short' });
   };
 
   return (
@@ -211,7 +214,7 @@ export function NotificationBell() {
       <button
         onClick={handleBellClick}
         className="relative p-2 rounded-lg text-muted-foreground hover:text-foreground hover:bg-muted transition-colors"
-        title="Notificaciones"
+        title={t('title')}
       >
         <Bell className="w-5 h-5" />
         {unreadCount > 0 && (
@@ -225,7 +228,7 @@ export function NotificationBell() {
         <div className="fixed left-4 bottom-20 w-80 bg-white/80 dark:bg-gray-900/80 backdrop-blur-xl backdrop-saturate-150 border border-white/20 dark:border-gray-700/50 rounded-2xl shadow-2xl z-50 overflow-hidden animate-scale-in">
           {/* Header */}
           <div className="flex items-center justify-between px-4 py-3 border-b border-white/10 dark:border-gray-700/50 bg-white/30 dark:bg-gray-800/30">
-            <h3 className="font-semibold">Notificaciones</h3>
+            <h3 className="font-semibold">{t('title')}</h3>
             <div className="flex items-center gap-2">
               {notifications.length > 0 && (
                 <>
@@ -235,7 +238,7 @@ export function NotificationBell() {
                       disabled={loading}
                       className="text-xs text-primary hover:text-primary/80 font-medium disabled:opacity-50"
                     >
-                      Marcar leídas
+                      {t('markAllRead')}
                     </button>
                   )}
                   <button
@@ -243,7 +246,7 @@ export function NotificationBell() {
                     disabled={loading}
                     className="text-xs text-destructive hover:text-destructive/80 font-medium disabled:opacity-50"
                   >
-                    Borrar todas
+                    {t('deleteAll')}
                   </button>
                 </>
               )}
@@ -261,7 +264,7 @@ export function NotificationBell() {
             {notifications.length === 0 ? (
               <div className="py-12 text-center">
                 <Bell className="w-10 h-10 mx-auto mb-3 text-muted-foreground/50" />
-                <p className="text-sm text-muted-foreground">No hay notificaciones</p>
+                <p className="text-sm text-muted-foreground">{t('empty')}</p>
               </div>
             ) : (
               notifications.map((notification) => {
@@ -312,7 +315,7 @@ export function NotificationBell() {
                             deleteNotification(notification.id);
                           }}
                           className="p-1.5 hover:bg-destructive/10 hover:text-destructive rounded-lg transition-colors"
-                          title="Eliminar"
+                          title={t('delete')}
                         >
                           <Trash2 className="w-3.5 h-3.5" />
                         </button>
@@ -334,7 +337,7 @@ export function NotificationBell() {
                 }}
                 className="w-full text-xs text-center text-muted-foreground hover:text-foreground transition-colors"
               >
-                Configurar notificaciones
+                {t('configure')}
               </button>
             </div>
           )}

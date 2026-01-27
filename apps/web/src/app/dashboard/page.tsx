@@ -3,11 +3,13 @@
 import { useEffect, useState } from 'react';
 import { Video, Eye, Users, RefreshCw, Calendar, Lightbulb, Play, ArrowRight, TrendingUp, Sparkles, Target, Zap, Star, Heart, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
+import { useTranslation } from 'react-i18next';
 import { cn } from '@/lib/utils';
 import { Skeleton, SkeletonCard, SkeletonList } from '@/components/ui/skeleton';
 import { AnimatedCounter } from '@/components/ui/animated-counter';
 import { ProgressRing, MiniProgress } from '@/components/ui/progress-ring';
 import { FloatingShapes, GlowingBadge, PulsingDot } from '@/components/ui/decorative';
+import { useLanguage } from '@/i18n/LanguageProvider';
 
 interface Channel {
   id: string;
@@ -58,14 +60,17 @@ const statusColors: Record<string, { bg: string; text: string; dot: string }> = 
   in_production: { bg: 'bg-purple-100 dark:bg-purple-900/50', text: 'text-purple-700 dark:text-purple-300', dot: 'bg-purple-400' },
 };
 
-const priorityConfig: Record<number, { label: string; color: string }> = {
-  0: { label: 'Low', color: 'text-gray-500' },
-  1: { label: 'Medium', color: 'text-blue-500' },
-  2: { label: 'High', color: 'text-amber-500' },
-  3: { label: 'Urgent', color: 'text-red-500' },
-};
-
 export default function DashboardPage() {
+  const { t } = useTranslation('dashboard');
+  const { t: tc } = useTranslation('common');
+  const { language } = useLanguage();
+
+  const priorityConfig: Record<number, { label: string; color: string }> = {
+    0: { label: t('ideas.priority.low'), color: 'text-gray-500' },
+    1: { label: t('ideas.priority.medium'), color: 'text-blue-500' },
+    2: { label: t('ideas.priority.high'), color: 'text-amber-500' },
+    3: { label: t('ideas.priority.urgent'), color: 'text-red-500' },
+  };
   const [channel, setChannel] = useState<Channel | null>(null);
   const [videos, setVideos] = useState<VideoData[]>([]);
   const [calendarItems, setCalendarItems] = useState<CalendarItem[]>([]);
@@ -134,9 +139,9 @@ export default function DashboardPage() {
     const tomorrow = new Date(today);
     tomorrow.setDate(tomorrow.getDate() + 1);
 
-    if (date.toDateString() === today.toDateString()) return 'Today';
-    if (date.toDateString() === tomorrow.toDateString()) return 'Tomorrow';
-    return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' });
+    if (date.toDateString() === today.toDateString()) return t('calendar.today');
+    if (date.toDateString() === tomorrow.toDateString()) return t('calendar.tomorrow');
+    return date.toLocaleDateString(language === 'es' ? 'es-ES' : 'en-US', { month: 'short', day: 'numeric' });
   };
 
   const getDaysUntil = (dateStr: string): number => {
@@ -224,14 +229,14 @@ export default function DashboardPage() {
         <div className="w-16 h-16 rounded-2xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center mb-4">
           <Zap className="w-8 h-8 text-red-500" />
         </div>
-        <h3 className="text-lg font-semibold mb-2">Something went wrong</h3>
+        <h3 className="text-lg font-semibold mb-2">{tc('errors.generic')}</h3>
         <p className="text-muted-foreground mb-4">{error}</p>
         <button
           onClick={() => fetchData()}
           className="btn-primary px-6 py-2.5"
         >
           <RefreshCw className="w-4 h-4 mr-2" />
-          Try again
+          {tc('errors.tryAgain')}
         </button>
       </div>
     );
@@ -243,16 +248,16 @@ export default function DashboardPage() {
         <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-primary to-rose-500 flex items-center justify-center mb-6 shadow-glow">
           <Play className="w-10 h-10 text-white fill-white" />
         </div>
-        <h3 className="text-2xl font-bold mb-2">Connect Your Channel</h3>
+        <h3 className="text-2xl font-bold mb-2">{t('connect.title')}</h3>
         <p className="text-muted-foreground mb-6 max-w-md">
-          Link your YouTube channel to start tracking your content performance and managing your videos.
+          {t('connect.description')}
         </p>
         <a
           href="http://localhost:4000/auth/google"
           className="btn-primary px-6 py-3 text-lg shadow-lg shadow-primary/25"
         >
           <Sparkles className="w-5 h-5 mr-2" />
-          Connect YouTube Channel
+          {t('connect.button')}
         </a>
       </div>
     );
@@ -260,15 +265,15 @@ export default function DashboardPage() {
 
   const stats = [
     {
-      name: 'Total Views',
-      rawValue: totalViews, // Sum of synced video views (same as Videos page)
+      name: t('stats.totalViews'),
+      rawValue: totalViews,
       icon: Eye,
       color: 'from-blue-500 to-cyan-500',
       bgColor: 'bg-blue-100 dark:bg-blue-900/30',
       iconColor: 'text-blue-500',
     },
     {
-      name: 'Subscribers',
+      name: t('stats.subscribers'),
       rawValue: channel.subscriberCount,
       icon: Users,
       color: 'from-purple-500 to-pink-500',
@@ -276,7 +281,7 @@ export default function DashboardPage() {
       iconColor: 'text-purple-500',
     },
     {
-      name: 'Synced Videos',
+      name: t('stats.syncedVideos'),
       rawValue: videos.length,
       icon: Video,
       color: 'from-green-500 to-emerald-500',
@@ -284,8 +289,8 @@ export default function DashboardPage() {
       iconColor: 'text-green-500',
     },
     {
-      name: 'Engagement Rate',
-      rawValue: parseFloat(engagementRate) * 10, // Store as integer for animation (e.g., 45 for 4.5%)
+      name: t('stats.engagementRate'),
+      rawValue: parseFloat(engagementRate) * 10,
       icon: Target,
       color: 'from-amber-500 to-orange-500',
       bgColor: 'bg-amber-100 dark:bg-amber-900/30',
@@ -306,18 +311,18 @@ export default function DashboardPage() {
             <h1 className="text-3xl font-bold">{channel.title}</h1>
             <GlowingBadge color="success">
               <PulsingDot color="bg-green-500" className="mr-1" />
-              Live
+              {t('video.live')}
             </GlowingBadge>
           </div>
           <p className="text-muted-foreground">
-            Welcome back! Here's your channel overview.
+            {t('header.welcome')}
           </p>
         </div>
         <div className="flex items-center gap-4">
           <button
             onClick={() => fetchData()}
             className="p-2.5 rounded-xl border bg-card hover:bg-muted hover:rotate-180 transition-all duration-500"
-            title="Refresh data"
+            title={tc('actions.refreshData')}
           >
             <RefreshCw className="w-5 h-5" />
           </button>
@@ -391,7 +396,7 @@ export default function DashboardPage() {
             <p className="text-2xl font-bold tabular-nums">
               <AnimatedCounter value={avgViews} formatter={formatNumber} />
             </p>
-            <p className="text-xs text-muted-foreground">Avg. Views/Video</p>
+            <p className="text-xs text-muted-foreground">{t('stats.avgViews')}</p>
           </div>
 
           <div className="text-center group">
@@ -401,7 +406,7 @@ export default function DashboardPage() {
             <p className="text-2xl font-bold tabular-nums">
               <AnimatedCounter value={totalLikes} formatter={formatNumber} />
             </p>
-            <p className="text-xs text-muted-foreground">Total Likes</p>
+            <p className="text-xs text-muted-foreground">{t('stats.totalLikes')}</p>
           </div>
 
           <div className="text-center group">
@@ -411,7 +416,7 @@ export default function DashboardPage() {
             <p className="text-2xl font-bold tabular-nums">
               <AnimatedCounter value={ideas.filter(i => i.status !== 'archived' && i.status !== 'completed').length} />
             </p>
-            <p className="text-xs text-muted-foreground">Active Ideas</p>
+            <p className="text-xs text-muted-foreground">{t('stats.activeIdeas')}</p>
           </div>
 
           <div className="text-center group">
@@ -421,7 +426,7 @@ export default function DashboardPage() {
             <p className="text-2xl font-bold tabular-nums">
               <AnimatedCounter value={upcomingItems.length} />
             </p>
-            <p className="text-xs text-muted-foreground">Scheduled</p>
+            <p className="text-xs text-muted-foreground">{t('stats.scheduled')}</p>
           </div>
         </div>
       </div>
@@ -434,7 +439,7 @@ export default function DashboardPage() {
             <div className="p-2 rounded-lg bg-purple-100 dark:bg-purple-900/30">
               <Target className="w-4 h-4 text-purple-500" />
             </div>
-            <h2 className="text-lg font-semibold">Engagement</h2>
+            <h2 className="text-lg font-semibold">{t('sections.engagement')}</h2>
           </div>
 
           <div className="flex flex-col items-center">
@@ -447,13 +452,13 @@ export default function DashboardPage() {
             >
               <div className="text-center">
                 <p className="text-3xl font-bold text-purple-500">{engagementRate}%</p>
-                <p className="text-xs text-muted-foreground">Rate</p>
+                <p className="text-xs text-muted-foreground">{t('engagement.rate')}</p>
               </div>
             </ProgressRing>
 
             <div className="w-full mt-6 space-y-3">
               <div className="flex items-center justify-between text-sm">
-                <span className="text-muted-foreground">Likes / Views</span>
+                <span className="text-muted-foreground">{t('engagement.likesViews')}</span>
                 <span className="font-medium">{formatNumber(totalLikes)} / {formatNumber(totalViews)}</span>
               </div>
               <MiniProgress value={parseFloat(engagementRate) * 10} color="bg-purple-500" />
@@ -462,7 +467,7 @@ export default function DashboardPage() {
                 <div className="flex items-center justify-between text-sm">
                   <div className="flex items-center gap-2">
                     <MessageCircle className="w-4 h-4 text-muted-foreground" />
-                    <span className="text-muted-foreground">Comments</span>
+                    <span className="text-muted-foreground">{t('engagement.comments')}</span>
                   </div>
                   <span className="font-medium">
                     <AnimatedCounter
@@ -483,13 +488,13 @@ export default function DashboardPage() {
               <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 group-hover:scale-110 transition-transform">
                 <TrendingUp className="w-4 h-4 text-green-500" />
               </div>
-              <h2 className="text-lg font-semibold">Top Performing Videos</h2>
+              <h2 className="text-lg font-semibold">{t('sections.topVideos')}</h2>
             </div>
             <Link
               href="/dashboard/videos"
               className="group text-sm text-primary hover:underline flex items-center gap-1 font-medium"
             >
-              View all <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              {tc('actions.viewAll')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
@@ -498,9 +503,9 @@ export default function DashboardPage() {
               <div className="w-20 h-20 rounded-2xl bg-muted flex items-center justify-center mb-4 animate-float">
                 <Video className="w-10 h-10" />
               </div>
-              <p className="font-medium mb-1">No videos synced yet</p>
+              <p className="font-medium mb-1">{t('empty.noVideos')}</p>
               <Link href="/dashboard/videos" className="text-sm text-primary hover:underline">
-                Sync your videos
+                {t('empty.syncVideos')}
               </Link>
             </div>
           ) : (
@@ -538,7 +543,7 @@ export default function DashboardPage() {
                       {video.title}
                     </p>
                     <p className="text-xs text-muted-foreground">
-                      {formatNumber(video.viewCount)} views · {formatNumber(video.likeCount)} likes
+                      {formatNumber(video.viewCount)} {t('video.views')} · {formatNumber(video.likeCount)} {t('video.likes')}
                     </p>
                   </div>
                 </div>
@@ -554,10 +559,10 @@ export default function DashboardPage() {
               <div className="p-2 rounded-lg bg-indigo-100 dark:bg-indigo-900/30">
                 <Calendar className="w-4 h-4 text-indigo-500" />
               </div>
-              <h2 className="text-lg font-semibold">Upcoming Content</h2>
+              <h2 className="text-lg font-semibold">{t('sections.upcomingContent')}</h2>
               {upcomingItems.length > 0 && (
                 <span className="px-2 py-0.5 text-xs font-medium bg-indigo-100 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 rounded-full">
-                  {upcomingItems.length} scheduled
+                  {upcomingItems.length} {t('stats.scheduled').toLowerCase()}
                 </span>
               )}
             </div>
@@ -565,7 +570,7 @@ export default function DashboardPage() {
               href="/dashboard/calendar"
               className="group text-sm text-primary hover:underline flex items-center gap-1 font-medium"
             >
-              View calendar <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+              {t('calendar.viewCalendar')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
             </Link>
           </div>
 
@@ -574,9 +579,9 @@ export default function DashboardPage() {
               <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4 animate-float">
                 <Calendar className="w-8 h-8" />
               </div>
-              <p className="font-medium mb-1">No upcoming content</p>
+              <p className="font-medium mb-1">{t('empty.noUpcoming')}</p>
               <Link href="/dashboard/calendar" className="text-sm text-primary hover:underline">
-                Schedule something
+                {t('empty.scheduleContent')}
               </Link>
             </div>
           ) : (
@@ -615,7 +620,7 @@ export default function DashboardPage() {
                         {formatDate(item.scheduledDate)}
                       </span>
                       {isUrgent && (
-                        <span className="text-[10px] text-red-500 font-medium mt-0.5">TODAY</span>
+                        <span className="text-[10px] text-red-500 font-medium mt-0.5">{t('calendar.today').toUpperCase()}</span>
                       )}
                     </div>
 
@@ -632,7 +637,7 @@ export default function DashboardPage() {
                           {item.status.replace('_', ' ')}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                          {item.contentType === 'short' ? 'Short' : 'Video'}
+                          {item.contentType === 'short' ? t('contentType.short') : t('contentType.video')}
                         </span>
                       </div>
                     </div>
@@ -653,10 +658,10 @@ export default function DashboardPage() {
             <div className="p-2 rounded-lg bg-amber-100 dark:bg-amber-900/30">
               <Lightbulb className="w-4 h-4 text-amber-500" />
             </div>
-            <h2 className="text-lg font-semibold">Recent Ideas</h2>
+            <h2 className="text-lg font-semibold">{t('sections.recentIdeas')}</h2>
             {recentIdeas.length > 0 && (
               <span className="px-2 py-0.5 text-xs font-medium bg-amber-100 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 rounded-full">
-                {ideas.length} total
+                {ideas.length} {tc('quickStats.total')}
               </span>
             )}
           </div>
@@ -664,7 +669,7 @@ export default function DashboardPage() {
             href="/dashboard/ideas"
             className="group text-sm text-primary hover:underline flex items-center gap-1 font-medium"
           >
-            View all <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            {tc('actions.viewAll')} <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
           </Link>
         </div>
 
@@ -673,9 +678,9 @@ export default function DashboardPage() {
             <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mb-4 animate-float">
               <Lightbulb className="w-8 h-8" />
             </div>
-            <p className="font-medium mb-1">No ideas yet</p>
+            <p className="font-medium mb-1">{t('empty.noIdeas')}</p>
             <Link href="/dashboard/ideas" className="text-sm text-primary hover:underline">
-              Add your first idea
+              {t('empty.addFirstIdea')}
             </Link>
           </div>
         ) : (

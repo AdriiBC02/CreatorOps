@@ -1,0 +1,65 @@
+{
+  "header": {
+    "title": "Panel de Control",
+    "welcome": "¡Bienvenido! Aquí está el resumen de tu canal."
+  },
+  "stats": {
+    "totalViews": "Vistas Totales",
+    "subscribers": "Suscriptores",
+    "syncedVideos": "Videos Sincronizados",
+    "engagementRate": "Tasa de Engagement",
+    "avgViews": "Vistas Promedio",
+    "totalLikes": "Me Gusta Totales",
+    "activeIdeas": "Ideas Activas",
+    "scheduled": "Programados"
+  },
+  "sections": {
+    "engagement": "Engagement",
+    "topVideos": "Videos Top",
+    "upcomingContent": "Contenido Próximo",
+    "recentIdeas": "Ideas Recientes"
+  },
+  "engagement": {
+    "rate": "Tasa",
+    "likesViews": "Me Gusta / Vistas",
+    "comments": "Comentarios"
+  },
+  "empty": {
+    "noVideos": "No hay videos sincronizados",
+    "syncVideos": "Sincroniza tus videos",
+    "noUpcoming": "No hay contenido próximo",
+    "scheduleContent": "Programa algo",
+    "noIdeas": "No hay ideas todavía",
+    "addFirstIdea": "Añade tu primera idea"
+  },
+  "connect": {
+    "title": "Conecta Tu Canal",
+    "description": "Vincula tu canal de YouTube para empezar a rastrear el rendimiento de tu contenido y gestionar tus videos.",
+    "button": "Conectar Canal de YouTube",
+    "connected": "Conectado"
+  },
+  "video": {
+    "views": "vistas",
+    "likes": "me gusta",
+    "comments": "comentarios",
+    "published": "Publicado",
+    "live": "En Directo"
+  },
+  "calendar": {
+    "today": "Hoy",
+    "tomorrow": "Mañana",
+    "viewCalendar": "Ver calendario"
+  },
+  "ideas": {
+    "priority": {
+      "low": "Baja",
+      "medium": "Media",
+      "high": "Alta",
+      "urgent": "Urgente"
+    }
+  },
+  "contentType": {
+    "short": "Short",
+    "video": "Video"
+  }
+}

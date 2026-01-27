@@ -1,0 +1,100 @@
+{
+  "header": {
+    "title": "AI Assistant",
+    "subtitle": "Your intelligent helper for content creation and channel growth"
+  },
+  "chat": {
+    "placeholder": "Ask me anything about YouTube content creation...",
+    "send": "Send",
+    "thinking": "Thinking...",
+    "copy": "Copy response",
+    "copied": "Copied",
+    "retry": "Retry",
+    "newChat": "New conversation",
+    "emptyTitle": "How can I help you today?",
+    "emptySubtitle": "Ask me anything about YouTube content creation, or use the quick actions above."
+  },
+  "quickActions": {
+    "title": "Quick Actions",
+    "generateTitles": "Generate Titles",
+    "generateTitlesDesc": "Create catchy video titles",
+    "videoIdeas": "Video Ideas",
+    "videoIdeasDesc": "Get content suggestions",
+    "analyzeChannel": "Analyze Channel",
+    "analyzeChannelDesc": "Get channel insights",
+    "analyzeChannelPrompt": "Analyze my channel and give me growth recommendations",
+    "seoTips": "SEO Tips",
+    "seoTipsDesc": "Optimize for search",
+    "seoTipsPrompt": "What are the best SEO practices for YouTube right now?"
+  },
+  "prompts": {
+    "titleGeneration": "Generate 5 catchy titles for a video about:",
+    "ideaSuggestion": "Suggest 5 content ideas for my YouTube channel",
+    "channelAnalysis": "Analyze my channel performance and give me suggestions",
+    "descriptionImprovement": "Improve this video description:"
+  },
+  "widget": {
+    "title": "AI Assistant",
+    "minimize": "Minimize",
+    "expand": "Expand",
+    "openFull": "Open full assistant",
+    "openButton": "Open AI Assistant",
+    "placeholder": "Type something...",
+    "emptyMessage": "How can I help you?",
+    "viewCalendar": "View calendar",
+    "viewCalendarPrompt": "What do I have scheduled in the calendar?",
+    "viewIdeas": "View ideas",
+    "viewIdeasPrompt": "Show me my content ideas",
+    "completed": "Completed",
+    "connectionError": "Connection error. Please try again."
+  },
+  "actions": {
+    "createEvent": "Create calendar event",
+    "createIdea": "Create idea",
+    "viewCalendar": "View calendar",
+    "viewIdeas": "View ideas",
+    "close": "Close",
+    "regenerate": "Regenerate"
+  },
+  "messages": {
+    "eventCreated": "Event created: \"{{title}}\"",
+    "creatingEvent": "Creating event...",
+    "ideaAdded": "Idea added: \"{{title}}\"",
+    "creatingIdea": "Creating idea...",
+    "eventUpdated": "Event updated",
+    "updatingEvent": "Updating event...",
+    "ideaUpdated": "Idea updated",
+    "updatingIdea": "Updating idea...",
+    "eventDeleted": "Event deleted",
+    "deletingEvent": "Deleting event...",
+    "ideaDeleted": "Idea deleted",
+    "deletingIdea": "Deleting idea...",
+    "noUpcomingEvents": "No upcoming events",
+    "noSavedIdeas": "You have no saved ideas"
+  },
+  "smartIdeas": {
+    "selectPrompt": "Select the ideas you want to create:",
+    "select": "Select",
+    "deselect": "Deselect",
+    "discard": "Discard",
+    "selectAll": "Select all",
+    "createSelected": "Create selected"
+  },
+  "titleModal": {
+    "title": "Generate Video Titles",
+    "describeVideo": "Describe your video",
+    "placeholder": "E.g., A tutorial about time management tips for students...",
+    "generate": "Generate Titles",
+    "generatedTitles": "Generated Titles:"
+  },
+  "ideasModal": {
+    "title": "Video Ideas for Your Channel",
+    "generating": "Generating ideas...",
+    "noIdeas": "No ideas generated yet"
+  },
+  "errors": {
+    "generic": "Sorry, I encountered an error. Please make sure at least one AI provider is configured (OPENAI_API_KEY, ANTHROPIC_API_KEY, or GROQ_API_KEY).",
+    "noProvider": "No AI provider configured",
+    "rateLimited": "Too many requests. Please wait."
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "header": {
+    "title": "Ideas de Contenido",
+    "subtitle": "Organiza y gestiona tus ideas de video",
+    "pressN": "Presiona <kbd>N</kbd> para nueva idea"
+  },
+  "columns": {
+    "new": "Nuevas Ideas",
+    "researching": "Investigando",
+    "approved": "Aprobadas",
+    "in_production": "En Producción"
+  },
+  "actions": {
+    "newIdea": "Nueva Idea",
+    "suggestAI": "Sugerir con IA",
+    "export": "Exportar a CSV",
+    "copyTitle": "Copiar título",
+    "duplicate": "Duplicar",
+    "delete": "Eliminar",
+    "reference": "Referencia",
+    "cancel": "Cancelar",
+    "close": "Cerrar",
+    "save": "Guardar",
+    "saveChanges": "Guardar Cambios",
+    "addIdea": "Añadir Idea"
+  },
+  "idea": {
+    "new": "Nueva Idea de Contenido",
+    "edit": "Editar Idea",
+    "delete": "Eliminar",
+    "duplicate": "Duplicar",
+    "title": "Título",
+    "titlePlaceholder": "Título de la idea de video...",
+    "description": "Descripción",
+    "descriptionPlaceholder": "Describe tu idea...",
+    "contentType": "Tipo de Contenido",
+    "priority": "Prioridad",
+    "status": "Estado",
+    "inspirationUrl": "URL de Inspiración",
+    "inspirationUrlPlaceholder": "https://..."
+  },
+  "contentType": {
+    "long_form": "Video Largo",
+    "short": "Short",
+    "video": "Video"
+  },
+  "priority": {
+    "label": "Prioridad:",
+    "low": "Baja",
+    "medium": "Media",
+    "high": "Alta",
+    "urgent": "Urgente",
+    "all": "Todas"
+  },
+  "status": {
+    "new": "Nueva",
+    "researching": "Investigando",
+    "approved": "Aprobada",
+    "in_production": "En Producción",
+    "completed": "Completada",
+    "archived": "Archivada"
+  },
+  "filters": {
+    "search": "Buscar ideas...",
+    "filters": "Filtros",
+    "type": "Tipo:",
+    "all": "Todas",
+    "clearAll": "Limpiar todo",
+    "found": "{{count}} idea encontrada",
+    "found_plural": "{{count}} ideas encontradas"
+  },
+  "empty": {
+    "noIdeas": "No hay ideas todavía",
+    "dragHere": "Arrastra ideas aquí",
+    "dropHere": "¡Suelta aquí!"
+  },
+  "ai": {
+    "title": "Ideas Sugeridas por IA",
+    "subtitle": "Obtén sugerencias de contenido personalizadas",
+    "prompt": "¿Qué tipo de contenido quieres ideas?",
+    "promptPlaceholder": "ej., gameplay de Minecraft, reviews de tecnología, tutoriales de cocina...",
+    "generate": "Generar",
+    "generating": "Generando ideas sobre \"{{topic}}\"...",
+    "analyzingChannel": "Analizando tu canal...",
+    "leaveEmpty": "Deja vacío para ideas generales basadas en el rendimiento de tu canal",
+    "useSuggestion": "Usar esta idea",
+    "readyToGenerate": "Listo para generar ideas",
+    "enterTopic": "Ingresa un tema arriba y haz clic en Generar",
+    "generateDescription": "Generar con IA",
+    "generatingDescription": "Generando..."
+  },
+  "copied": "¡Copiado al portapapeles!",
+  "confirm": {
+    "unsavedChanges": "Tienes cambios sin guardar. ¿Estás seguro de que quieres cerrar?",
+    "unsavedCancel": "Tienes cambios sin guardar. ¿Estás seguro de que quieres cancelar?",
+    "deleteIdea": "¿Estás seguro de que quieres eliminar esta idea?"
+  }
+}

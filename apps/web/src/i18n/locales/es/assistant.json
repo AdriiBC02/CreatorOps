@@ -1,0 +1,100 @@
+{
+  "header": {
+    "title": "Asistente IA",
+    "subtitle": "Tu asistente inteligente para creación de contenido y crecimiento de canal"
+  },
+  "chat": {
+    "placeholder": "Pregúntame cualquier cosa sobre creación de contenido en YouTube...",
+    "send": "Enviar",
+    "thinking": "Pensando...",
+    "copy": "Copiar respuesta",
+    "copied": "Copiado",
+    "retry": "Reintentar",
+    "newChat": "Nueva conversación",
+    "emptyTitle": "¿En qué puedo ayudarte hoy?",
+    "emptySubtitle": "Pregúntame cualquier cosa sobre creación de contenido en YouTube, o usa las acciones rápidas de arriba."
+  },
+  "quickActions": {
+    "title": "Acciones Rápidas",
+    "generateTitles": "Generar Títulos",
+    "generateTitlesDesc": "Crea títulos atractivos para tus videos",
+    "videoIdeas": "Ideas de Video",
+    "videoIdeasDesc": "Obtén sugerencias de contenido",
+    "analyzeChannel": "Analizar Canal",
+    "analyzeChannelDesc": "Obtén insights del canal",
+    "analyzeChannelPrompt": "Analiza mi canal y dame recomendaciones de crecimiento",
+    "seoTips": "Tips SEO",
+    "seoTipsDesc": "Optimiza para búsquedas",
+    "seoTipsPrompt": "¿Cuáles son las mejores prácticas de SEO para YouTube ahora mismo?"
+  },
+  "prompts": {
+    "titleGeneration": "Genera 5 títulos atractivos para un video sobre:",
+    "ideaSuggestion": "Sugiere 5 ideas de contenido para mi canal de YouTube",
+    "channelAnalysis": "Analiza el rendimiento de mi canal y dame sugerencias",
+    "descriptionImprovement": "Mejora esta descripción de video:"
+  },
+  "widget": {
+    "title": "Asistente IA",
+    "minimize": "Minimizar",
+    "expand": "Expandir",
+    "openFull": "Abrir asistente completo",
+    "openButton": "Abrir AI Assistant",
+    "placeholder": "Escribe algo...",
+    "emptyMessage": "¿En qué puedo ayudarte?",
+    "viewCalendar": "Ver calendario",
+    "viewCalendarPrompt": "¿Qué tengo programado en el calendario?",
+    "viewIdeas": "Ver ideas",
+    "viewIdeasPrompt": "Muéstrame mis ideas de contenido",
+    "completed": "Completado",
+    "connectionError": "Error de conexión. Inténtalo de nuevo."
+  },
+  "actions": {
+    "createEvent": "Crear evento en calendario",
+    "createIdea": "Crear idea",
+    "viewCalendar": "Ver calendario",
+    "viewIdeas": "Ver ideas",
+    "close": "Cerrar",
+    "regenerate": "Regenerar"
+  },
+  "messages": {
+    "eventCreated": "Evento creado: \"{{title}}\"",
+    "creatingEvent": "Creando evento...",
+    "ideaAdded": "Idea añadida: \"{{title}}\"",
+    "creatingIdea": "Creando idea...",
+    "eventUpdated": "Evento actualizado",
+    "updatingEvent": "Actualizando evento...",
+    "ideaUpdated": "Idea actualizada",
+    "updatingIdea": "Actualizando idea...",
+    "eventDeleted": "Evento eliminado",
+    "deletingEvent": "Eliminando evento...",
+    "ideaDeleted": "Idea eliminada",
+    "deletingIdea": "Eliminando idea...",
+    "noUpcomingEvents": "No hay eventos próximos",
+    "noSavedIdeas": "No tienes ideas guardadas"
+  },
+  "smartIdeas": {
+    "selectPrompt": "Selecciona las ideas que quieres crear:",
+    "select": "Seleccionar",
+    "deselect": "Deseleccionar",
+    "discard": "Descartar",
+    "selectAll": "Seleccionar todas",
+    "createSelected": "Crear seleccionadas"
+  },
+  "titleModal": {
+    "title": "Generar Títulos de Video",
+    "describeVideo": "Describe tu video",
+    "placeholder": "Ej., Un tutorial sobre tips de gestión del tiempo para estudiantes...",
+    "generate": "Generar Títulos",
+    "generatedTitles": "Títulos Generados:"
+  },
+  "ideasModal": {
+    "title": "Ideas de Video para Tu Canal",
+    "generating": "Generando ideas...",
+    "noIdeas": "No hay ideas generadas todavía"
+  },
+  "errors": {
+    "generic": "Lo siento, encontré un error. Por favor asegúrate de que al menos un proveedor de IA esté configurado (OPENAI_API_KEY, ANTHROPIC_API_KEY, o GROQ_API_KEY).",
+    "noProvider": "Ningún proveedor de IA configurado",
+    "rateLimited": "Demasiadas solicitudes. Espera un momento."
+  }
+}

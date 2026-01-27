@@ -1,0 +1,103 @@
+{
+  "header": {
+    "title": "Ajustes",
+    "subtitle": "Configura tu cuenta y preferencias"
+  },
+  "tabs": {
+    "profile": "Perfil",
+    "channels": "Canales",
+    "notifications": "Notificaciones",
+    "appearance": "Apariencia",
+    "security": "Seguridad"
+  },
+  "profile": {
+    "title": "Perfil",
+    "displayName": "Nombre",
+    "displayNamePlaceholder": "Tu nombre",
+    "email": "Correo electrónico",
+    "timezone": "Zona horaria",
+    "save": "Guardar cambios",
+    "saving": "Guardando...",
+    "saved": "Cambios guardados"
+  },
+  "channels": {
+    "title": "Canales Conectados",
+    "description": "Gestiona tus canales de YouTube conectados",
+    "connect": "Conectar Canal",
+    "disconnect": "Desconectar",
+    "disconnectConfirm": "¿Seguro que quieres desconectar este canal?",
+    "noChannels": "No hay canales conectados",
+    "connectFirst": "Conecta tu primer canal de YouTube",
+    "subscribers": "suscriptores",
+    "videos": "videos",
+    "lastSync": "Última sincronización"
+  },
+  "notifications": {
+    "title": "Preferencias de Notificación",
+    "description": "Elige qué notificaciones quieres recibir",
+    "emailDigest": "Resumen semanal por email",
+    "emailDigestDesc": "Recibe un resumen de tu actividad cada semana",
+    "uploadComplete": "Subida completada",
+    "uploadCompleteDesc": "Cuando un video termina de procesarse",
+    "newComments": "Nuevos comentarios",
+    "newCommentsDesc": "Cuando alguien comenta en tus videos",
+    "milestones": "Hitos",
+    "milestonesDesc": "Cuando alcanzas hitos de suscriptores o vistas",
+    "aiSuggestions": "Sugerencias de IA",
+    "aiSuggestionsDesc": "Recibe sugerencias del asistente de IA",
+    "desktopNotifications": "Notificaciones de escritorio",
+    "desktopNotificationsDesc": "Recibe notificaciones en tu navegador",
+    "testNotification": "Probar notificación",
+    "permissionDenied": "Permiso denegado",
+    "permissionGranted": "Permiso concedido",
+    "statusEnabled": "Activadas",
+    "statusBlocked": "Bloqueadas (revisa configuración del navegador)",
+    "statusPending": "Pendiente de activar",
+    "statusNotSupported": "No soportadas",
+    "status": "Estado",
+    "enableNotifications": "Activar notificaciones",
+    "permissionsEnabled": "Permisos activados",
+    "permissionsEnabledDesc": "Recibirás notificaciones de escritorio",
+    "permissionsNotGranted": "Permisos no concedidos",
+    "permissionsNotGrantedDesc": "No se pudieron activar las notificaciones"
+  },
+  "appearance": {
+    "title": "Apariencia",
+    "theme": "Tema",
+    "themeDesc": "Selecciona el tema de la aplicación",
+    "light": "Claro",
+    "dark": "Oscuro",
+    "system": "Sistema",
+    "language": "Idioma",
+    "languageDesc": "Selecciona el idioma de la interfaz",
+    "currentLanguage": "Idioma actual"
+  },
+  "security": {
+    "title": "Seguridad",
+    "signOut": "Cerrar sesión",
+    "signOutDesc": "Cierra sesión en todos los dispositivos",
+    "signOutConfirm": "¿Seguro que quieres cerrar sesión?",
+    "connectedServices": "Servicios Conectados",
+    "googleSignIn": "Iniciaste sesión con Google. Tu contraseña la gestiona Google.",
+    "dangerZone": "Zona de Peligro",
+    "deleteAccount": "Eliminar cuenta",
+    "deleteAccountDesc": "Elimina permanentemente tu cuenta y todos tus datos. Esta acción no se puede deshacer.",
+    "deleteAccountConfirm": "Esta acción no se puede deshacer. ¿Estás seguro?"
+  },
+  "toast": {
+    "soloToast": "Solo Toast (guarda en 4s)",
+    "soloToastDesc": "Muestra notificación sin guardar",
+    "milestone": "Toast + Desktop (guarda en 4s)",
+    "milestoneDesc": "Prueba notificación de hito",
+    "milestoneTitle": "¡Nuevo hito alcanzado!",
+    "testCreatedAt": "Prueba creada a las {{time}} - se guardará en 4s",
+    "aiSuggestionTitle": "Sugerencia de IA",
+    "uploadComplete": "Subida Completa",
+    "uploadCompleteDesc": "Prueba notificación de subida",
+    "newComment": "Nuevo Comentario",
+    "newCommentDesc": "Prueba notificación de comentario",
+    "aiSuggestion": "Sugerencia IA",
+    "aiSuggestionDesc": "Prueba notificación de IA"
+  },
+  "desktopInfo": "Las notificaciones de escritorio te avisan incluso cuando no tienes la app abierta"
+}

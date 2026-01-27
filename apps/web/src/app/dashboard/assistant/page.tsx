@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { emitCalendarUpdate, emitIdeasUpdate } from '@/lib/events';
+import { useTranslation } from 'react-i18next';
 
 interface SmartIdea {
   title: string;
@@ -73,6 +74,7 @@ interface QuickAction {
 }
 
 export default function AssistantPage() {
+  const { t } = useTranslation('assistant');
   const [channel, setChannel] = useState<Channel | null>(null);
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState('');
@@ -276,7 +278,7 @@ export default function AssistantPage() {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
-        content: 'Sorry, I encountered an error. Please make sure at least one AI provider is configured (OPENAI_API_KEY, ANTHROPIC_API_KEY, or GROQ_API_KEY).',
+        content: t('errors.generic'),
         timestamp: new Date(),
       };
       setMessages((prev) => [...prev, errorMessage]);
@@ -555,16 +557,16 @@ export default function AssistantPage() {
   const quickActions: QuickAction[] = [
     {
       id: 'titles',
-      label: 'Generate Titles',
+      label: t('quickActions.generateTitles'),
       icon: FileText,
-      description: 'Create catchy video titles',
+      description: t('quickActions.generateTitlesDesc'),
       action: () => setShowTitleModal(true),
     },
     {
       id: 'ideas',
-      label: 'Video Ideas',
+      label: t('quickActions.videoIdeas'),
       icon: Lightbulb,
-      description: 'Get content suggestions',
+      description: t('quickActions.videoIdeasDesc'),
       action: () => {
         setShowIdeasModal(true);
         generateIdeas();
@@ -572,21 +574,21 @@ export default function AssistantPage() {
     },
     {
       id: 'analyze-channel',
-      label: 'Analyze Channel',
+      label: t('quickActions.analyzeChannel'),
       icon: BarChart3,
-      description: 'Get channel insights',
+      description: t('quickActions.analyzeChannelDesc'),
       action: () => {
-        setInput('Analyze my channel and give me growth recommendations');
+        setInput(t('quickActions.analyzeChannelPrompt'));
         inputRef.current?.focus();
       },
     },
     {
       id: 'optimize',
-      label: 'SEO Tips',
+      label: t('quickActions.seoTips'),
       icon: Wand2,
-      description: 'Optimize for search',
+      description: t('quickActions.seoTipsDesc'),
       action: () => {
-        setInput('What are the best SEO practices for YouTube right now?');
+        setInput(t('quickActions.seoTipsPrompt'));
         inputRef.current?.focus();
       },
     },
@@ -606,10 +608,10 @@ export default function AssistantPage() {
       <div className="mb-6">
         <h1 className="text-3xl font-bold flex items-center gap-2">
           <Sparkles className="w-8 h-8 text-primary" />
-          AI Assistant
+          {t('header.title')}
         </h1>
         <p className="text-muted-foreground mt-1">
-          Your intelligent helper for content creation and channel growth
+          {t('header.subtitle')}
         </p>
       </div>
 
@@ -635,9 +637,9 @@ export default function AssistantPage() {
           {messages.length === 0 ? (
             <div className="flex flex-col items-center justify-center h-full text-center text-muted-foreground">
               <Bot className="w-16 h-16 mb-4" />
-              <p className="text-lg font-medium">How can I help you today?</p>
+              <p className="text-lg font-medium">{t('chat.emptyTitle')}</p>
               <p className="text-sm mt-1">
-                Ask me anything about YouTube content creation, or use the quick actions above.
+                {t('chat.emptySubtitle')}
               </p>
             </div>
           ) : (
@@ -675,8 +677,8 @@ export default function AssistantPage() {
                           <span>{message.actionExecuted ? '✓' : '📅'}</span>
                           <span>
                             {message.actionExecuted
-                              ? `Evento creado: "${(message.action.data as { title: string }).title}"`
-                              : `Creando evento...`}
+                              ? t('messages.eventCreated', { title: (message.action.data as { title: string }).title })
+                              : t('messages.creatingEvent')}
                           </span>
                         </div>
                       )}
@@ -685,33 +687,33 @@ export default function AssistantPage() {
                           <span>{message.actionExecuted ? '✓' : '💡'}</span>
                           <span>
                             {message.actionExecuted
-                              ? `Idea añadida: "${(message.action.data as { title: string }).title}"`
-                              : `Creando idea...`}
+                              ? t('messages.ideaAdded', { title: (message.action.data as { title: string }).title })
+                              : t('messages.creatingIdea')}
                           </span>
                         </div>
                       )}
                       {message.action.action === 'UPDATE_CALENDAR_EVENT' && (
                         <div className="flex items-center gap-2">
                           <span>{message.actionExecuted ? '✓' : '📅'}</span>
-                          <span>{message.actionExecuted ? 'Evento actualizado' : 'Actualizando evento...'}</span>
+                          <span>{message.actionExecuted ? t('messages.eventUpdated') : t('messages.updatingEvent')}</span>
                         </div>
                       )}
                       {message.action.action === 'UPDATE_IDEA' && (
                         <div className="flex items-center gap-2">
                           <span>{message.actionExecuted ? '✓' : '💡'}</span>
-                          <span>{message.actionExecuted ? 'Idea actualizada' : 'Actualizando idea...'}</span>
+                          <span>{message.actionExecuted ? t('messages.ideaUpdated') : t('messages.updatingIdea')}</span>
                         </div>
                       )}
                       {message.action.action === 'DELETE_CALENDAR_EVENT' && (
                         <div className="flex items-center gap-2">
                           <span>{message.actionExecuted ? '✓' : '🗑️'}</span>
-                          <span>{message.actionExecuted ? 'Evento eliminado' : 'Eliminando evento...'}</span>
+                          <span>{message.actionExecuted ? t('messages.eventDeleted') : t('messages.deletingEvent')}</span>
                         </div>
                       )}
                       {message.action.action === 'DELETE_IDEA' && (
                         <div className="flex items-center gap-2">
                           <span>{message.actionExecuted ? '✓' : '🗑️'}</span>
-                          <span>{message.actionExecuted ? 'Idea eliminada' : 'Eliminando idea...'}</span>
+                          <span>{message.actionExecuted ? t('messages.ideaDeleted') : t('messages.deletingIdea')}</span>
                         </div>
                       )}
                     </div>
@@ -727,7 +729,7 @@ export default function AssistantPage() {
                         ))
                       ) : (
                         <div className="text-xs p-2 bg-muted/50 rounded text-muted-foreground">
-                          No hay eventos próximos
+                          {t('messages.noUpcomingEvents')}
                         </div>
                       )}
                     </div>
@@ -743,14 +745,14 @@ export default function AssistantPage() {
                         ))
                       ) : (
                         <div className="text-xs p-2 bg-muted/50 rounded text-muted-foreground">
-                          No tienes ideas guardadas
+                          {t('messages.noSavedIdeas')}
                         </div>
                       )}
                     </div>
                   )}
                   {message.action?.action === 'CREATE_SMART_IDEAS' && message.pendingIdeas && (
                     <div className="mt-3 space-y-2">
-                      <div className="text-xs text-muted-foreground font-medium">Selecciona las ideas que quieres crear:</div>
+                      <div className="text-xs text-muted-foreground font-medium">{t('smartIdeas.selectPrompt')}</div>
                       {message.pendingIdeas.map((idea, idx) => (
                         <div
                           key={idx}
@@ -789,14 +791,14 @@ export default function AssistantPage() {
                                       ? 'bg-blue-500 text-white'
                                       : 'bg-muted hover:bg-blue-100 dark:hover:bg-blue-900/30'
                                   )}
-                                  title={idea.accepted ? 'Deseleccionar' : 'Seleccionar'}
+                                  title={idea.accepted ? t('smartIdeas.deselect') : t('smartIdeas.select')}
                                 >
                                   <Check className="w-4 h-4" />
                                 </button>
                                 <button
                                   onClick={() => rejectIdea(message.id, idx)}
                                   className="p-1.5 rounded bg-muted hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-600 transition-colors"
-                                  title="Descartar"
+                                  title={t('smartIdeas.discard')}
                                 >
                                   <X className="w-4 h-4" />
                                 </button>
@@ -811,14 +813,14 @@ export default function AssistantPage() {
                             onClick={() => acceptAllIdeas(message.id)}
                             className="flex-1 py-2 px-4 bg-muted hover:bg-muted/80 rounded-lg text-sm font-medium transition-colors"
                           >
-                            Seleccionar todas
+                            {t('smartIdeas.selectAll')}
                           </button>
                           <button
                             onClick={() => createAcceptedIdeas(message.id)}
                             disabled={!message.pendingIdeas.some(i => i.accepted && !i.created)}
                             className="flex-1 py-2 px-4 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                           >
-                            Crear seleccionadas
+                            {t('smartIdeas.createSelected')}
                           </button>
                         </div>
                       )}
@@ -832,7 +834,7 @@ export default function AssistantPage() {
                       <button
                         onClick={() => copyToClipboard(message.content, message.id)}
                         className="p-1 hover:bg-background/50 rounded"
-                        title="Copy response"
+                        title={t('chat.copy')}
                       >
                         {copiedId === message.id ? (
                           <Check className="w-3 h-3 text-green-500" />
@@ -877,7 +879,7 @@ export default function AssistantPage() {
               value={input}
               onChange={(e) => setInput(e.target.value)}
               onKeyDown={handleKeyDown}
-              placeholder="Ask me anything about YouTube content creation..."
+              placeholder={t('chat.placeholder')}
               className="flex-1 px-4 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
               disabled={loading}
             />
@@ -896,17 +898,17 @@ export default function AssistantPage() {
       {showTitleModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-card border rounded-lg p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">Generate Video Titles</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('titleModal.title')}</h3>
 
             <div className="space-y-4">
               <div>
                 <label className="block text-sm font-medium mb-1">
-                  Describe your video
+                  {t('titleModal.describeVideo')}
                 </label>
                 <textarea
                   value={titleDescription}
                   onChange={(e) => setTitleDescription(e.target.value)}
-                  placeholder="E.g., A tutorial about time management tips for students..."
+                  placeholder={t('titleModal.placeholder')}
                   className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
                   rows={3}
                 />
@@ -920,13 +922,13 @@ export default function AssistantPage() {
                 {generating ? (
                   <RefreshCw className="w-4 h-4 animate-spin mx-auto" />
                 ) : (
-                  'Generate Titles'
+                  t('titleModal.generate')
                 )}
               </button>
 
               {generatedTitles.length > 0 && (
                 <div className="space-y-2">
-                  <p className="text-sm font-medium">Generated Titles:</p>
+                  <p className="text-sm font-medium">{t('titleModal.generatedTitles')}</p>
                   {generatedTitles.map((title, index) => (
                     <div
                       key={index}
@@ -958,7 +960,7 @@ export default function AssistantPage() {
                 }}
                 className="px-4 py-2 text-sm hover:bg-muted rounded-lg"
               >
-                Close
+                {t('actions.close')}
               </button>
             </div>
           </div>
@@ -969,12 +971,12 @@ export default function AssistantPage() {
       {showIdeasModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
           <div className="bg-card border rounded-lg p-6 w-full max-w-lg max-h-[80vh] overflow-y-auto">
-            <h3 className="text-lg font-semibold mb-4">Video Ideas for Your Channel</h3>
+            <h3 className="text-lg font-semibold mb-4">{t('ideasModal.title')}</h3>
 
             {generating ? (
               <div className="flex flex-col items-center justify-center py-8">
                 <RefreshCw className="w-8 h-8 animate-spin text-primary mb-2" />
-                <p className="text-sm text-muted-foreground">Generating ideas...</p>
+                <p className="text-sm text-muted-foreground">{t('ideasModal.generating')}</p>
               </div>
             ) : generatedIdeas.length > 0 ? (
               <div className="space-y-4">
@@ -1000,7 +1002,7 @@ export default function AssistantPage() {
               </div>
             ) : (
               <p className="text-center text-muted-foreground py-8">
-                No ideas generated yet
+                {t('ideasModal.noIdeas')}
               </p>
             )}
 
@@ -1010,7 +1012,7 @@ export default function AssistantPage() {
                 disabled={generating}
                 className="px-4 py-2 text-sm bg-secondary hover:bg-secondary/80 rounded-lg"
               >
-                Regenerate
+                {t('actions.regenerate')}
               </button>
               <button
                 onClick={() => {
@@ -1019,7 +1021,7 @@ export default function AssistantPage() {
                 }}
                 className="px-4 py-2 text-sm hover:bg-muted rounded-lg"
               >
-                Close
+                {t('actions.close')}
               </button>
             </div>
           </div>

@@ -1,0 +1,47 @@
+{
+  "title": "Notifications",
+  "markAllRead": "Mark all read",
+  "deleteAll": "Delete all",
+  "empty": "No notifications",
+  "configure": "Configure notifications",
+  "saving": "Saving...",
+  "savesIn": "saves in {{seconds}}s",
+  "delete": "Delete",
+  "closeAndSave": "Close and save to notifications",
+  "types": {
+    "milestone": {
+      "title": "New Milestone",
+      "reached": "You reached {{count}} {{type}}!"
+    },
+    "upload_complete": {
+      "title": "Upload Complete",
+      "message": "Your video is ready"
+    },
+    "new_comment": {
+      "title": "New Comment",
+      "message": "Someone commented on your video"
+    },
+    "system": {
+      "title": "System",
+      "message": "System message"
+    },
+    "ai_suggestion": {
+      "title": "AI Suggestion",
+      "message": "You have a new suggestion"
+    }
+  },
+  "time": {
+    "now": "Now",
+    "minutesAgo": "{{count}}m ago",
+    "hoursAgo": "{{count}}h ago",
+    "daysAgo": "{{count}}d ago"
+  },
+  "toast": {
+    "testTitle": "Test notification",
+    "testMessage": "This is a test notification"
+  },
+  "milestones": {
+    "subscribers": "subscribers",
+    "views": "views"
+  }
+}
