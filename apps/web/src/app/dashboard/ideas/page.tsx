@@ -1,13 +1,15 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { Plus, RefreshCw, Lightbulb, GripVertical, Trash2, ExternalLink, Search, X, Copy, Download, Sparkles } from 'lucide-react';
+import { Plus, RefreshCw, Lightbulb, GripVertical, Trash2, ExternalLink, Search, X, Copy, Download, Sparkles, Check, Filter, ChevronDown } from 'lucide-react';
+import { SkeletonKanban } from '@/components/ui/skeleton';
 import { cn } from '@/lib/utils';
 import { onIdeasUpdate } from '@/lib/events';
 import {
   DndContext,
   DragOverlay,
-  closestCorners,
+  pointerWithin,
+  rectIntersection,
   KeyboardSensor,
   PointerSensor,
   useSensor,
@@ -15,8 +17,11 @@ import {
   useDroppable,
   type DragEndEvent,
   type DragStartEvent,
+  type DragOverEvent,
+  type CollisionDetection,
+  type UniqueIdentifier,
 } from '@dnd-kit/core';
-import { useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
+import { useSortable, SortableContext, verticalListSortingStrategy, arrayMove } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 interface Idea {
@@ -28,6 +33,7 @@ interface Idea {
   status: string;
   inspirationUrls: string[] | null;
   createdAt: string;
+  sortOrder?: number;
 }
 
 interface Channel {
@@ -36,24 +42,17 @@ interface Channel {
 }
 
 const statusColumns = [
-  { id: 'new', title: 'New Ideas', color: 'border-gray-400' },
-  { id: 'researching', title: 'Researching', color: 'border-blue-400' },
-  { id: 'approved', title: 'Approved', color: 'border-green-400' },
-  { id: 'in_production', title: 'In Production', color: 'border-purple-400' },
+  { id: 'new', title: 'New Ideas', color: 'from-gray-400 to-gray-500', bgColor: 'bg-gray-50 dark:bg-gray-900/20' },
+  { id: 'researching', title: 'Researching', color: 'from-blue-400 to-blue-500', bgColor: 'bg-blue-50 dark:bg-blue-900/20' },
+  { id: 'approved', title: 'Approved', color: 'from-green-400 to-green-500', bgColor: 'bg-green-50 dark:bg-green-900/20' },
+  { id: 'in_production', title: 'In Production', color: 'from-purple-400 to-purple-500', bgColor: 'bg-purple-50 dark:bg-purple-900/20' },
 ];
 
-const priorityColors: Record<number, string> = {
-  0: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
-  1: 'bg-blue-100 text-blue-600 dark:bg-blue-900 dark:text-blue-400',
-  2: 'bg-yellow-100 text-yellow-600 dark:bg-yellow-900 dark:text-yellow-400',
-  3: 'bg-red-100 text-red-600 dark:bg-red-900 dark:text-red-400',
-};
-
-const priorityLabels: Record<number, string> = {
-  0: 'Low',
-  1: 'Medium',
-  2: 'High',
-  3: 'Urgent',
+const priorityConfig: Record<number, { label: string; color: string; dot: string }> = {
+  0: { label: 'Low', color: 'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400', dot: 'bg-gray-400' },
+  1: { label: 'Medium', color: 'bg-blue-100 text-blue-600 dark:bg-blue-900/50 dark:text-blue-400', dot: 'bg-blue-400' },
+  2: { label: 'High', color: 'bg-amber-100 text-amber-600 dark:bg-amber-900/50 dark:text-amber-400', dot: 'bg-amber-400' },
+  3: { label: 'Urgent', color: 'bg-red-100 text-red-600 dark:bg-red-900/50 dark:text-red-400', dot: 'bg-red-400' },
 };
 
 // Draggable Idea Card Component
@@ -77,112 +76,115 @@ function DraggableIdeaCard({
     transform,
     transition,
     isDragging,
-  } = useSortable({ id: idea.id, data: { idea } });
+  } = useSortable({ id: idea.id, data: { idea, type: 'idea' } });
 
   const style = {
     transform: CSS.Transform.toString(transform),
     transition,
-    opacity: isDragging ? 0.5 : 1,
   };
+
+  const priority = priorityConfig[idea.priority];
 
   return (
     <div
       ref={setNodeRef}
       style={style}
       className={cn(
-        'p-4 rounded-lg border bg-card hover:shadow-md transition-shadow',
-        isDragging && 'shadow-lg ring-2 ring-primary'
+        'group p-4 rounded-xl border bg-card shadow-sm transition-all duration-200',
+        isDragging
+          ? 'opacity-50 shadow-xl ring-2 ring-primary scale-[1.02]'
+          : 'hover:shadow-md hover:border-primary/20'
       )}
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="flex items-start gap-2 flex-1">
-          <button
-            {...attributes}
-            {...listeners}
-            className="mt-1 cursor-grab active:cursor-grabbing touch-none"
-          >
-            <GripVertical className="w-4 h-4 text-muted-foreground" />
-          </button>
-          <div className="flex-1 min-w-0">
+      <div className="flex items-start gap-3">
+        <button
+          {...attributes}
+          {...listeners}
+          className="mt-0.5 p-1 -ml-1 cursor-grab active:cursor-grabbing touch-none rounded-md hover:bg-muted transition-colors"
+        >
+          <GripVertical className="w-4 h-4 text-muted-foreground" />
+        </button>
+
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
             <h4
-              className="font-medium line-clamp-2 cursor-pointer hover:text-primary"
+              className="font-semibold text-sm line-clamp-2 cursor-pointer hover:text-primary transition-colors"
               onClick={() => onEdit(idea)}
               title={idea.title}
             >
               {idea.title}
             </h4>
-            {idea.description && (
-              <p className="text-sm text-muted-foreground mt-1 line-clamp-2" title={idea.description}>
-                {idea.description}
-              </p>
-            )}
+            <div className="flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              <button
+                onClick={() => onCopy(idea.title)}
+                className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+                title="Copy title"
+              >
+                <Copy className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => onDuplicate(idea)}
+                className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+                title="Duplicate"
+              >
+                <Plus className="w-3.5 h-3.5" />
+              </button>
+              <button
+                onClick={() => onDelete(idea.id)}
+                className="p-1.5 hover:bg-destructive/10 rounded-lg text-muted-foreground hover:text-destructive transition-colors"
+                title="Delete"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </div>
           </div>
-        </div>
-        <div className="flex items-center gap-1">
-          <button
-            onClick={() => onCopy(idea.title)}
-            className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
-            title="Copy title"
-          >
-            <Copy className="w-3 h-3" />
-          </button>
-          <button
-            onClick={() => onDuplicate(idea)}
-            className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-foreground"
-            title="Duplicate"
-          >
-            <Plus className="w-3 h-3" />
-          </button>
-          <button
-            onClick={() => onDelete(idea.id)}
-            className="p-1 hover:bg-muted rounded text-muted-foreground hover:text-destructive"
-            title="Delete"
-          >
-            <Trash2 className="w-3 h-3" />
-          </button>
+
+          {idea.description && (
+            <p className="text-xs text-muted-foreground mt-1.5 line-clamp-2" title={idea.description}>
+              {idea.description}
+            </p>
+          )}
+
+          <div className="flex items-center gap-2 mt-3">
+            <span className={cn(
+              'inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium',
+              priority.color
+            )}>
+              <span className={cn('w-1.5 h-1.5 rounded-full', priority.dot)} />
+              {priority.label}
+            </span>
+            <span className="px-2 py-1 rounded-md text-xs font-medium bg-secondary text-secondary-foreground">
+              {idea.contentType === 'short' ? 'Short' : 'Video'}
+            </span>
+          </div>
+
+          {idea.inspirationUrls && idea.inspirationUrls.length > 0 && (
+            <a
+              href={idea.inspirationUrls[0]}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center gap-1 mt-3 text-xs text-primary hover:underline"
+            >
+              <ExternalLink className="w-3 h-3" />
+              Reference
+            </a>
+          )}
         </div>
       </div>
-
-      <div className="flex items-center gap-2 mt-3">
-        <span className={cn('px-2 py-0.5 rounded text-xs font-medium', priorityColors[idea.priority])}>
-          {priorityLabels[idea.priority]}
-        </span>
-        <span className="px-2 py-0.5 rounded text-xs bg-muted">
-          {idea.contentType === 'short' ? 'Short' : 'Video'}
-        </span>
-      </div>
-
-      {idea.inspirationUrls && idea.inspirationUrls.length > 0 && (
-        <div className="mt-2">
-          <a
-            href={idea.inspirationUrls[0]}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs text-primary hover:underline"
-          >
-            <ExternalLink className="w-3 h-3" />
-            Reference
-          </a>
-        </div>
-      )}
     </div>
   );
 }
 
 // Droppable Column Component
 function DroppableColumn({
-  id,
-  title,
-  color,
+  column,
   ideas,
   onEdit,
   onDelete,
   onDuplicate,
   onCopy,
 }: {
-  id: string;
-  title: string;
-  color: string;
+  column: typeof statusColumns[0];
   ideas: Idea[];
   onEdit: (idea: Idea) => void;
   onDelete: (id: string) => void;
@@ -190,14 +192,16 @@ function DroppableColumn({
   onCopy: (text: string) => void;
 }) {
   const { setNodeRef, isOver } = useDroppable({
-    id: id,
+    id: column.id,
+    data: { type: 'column', status: column.id },
   });
 
   return (
-    <div className="space-y-3">
-      <div className={cn('flex items-center gap-2 pb-2 border-b-2', color)}>
-        <h3 className="font-semibold">{title}</h3>
-        <span className="text-sm text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+    <div className="flex flex-col h-full">
+      <div className="flex items-center gap-3 mb-4">
+        <div className={cn('w-1 h-6 rounded-full bg-gradient-to-b', column.color)} />
+        <h3 className="font-semibold text-sm">{column.title}</h3>
+        <span className="ml-auto px-2.5 py-0.5 rounded-full text-xs font-medium bg-muted text-muted-foreground">
           {ideas.length}
         </span>
       </div>
@@ -205,8 +209,9 @@ function DroppableColumn({
       <div
         ref={setNodeRef}
         className={cn(
-          'space-y-3 min-h-[200px] p-2 rounded-lg transition-colors',
-          isOver ? 'bg-primary/10 ring-2 ring-primary/50' : 'bg-muted/30'
+          'flex-1 space-y-3 p-3 rounded-xl transition-all duration-200 min-h-[300px]',
+          column.bgColor,
+          isOver && 'ring-2 ring-primary ring-offset-2 ring-offset-background'
         )}
       >
         <SortableContext items={ideas.map(i => i.id)} strategy={verticalListSortingStrategy}>
@@ -224,11 +229,12 @@ function DroppableColumn({
 
         {ideas.length === 0 && (
           <div className={cn(
-            'flex flex-col items-center justify-center py-8 text-muted-foreground',
-            isOver && 'text-primary'
+            'flex flex-col items-center justify-center py-12 text-muted-foreground rounded-xl border-2 border-dashed',
+            isOver ? 'border-primary bg-primary/5' : 'border-muted'
           )}>
-            <Lightbulb className="w-8 h-8 mb-2" />
-            <p className="text-sm">{isOver ? 'Drop here!' : 'Drop ideas here'}</p>
+            <Lightbulb className={cn('w-8 h-8 mb-2', isOver && 'text-primary')} />
+            <p className="text-sm font-medium">{isOver ? 'Drop here!' : 'No ideas yet'}</p>
+            <p className="text-xs mt-1">Drag ideas here</p>
           </div>
         )}
       </div>
@@ -246,6 +252,9 @@ export default function IdeasPage() {
   const [editingIdea, setEditingIdea] = useState<Idea | null>(null);
   const [activeId, setActiveId] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
+  const [showFilters, setShowFilters] = useState(false);
+  const [priorityFilter, setPriorityFilter] = useState<number | 'all'>('all');
+  const [contentTypeFilter, setContentTypeFilter] = useState<string | 'all'>('all');
 
   const [formData, setFormData] = useState({
     title: '',
@@ -261,7 +270,7 @@ export default function IdeasPage() {
   const [showAiSuggestions, setShowAiSuggestions] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<Array<{ title: string; description: string; reason: string }>>([]);
   const [generatingDescription, setGeneratingDescription] = useState(false);
-  const [aiPrompt, setAiPrompt] = useState(''); // Custom prompt for AI suggestions
+  const [aiPrompt, setAiPrompt] = useState('');
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -271,6 +280,36 @@ export default function IdeasPage() {
     }),
     useSensor(KeyboardSensor)
   );
+
+  // Custom collision detection
+  const collisionDetection: CollisionDetection = (args) => {
+    const pointerCollisions = pointerWithin(args);
+
+    if (pointerCollisions.length > 0) {
+      // Check if we're hovering over an idea
+      const ideaCollision = pointerCollisions.find(
+        collision => ideas.some(idea => idea.id === collision.id)
+      );
+
+      // If hovering over an idea, prioritize it (for reordering within column)
+      if (ideaCollision) {
+        return [ideaCollision];
+      }
+
+      // Otherwise, check for column collision (for moving between columns)
+      const columnCollision = pointerCollisions.find(
+        collision => statusColumns.some(col => col.id === collision.id)
+      );
+      if (columnCollision) {
+        return [columnCollision];
+      }
+
+      return pointerCollisions;
+    }
+
+    // Fallback to rect intersection
+    return rectIntersection(args);
+  };
 
   useEffect(() => {
     fetchChannel();
@@ -282,7 +321,6 @@ export default function IdeasPage() {
     }
   }, [channel]);
 
-  // Listen for AI-triggered ideas updates
   useEffect(() => {
     const unsubscribe = onIdeasUpdate(() => {
       if (channel) {
@@ -292,10 +330,8 @@ export default function IdeasPage() {
     return unsubscribe;
   }, [channel]);
 
-  // Check for unsaved changes
   const hasUnsavedChanges = showModal && formData.title.trim() !== '';
 
-  // Keyboard shortcuts
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'n' && !e.metaKey && !e.ctrlKey && !showModal) {
@@ -322,7 +358,6 @@ export default function IdeasPage() {
     return () => window.removeEventListener('keydown', handleKeyDown);
   }, [showModal, hasUnsavedChanges]);
 
-  // Warn before leaving page with unsaved changes
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
       if (hasUnsavedChanges) {
@@ -467,6 +502,24 @@ export default function IdeasPage() {
     }
   };
 
+  const saveIdeasOrder = async (reorderedIdeas: Idea[]) => {
+    if (!channel) return;
+
+    try {
+      await fetch('http://localhost:4000/ideas/reorder', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          channelId: channel.id,
+          ideaIds: reorderedIdeas.map((idea) => idea.id),
+        }),
+      });
+    } catch (err) {
+      console.error('Failed to save ideas order:', err);
+    }
+  };
+
   const deleteIdea = async (ideaId: string) => {
     if (!confirm('Are you sure you want to delete this idea?')) return;
 
@@ -606,7 +659,7 @@ export default function IdeasPage() {
       idea.title,
       idea.description || '',
       idea.status,
-      priorityLabels[idea.priority],
+      priorityConfig[idea.priority].label,
       idea.contentType,
       new Date(idea.createdAt).toLocaleDateString(),
     ]);
@@ -627,6 +680,41 @@ export default function IdeasPage() {
     setActiveId(event.active.id as string);
   };
 
+  const handleDragOver = (event: DragOverEvent) => {
+    const { active, over } = event;
+    if (!over) return;
+
+    const activeIdea = ideas.find((i) => i.id === active.id);
+    if (!activeIdea) return;
+
+    const overId = over.id as string;
+
+    // Check if dropping on another idea (for reordering or moving to that idea's column)
+    const overIdea = ideas.find((i) => i.id === overId);
+    if (overIdea) {
+      // Only update status if moving to a different column
+      if (overIdea.status !== activeIdea.status) {
+        setIdeas((prev) =>
+          prev.map((idea) =>
+            idea.id === activeIdea.id ? { ...idea, status: overIdea.status } : idea
+          )
+        );
+      }
+      // If same column, don't do anything in dragOver - reordering happens in dragEnd
+      return;
+    }
+
+    // Check if dropping on a column directly (empty area)
+    const targetColumn = statusColumns.find((col) => col.id === overId);
+    if (targetColumn && targetColumn.id !== activeIdea.status) {
+      setIdeas((prev) =>
+        prev.map((idea) =>
+          idea.id === activeIdea.id ? { ...idea, status: targetColumn.id } : idea
+        )
+      );
+    }
+  };
+
   const handleDragEnd = (event: DragEndEvent) => {
     const { active, over } = event;
     setActiveId(null);
@@ -636,35 +724,81 @@ export default function IdeasPage() {
     const activeIdea = ideas.find((i) => i.id === active.id);
     if (!activeIdea) return;
 
+    const overId = over.id as string;
+
     // Check if dropped on a column
-    const targetStatus = statusColumns.find((col) => col.id === over.id)?.id;
+    const targetColumn = statusColumns.find((col) => col.id === overId);
+    if (targetColumn) {
+      if (targetColumn.id !== activeIdea.status) {
+        // Status already updated in handleDragOver, just sync with backend
+        updateIdeaStatus(activeIdea.id, targetColumn.id);
+        // Also save the order after status change
+        saveIdeasOrder(ideas.map(idea =>
+          idea.id === activeIdea.id ? { ...idea, status: targetColumn.id } : idea
+        ));
+      }
+      return;
+    }
 
-    // Or check if dropped on another idea
-    const targetIdea = ideas.find((i) => i.id === over.id);
-    const targetStatusFromIdea = targetIdea?.status;
-
-    const newStatus = targetStatus || targetStatusFromIdea;
-
-    if (newStatus && newStatus !== activeIdea.status) {
-      updateIdeaStatus(activeIdea.id, newStatus);
+    // Check if dropped on another idea
+    const overIdea = ideas.find((i) => i.id === overId);
+    if (overIdea) {
+      // Reordering within the same column
+      if (overIdea.status === activeIdea.status && active.id !== over.id) {
+        const oldIndex = ideas.findIndex((i) => i.id === active.id);
+        const newIndex = ideas.findIndex((i) => i.id === over.id);
+        const reorderedIdeas = arrayMove(ideas, oldIndex, newIndex);
+        setIdeas(reorderedIdeas);
+        saveIdeasOrder(reorderedIdeas);
+      } else if (overIdea.status !== activeIdea.status) {
+        // Status already updated in handleDragOver, just sync with backend
+        updateIdeaStatus(activeIdea.id, overIdea.status);
+        // Also save the order after status change
+        saveIdeasOrder(ideas.map(idea =>
+          idea.id === activeIdea.id ? { ...idea, status: overIdea.status } : idea
+        ));
+      }
     }
   };
 
-  const filteredIdeas = ideas.filter(
-    (idea) =>
+  const filteredIdeas = ideas.filter((idea) => {
+    // Search filter
+    const matchesSearch =
       idea.title.toLowerCase().includes(search.toLowerCase()) ||
-      idea.description?.toLowerCase().includes(search.toLowerCase())
-  );
+      idea.description?.toLowerCase().includes(search.toLowerCase());
+
+    // Priority filter
+    const matchesPriority = priorityFilter === 'all' || idea.priority === priorityFilter;
+
+    // Content type filter
+    const matchesContentType = contentTypeFilter === 'all' || idea.contentType === contentTypeFilter;
+
+    return matchesSearch && matchesPriority && matchesContentType;
+  });
 
   const getIdeasByStatus = (status: string) =>
-    filteredIdeas.filter((idea) => idea.status === status).sort((a, b) => b.priority - a.priority);
+    filteredIdeas.filter((idea) => idea.status === status);
 
   const activeIdea = activeId ? ideas.find((i) => i.id === activeId) : null;
 
+  const hasActiveFilters = priorityFilter !== 'all' || contentTypeFilter !== 'all' || search !== '';
+
+  const clearAllFilters = () => {
+    setSearch('');
+    setPriorityFilter('all');
+    setContentTypeFilter('all');
+  };
+
   if (loading && !channel) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 animate-spin text-muted-foreground" />
+      <div className="space-y-6 animate-fade-in">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold">Content Ideas</h1>
+            <p className="text-muted-foreground mt-1">Organize and track your video ideas</p>
+          </div>
+        </div>
+        <SkeletonKanban columns={4} cardsPerColumn={3} />
       </div>
     );
   }
@@ -672,80 +806,145 @@ export default function IdeasPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">Content Ideas</h1>
           <p className="text-muted-foreground mt-1">
-            Organize and track your video ideas · <span className="text-xs">Press N for new idea</span>
+            Organize and track your video ideas
+            <span className="hidden sm:inline"> · Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">N</kbd> for new idea</span>
           </p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={exportToCSV}
-            className="flex items-center gap-2 px-3 py-2 bg-secondary text-secondary-foreground rounded-lg font-medium hover:bg-secondary/80 transition-colors"
+            className="btn-secondary px-3 py-2"
             title="Export to CSV"
           >
             <Download className="w-4 h-4" />
           </button>
           <button
             onClick={openAiSuggestionsModal}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:opacity-90 transition-all"
+            className="btn px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-[1.02] active:scale-[0.98]"
             title="Get AI suggestions"
           >
             <Sparkles className="w-4 h-4" />
-            Suggest with AI
+            <span className="hidden sm:inline">Suggest with AI</span>
           </button>
           <button
             onClick={openAddModal}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+            className="btn-primary px-4 py-2 shadow-lg shadow-primary/25"
           >
             <Plus size={20} />
-            New Idea
+            <span className="hidden sm:inline">New Idea</span>
           </button>
         </div>
       </div>
 
       {/* Copied notification */}
       {copied && (
-        <div className="fixed top-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg z-50">
+        <div className="fixed top-4 right-4 flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 rounded-xl shadow-lg z-50 animate-slide-in-right">
+          <Check className="w-4 h-4" />
           Copied to clipboard!
         </div>
       )}
 
-      {/* Search */}
-      <div className="relative max-w-md">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-        <input
-          type="text"
-          placeholder="Search ideas..."
-          value={search}
-          onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-10 pr-10 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
-        />
-        {search && (
+      {/* Search and Filters */}
+      <div className="space-y-4">
+        <div className="flex flex-col sm:flex-row gap-3">
+          <div className="relative flex-1 max-w-md">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <input
+              type="text"
+              placeholder="Search ideas..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="input pl-11 pr-10 w-full"
+            />
+            {search && (
+              <button
+                onClick={() => setSearch('')}
+                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-lg transition-colors"
+              >
+                <X className="w-4 h-4 text-muted-foreground" />
+              </button>
+            )}
+          </div>
+
           <button
-            onClick={() => setSearch('')}
-            className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded"
+            onClick={() => setShowFilters(!showFilters)}
+            className={cn(
+              'btn-secondary px-4 py-2 flex items-center gap-2',
+              showFilters && 'bg-primary text-primary-foreground hover:bg-primary/90'
+            )}
           >
-            <X className="w-4 h-4 text-muted-foreground" />
+            <Filter className="w-4 h-4" />
+            Filters
+            {hasActiveFilters && (
+              <span className="w-2 h-2 rounded-full bg-primary" />
+            )}
           </button>
+        </div>
+
+        {/* Filter Panel */}
+        {showFilters && (
+          <div className="flex flex-wrap items-center gap-4 p-4 rounded-xl bg-muted/30 border animate-fade-in">
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium">Priority:</label>
+              <select
+                value={priorityFilter === 'all' ? 'all' : priorityFilter.toString()}
+                onChange={(e) => setPriorityFilter(e.target.value === 'all' ? 'all' : parseInt(e.target.value))}
+                className="input py-1.5 px-3 min-w-[120px]"
+              >
+                <option value="all">All</option>
+                <option value="0">Low</option>
+                <option value="1">Medium</option>
+                <option value="2">High</option>
+                <option value="3">Urgent</option>
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <label className="text-sm font-medium">Type:</label>
+              <select
+                value={contentTypeFilter}
+                onChange={(e) => setContentTypeFilter(e.target.value)}
+                className="input py-1.5 px-3 min-w-[120px]"
+              >
+                <option value="all">All</option>
+                <option value="long_form">Video</option>
+                <option value="short">Short</option>
+              </select>
+            </div>
+
+            {hasActiveFilters && (
+              <button
+                onClick={clearAllFilters}
+                className="text-sm text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Clear all
+              </button>
+            )}
+
+            <div className="ml-auto text-sm text-muted-foreground">
+              {filteredIdeas.length} idea{filteredIdeas.length !== 1 ? 's' : ''} found
+            </div>
+          </div>
         )}
       </div>
 
       {/* Kanban Board with Drag and Drop */}
       <DndContext
         sensors={sensors}
-        collisionDetection={closestCorners}
+        collisionDetection={collisionDetection}
         onDragStart={handleDragStart}
+        onDragOver={handleDragOver}
         onDragEnd={handleDragEnd}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {statusColumns.map((column) => (
             <DroppableColumn
               key={column.id}
-              id={column.id}
-              title={column.title}
-              color={column.color}
+              column={column}
               ideas={getIdeasByStatus(column.id)}
               onEdit={openEditModal}
               onDelete={deleteIdea}
@@ -757,11 +956,15 @@ export default function IdeasPage() {
 
         <DragOverlay>
           {activeIdea ? (
-            <div className="p-4 rounded-lg border bg-card shadow-xl opacity-90 w-64">
-              <h4 className="font-medium truncate">{activeIdea.title}</h4>
-              <div className="flex items-center gap-2 mt-2">
-                <span className={cn('px-2 py-0.5 rounded text-xs font-medium', priorityColors[activeIdea.priority])}>
-                  {priorityLabels[activeIdea.priority]}
+            <div className="p-4 rounded-xl border bg-card shadow-2xl w-72 rotate-3">
+              <h4 className="font-semibold text-sm truncate">{activeIdea.title}</h4>
+              <div className="flex items-center gap-2 mt-3">
+                <span className={cn(
+                  'inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium',
+                  priorityConfig[activeIdea.priority].color
+                )}>
+                  <span className={cn('w-1.5 h-1.5 rounded-full', priorityConfig[activeIdea.priority].dot)} />
+                  {priorityConfig[activeIdea.priority].label}
                 </span>
               </div>
             </div>
@@ -771,10 +974,10 @@ export default function IdeasPage() {
 
       {/* Add/Edit Idea Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-card border rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">{editingIdea ? 'Edit Idea' : 'New Content Idea'}</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-card border rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in">
+            <div className="flex items-center justify-between mb-6">
+              <h3 className="text-xl font-bold">{editingIdea ? 'Edit Idea' : 'New Content Idea'}</h3>
               <button
                 onClick={() => {
                   if (hasUnsavedChanges) {
@@ -787,35 +990,35 @@ export default function IdeasPage() {
                     resetForm();
                   }
                 }}
-                className="p-1 hover:bg-muted rounded"
+                className="p-2 hover:bg-muted rounded-xl transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <label className="block text-sm font-medium mb-1">Title *</label>
+                <label className="block text-sm font-medium mb-2">Title *</label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="input"
                   placeholder="Video idea title..."
                   autoFocus
                 />
               </div>
 
               <div>
-                <div className="flex items-center justify-between mb-1">
+                <div className="flex items-center justify-between mb-2">
                   <label className="block text-sm font-medium">Description</label>
                   <button
                     type="button"
                     onClick={generateAiDescription}
                     disabled={generatingDescription || !formData.title}
-                    className="flex items-center gap-1 text-xs text-purple-500 hover:text-purple-600 disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="flex items-center gap-1.5 text-xs font-medium text-purple-500 hover:text-purple-600 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
                   >
-                    <Sparkles className={cn('w-3 h-3', generatingDescription && 'animate-spin')} />
+                    <Sparkles className={cn('w-3.5 h-3.5', generatingDescription && 'animate-spin')} />
                     {generatingDescription ? 'Generating...' : 'Generate with AI'}
                   </button>
                 </div>
@@ -823,18 +1026,18 @@ export default function IdeasPage() {
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                  className="input resize-none"
                   placeholder="Describe your idea..."
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Content Type</label>
+                  <label className="block text-sm font-medium mb-2">Content Type</label>
                   <select
                     value={formData.contentType}
                     onChange={(e) => setFormData({ ...formData, contentType: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="input"
                   >
                     <option value="long_form">Long Form Video</option>
                     <option value="short">Short</option>
@@ -842,11 +1045,11 @@ export default function IdeasPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">Priority</label>
+                  <label className="block text-sm font-medium mb-2">Priority</label>
                   <select
                     value={formData.priority}
                     onChange={(e) => setFormData({ ...formData, priority: parseInt(e.target.value) })}
-                    className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="input"
                   >
                     <option value={0}>Low</option>
                     <option value={1}>Medium</option>
@@ -858,11 +1061,11 @@ export default function IdeasPage() {
 
               {editingIdea && (
                 <div>
-                  <label className="block text-sm font-medium mb-1">Status</label>
+                  <label className="block text-sm font-medium mb-2">Status</label>
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="input"
                   >
                     <option value="new">New</option>
                     <option value="researching">Researching</option>
@@ -875,29 +1078,29 @@ export default function IdeasPage() {
               )}
 
               <div>
-                <label className="block text-sm font-medium mb-1">Inspiration URL</label>
+                <label className="block text-sm font-medium mb-2">Inspiration URL</label>
                 <input
                   type="url"
                   value={formData.inspirationUrl}
                   onChange={(e) => setFormData({ ...formData, inspirationUrl: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="input"
                   placeholder="https://..."
                 />
               </div>
             </div>
 
-            <div className="flex justify-between gap-2 mt-6">
+            <div className="flex justify-between gap-3 mt-8 pt-6 border-t">
               <div>
                 {editingIdea && (
                   <button
                     onClick={() => deleteIdea(editingIdea.id)}
-                    className="px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-lg"
+                    className="btn-ghost px-4 py-2.5 text-destructive hover:bg-destructive/10"
                   >
                     Delete
                   </button>
                 )}
               </div>
-              <div className="flex gap-2">
+              <div className="flex gap-3">
                 <button
                   onClick={() => {
                     if (hasUnsavedChanges) {
@@ -910,16 +1113,22 @@ export default function IdeasPage() {
                       resetForm();
                     }
                   }}
-                  className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg"
+                  className="btn-ghost px-4 py-2.5"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveIdea}
                   disabled={saving || !formData.title}
-                  className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50"
+                  className="btn-primary px-6 py-2.5"
                 >
-                  {saving ? 'Saving...' : editingIdea ? 'Save Changes' : 'Add Idea'}
+                  {saving ? (
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                  ) : editingIdea ? (
+                    'Save Changes'
+                  ) : (
+                    'Add Idea'
+                  )}
                 </button>
               </div>
             </div>
@@ -929,25 +1138,30 @@ export default function IdeasPage() {
 
       {/* AI Suggestions Modal */}
       {showAiSuggestions && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-card border rounded-lg p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-purple-500" />
-                <h3 className="text-lg font-semibold">AI-Suggested Ideas</h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-card border rounded-2xl p-6 w-full max-w-2xl max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center">
+                  <Sparkles className="w-5 h-5 text-white" />
+                </div>
+                <div>
+                  <h3 className="text-xl font-bold">AI-Suggested Ideas</h3>
+                  <p className="text-sm text-muted-foreground">Get personalized content suggestions</p>
+                </div>
               </div>
               <button
                 onClick={() => setShowAiSuggestions(false)}
-                className="p-1 hover:bg-muted rounded"
+                className="p-2 hover:bg-muted rounded-xl transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
             {/* Custom Prompt Input */}
-            <div className="mb-4 p-4 bg-muted/30 rounded-lg">
+            <div className="mb-6 p-4 bg-muted/30 rounded-xl">
               <label className="block text-sm font-medium mb-2">
-                What type of content do you want ideas for? (optional)
+                What type of content do you want ideas for?
               </label>
               <div className="flex gap-2">
                 <input
@@ -955,51 +1169,52 @@ export default function IdeasPage() {
                   value={aiPrompt}
                   onChange={(e) => setAiPrompt(e.target.value)}
                   onKeyDown={(e) => e.key === 'Enter' && !aiLoading && generateAiSuggestions()}
-                  placeholder="e.g., gameplay of Minecraft, analysis of tech products, cooking tutorials..."
-                  className="flex-1 px-3 py-2 text-sm border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  placeholder="e.g., gameplay of Minecraft, tech reviews, cooking tutorials..."
+                  className="input"
                   disabled={aiLoading}
                 />
                 <button
                   onClick={() => generateAiSuggestions()}
                   disabled={aiLoading}
-                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:opacity-90 disabled:opacity-50"
+                  className="btn px-4 py-2.5 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg hover:shadow-purple-500/40 disabled:opacity-50 whitespace-nowrap"
                 >
                   {aiLoading ? (
                     <RefreshCw className="w-4 h-4 animate-spin" />
                   ) : (
-                    <Sparkles className="w-4 h-4" />
+                    <>
+                      <Sparkles className="w-4 h-4" />
+                      Generate
+                    </>
                   )}
-                  Generate
                 </button>
               </div>
               <p className="text-xs text-muted-foreground mt-2">
-                Leave empty for general ideas based on your channel, or specify a topic for targeted suggestions.
+                Leave empty for general ideas based on your channel performance
               </p>
             </div>
 
             {aiLoading ? (
-              <div className="flex flex-col items-center justify-center py-12">
-                <RefreshCw className="w-8 h-8 animate-spin text-purple-500 mb-4" />
+              <div className="flex flex-col items-center justify-center py-16">
+                <div className="w-12 h-12 rounded-xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mb-4 animate-pulse">
+                  <Sparkles className="w-6 h-6 text-white" />
+                </div>
                 <p className="text-muted-foreground">
-                  {aiPrompt ? `Generating ideas about "${aiPrompt}"...` : 'Generating ideas based on your channel...'}
+                  {aiPrompt ? `Generating ideas about "${aiPrompt}"...` : 'Analyzing your channel...'}
                 </p>
               </div>
             ) : aiSuggestions.length > 0 ? (
               <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  {aiPrompt ? `Ideas about "${aiPrompt}":` : 'Based on your channel performance, here are some content ideas:'}
-                </p>
                 {aiSuggestions.map((suggestion, index) => (
                   <div
                     key={index}
-                    className="p-4 border rounded-lg hover:border-purple-500/50 transition-colors"
+                    className="group p-4 border rounded-xl hover:border-purple-500/50 hover:shadow-md transition-all duration-200"
                   >
-                    <h4 className="font-medium mb-1">{suggestion.title}</h4>
+                    <h4 className="font-semibold mb-1">{suggestion.title}</h4>
                     <p className="text-sm text-muted-foreground mb-2">{suggestion.description}</p>
-                    <p className="text-xs text-purple-500 mb-3">{suggestion.reason}</p>
+                    <p className="text-xs text-purple-500 mb-4">{suggestion.reason}</p>
                     <button
                       onClick={() => useAiSuggestion(suggestion)}
-                      className="text-sm text-primary hover:underline"
+                      className="btn-ghost text-sm text-primary hover:bg-primary/10"
                     >
                       Use this idea
                     </button>
@@ -1007,17 +1222,19 @@ export default function IdeasPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-8 text-muted-foreground">
-                <Lightbulb className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p className="mb-2">Enter a topic above and click Generate</p>
-                <p className="text-xs">Or leave it empty for general channel-based ideas</p>
+              <div className="text-center py-16">
+                <div className="w-16 h-16 rounded-2xl bg-muted flex items-center justify-center mx-auto mb-4">
+                  <Lightbulb className="w-8 h-8 text-muted-foreground" />
+                </div>
+                <p className="font-medium mb-1">Ready to generate ideas</p>
+                <p className="text-sm text-muted-foreground">Enter a topic above and click Generate</p>
               </div>
             )}
 
-            <div className="flex justify-end gap-2 mt-6 pt-4 border-t">
+            <div className="flex justify-end mt-6 pt-6 border-t">
               <button
                 onClick={() => setShowAiSuggestions(false)}
-                className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg"
+                className="btn-ghost px-4 py-2.5"
               >
                 Close
               </button>

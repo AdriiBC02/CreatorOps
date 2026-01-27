@@ -45,6 +45,7 @@ export const contentIdeas = pgTable('content_ideas', {
   estimatedEffort: varchar('estimated_effort', { length: 20 }),
   inspirationUrls: text('inspiration_urls').array(),
   status: varchar('status', { length: 20 }).default('new').notNull(),
+  sortOrder: integer('sort_order').default(0).notNull(),
   createdAt: timestamp('created_at').defaultNow().notNull(),
   updatedAt: timestamp('updated_at').defaultNow().notNull(),
 });

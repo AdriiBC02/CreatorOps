@@ -3,6 +3,7 @@ import { google } from 'googleapis';
 import { channels, videos, type DbClient } from '@creatorops/database';
 import { config } from '../../config/index.js';
 import { NotFoundError, ForbiddenError } from '../../middleware/error-handler.js';
+import { milestoneService } from '../notifications/milestone.service.js';
 
 export class ChannelsService {
   async getUserChannels(userId: string, db: DbClient) {
@@ -75,6 +76,13 @@ export class ChannelsService {
 
     // Sync videos from YouTube
     await this.syncVideos(channelId, oauth2Client, db);
+
+    // Check for milestones after sync
+    try {
+      await milestoneService.checkAllMilestones(userId, channelId, db);
+    } catch (error) {
+      console.error('Error checking milestones:', error);
+    }
 
     return updatedChannel;
   }

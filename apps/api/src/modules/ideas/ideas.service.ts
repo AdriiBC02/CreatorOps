@@ -21,6 +21,11 @@ interface UpdateIdeaData {
   estimatedEffort?: 'low' | 'medium' | 'high' | null;
   inspirationUrls?: string[] | null;
   status?: 'new' | 'researching' | 'approved' | 'in_production' | 'completed' | 'archived';
+  sortOrder?: number;
+}
+
+interface ReorderIdeasData {
+  ideaIds: string[];
 }
 
 export class IdeasService {
@@ -36,7 +41,7 @@ export class IdeasService {
 
     return db.query.contentIdeas.findMany({
       where: eq(contentIdeas.channelId, channelId),
-      orderBy: (ideas, { desc }) => [desc(ideas.createdAt)],
+      orderBy: (ideas, { asc, desc }) => [asc(ideas.sortOrder), desc(ideas.createdAt)],
     });
   }
 
@@ -102,6 +107,7 @@ export class IdeasService {
     if (data.estimatedEffort !== undefined) updateData.estimatedEffort = data.estimatedEffort;
     if (data.inspirationUrls !== undefined) updateData.inspirationUrls = data.inspirationUrls;
     if (data.status !== undefined) updateData.status = data.status;
+    if (data.sortOrder !== undefined) updateData.sortOrder = data.sortOrder;
 
     const [updatedIdea] = await db
       .update(contentIdeas)
@@ -120,5 +126,28 @@ export class IdeasService {
     }
 
     await db.delete(contentIdeas).where(eq(contentIdeas.id, ideaId));
+  }
+
+  async reorderIdeas(channelId: string, data: ReorderIdeasData, userId: string, db: DbClient) {
+    // Verify channel ownership
+    const channel = await db.query.channels.findFirst({
+      where: and(eq(channels.id, channelId), eq(channels.userId, userId)),
+    });
+
+    if (!channel) {
+      throw new ForbiddenError('You do not have access to this channel');
+    }
+
+    // Update sort order for each idea
+    const updates = data.ideaIds.map((ideaId, index) =>
+      db
+        .update(contentIdeas)
+        .set({ sortOrder: index, updatedAt: new Date() })
+        .where(and(eq(contentIdeas.id, ideaId), eq(contentIdeas.channelId, channelId)))
+    );
+
+    await Promise.all(updates);
+
+    return { success: true };
   }
 }

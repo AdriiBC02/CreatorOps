@@ -25,6 +25,11 @@ const updateIdeaSchema = z.object({
   status: z.enum(['new', 'researching', 'approved', 'in_production', 'completed', 'archived']).optional(),
 });
 
+const reorderIdeasSchema = z.object({
+  channelId: z.string().uuid(),
+  ideaIds: z.array(z.string().uuid()),
+});
+
 export class IdeasController {
   private ideasService = new IdeasService();
 
@@ -78,6 +83,19 @@ export class IdeasController {
       const db = req.app.locals.db;
 
       await this.ideasService.deleteIdea(id, req.user!.userId, db);
+
+      res.json({ success: true });
+    } catch (error) {
+      next(error);
+    }
+  };
+
+  reorderIdeas = async (req: AuthenticatedRequest, res: Response, next: NextFunction) => {
+    try {
+      const data = reorderIdeasSchema.parse(req.body);
+      const db = req.app.locals.db;
+
+      await this.ideasService.reorderIdeas(data.channelId, { ideaIds: data.ideaIds }, req.user!.userId, db);
 
       res.json({ success: true });
     } catch (error) {

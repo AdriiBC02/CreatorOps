@@ -14,6 +14,43 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [0.3.2] - 2026-01-27
+
+### Added - Notification Toast System
+- Sistema completo de notificaciones toast con animaciones
+- Barra de progreso animada (4 segundos) de derecha a izquierda
+- Colores por tipo de notificación (milestone, upload_complete, new_comment, system, ai_suggestion)
+- Animación "Guardando..." cuando el toast se guarda en la campana
+- Animación de vuelo hacia la izquierda al cerrar
+- Reposicionamiento suave cuando se elimina un toast
+- Sistema de deduplicación para evitar toasts duplicados
+- Refresh instantáneo de la campana cuando se guarda una notificación (eventos custom)
+- Soporte para notificaciones de escritorio (browser notifications)
+
+### Added - Quick Stats Refresh Animation
+- Animación de refresh en Quick Stats del sidebar
+- Icono giratorio (`animate-spin`) mientras carga
+- Atenuación de stats (opacity 50%) durante la recarga
+- Delay mínimo de 500ms para feedback visual
+- Animación `hover:rotate-180` en botones de refresh (sidebar, dashboard, analytics)
+
+### Changed
+- Botones de test de notificaciones en Settings ahora muestran duración ("guarda en 4s")
+- Mejorada la sincronización entre toasts y campana de notificaciones
+
+### Fixed
+- Barra de progreso ahora funciona en todos los tipos de notificación (usando colores hex inline)
+- Animación de colapso no corta la animación de vuelo (delay de 200ms)
+- Timing sincronizado entre animaciones CSS y JavaScript (500ms)
+
+### Removed
+- Eliminados console.log y console.error de múltiples archivos:
+  - layout.tsx, page.tsx (dashboard)
+  - NotificationToast.tsx, NotificationBell.tsx
+  - analytics/page.tsx
+
+---
+
 ## [0.3.1] - 2026-01-27
 
 ### Added - AI Actions (Chat Commands)

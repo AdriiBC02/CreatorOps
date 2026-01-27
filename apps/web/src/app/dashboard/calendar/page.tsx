@@ -1,9 +1,11 @@
 'use client';
 
 import { useEffect, useState, useRef } from 'react';
-import { ChevronLeft, ChevronRight, Plus, RefreshCw, Video, Clock, Trash2, Edit2, X, ChevronDown, Copy, Download } from 'lucide-react';
+import { ChevronLeft, ChevronRight, Plus, RefreshCw, Video, Clock, Trash2, Edit2, X, ChevronDown, Copy, Download, Calendar, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { onCalendarUpdate } from '@/lib/events';
+import { FloatingShapes, GlowingBadge, PulsingDot } from '@/components/ui/decorative';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface CalendarItem {
   id: string;
@@ -396,19 +398,62 @@ export default function CalendarPage() {
 
   if (loading && !channel) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 animate-spin text-muted-foreground" />
+      <div className="space-y-6 animate-fade-in">
+        {/* Header skeleton */}
+        <div className="flex items-center justify-between">
+          <div>
+            <Skeleton className="h-9 w-48 mb-2" />
+            <Skeleton className="h-4 w-64" />
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-10 rounded-lg" />
+            <Skeleton className="h-10 w-32 rounded-lg" />
+          </div>
+        </div>
+
+        {/* Navigation skeleton */}
+        <div className="flex items-center justify-between">
+          <Skeleton className="h-10 w-10 rounded-lg" />
+          <Skeleton className="h-10 w-40 rounded-lg" />
+          <Skeleton className="h-10 w-10 rounded-lg" />
+        </div>
+
+        {/* Calendar skeleton */}
+        <div className="border rounded-xl overflow-hidden">
+          <div className="grid grid-cols-7 bg-muted/50">
+            {Array.from({ length: 7 }).map((_, i) => (
+              <Skeleton key={i} className="h-10 m-2" />
+            ))}
+          </div>
+          <div className="grid grid-cols-7 gap-px bg-muted/30">
+            {Array.from({ length: 35 }).map((_, i) => (
+              <div key={i} className="min-h-[120px] p-2 bg-card">
+                <Skeleton className="h-7 w-7 rounded-full mb-2" />
+                {i % 4 === 0 && <Skeleton className="h-6 w-full rounded" />}
+              </div>
+            ))}
+          </div>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-6">
+      {/* Background decoration */}
+      <FloatingShapes className="fixed" />
+
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="relative flex items-center justify-between animate-fade-in">
         <div>
-          <h1 className="text-3xl font-bold">Content Calendar</h1>
-          <p className="text-muted-foreground mt-1">
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-3xl font-bold">Content Calendar</h1>
+            <GlowingBadge color="purple">
+              <Calendar className="w-3 h-3 mr-1" />
+              {items.length} items
+            </GlowingBadge>
+          </div>
+          <p className="text-muted-foreground">
             Plan and schedule your content
           </p>
         </div>
@@ -416,51 +461,54 @@ export default function CalendarPage() {
           <button
             onClick={exportToCSV}
             disabled={items.length === 0}
-            className="flex items-center gap-2 px-3 py-2 bg-secondary text-secondary-foreground rounded-lg font-medium hover:bg-secondary/80 transition-colors disabled:opacity-50"
+            className="flex items-center gap-2 px-3 py-2.5 bg-secondary text-secondary-foreground rounded-xl font-medium hover:bg-secondary/80 hover:scale-105 transition-all disabled:opacity-50"
             title="Export to CSV"
           >
             <Download className="w-4 h-4" />
           </button>
           <button
             onClick={() => openAddModal()}
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+            className="group flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 hover:scale-105 hover:shadow-lg hover:shadow-primary/25 transition-all"
           >
-            <Plus size={20} />
+            <Plus size={20} className="group-hover:rotate-90 transition-transform" />
             Add Content
           </button>
         </div>
       </div>
 
       {/* Calendar Navigation */}
-      <div className="flex items-center justify-between">
-        <button onClick={prevMonth} className="p-2 hover:bg-muted rounded-lg">
+      <div className="relative flex items-center justify-between p-4 bg-card border rounded-2xl animate-fade-in animation-delay-100">
+        <button
+          onClick={prevMonth}
+          className="p-2.5 hover:bg-muted rounded-xl hover:scale-110 transition-all"
+        >
           <ChevronLeft className="w-5 h-5" />
         </button>
 
         <div className="relative" ref={datePickerRef}>
           <button
             onClick={() => setShowDatePicker(!showDatePicker)}
-            className="flex items-center gap-2 text-xl font-semibold hover:bg-muted px-4 py-2 rounded-lg transition-colors"
+            className="flex items-center gap-2 text-xl font-semibold hover:bg-muted px-6 py-2.5 rounded-xl transition-all hover:scale-105"
           >
             {monthName} {year}
-            <ChevronDown className={cn("w-5 h-5 transition-transform", showDatePicker && "rotate-180")} />
+            <ChevronDown className={cn("w-5 h-5 transition-transform duration-300", showDatePicker && "rotate-180")} />
           </button>
 
           {/* Date Picker Dropdown */}
           {showDatePicker && (
-            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-card border rounded-lg shadow-lg p-4 z-50 min-w-[300px]">
+            <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 bg-card border rounded-2xl shadow-xl p-5 z-50 min-w-[320px] animate-fade-in">
               {/* Year selector */}
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-2">Year</label>
+                <label className="block text-sm font-medium mb-2 text-muted-foreground">Year</label>
                 <div className="flex flex-wrap gap-2">
                   {years.map((y) => (
                     <button
                       key={y}
                       onClick={() => goToYear(y)}
                       className={cn(
-                        "px-3 py-1 text-sm rounded-lg transition-colors",
+                        "px-3 py-1.5 text-sm rounded-lg transition-all hover:scale-105",
                         y === year
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
                           : "hover:bg-muted"
                       )}
                     >
@@ -472,16 +520,16 @@ export default function CalendarPage() {
 
               {/* Month selector */}
               <div className="mb-4">
-                <label className="block text-sm font-medium mb-2">Month</label>
+                <label className="block text-sm font-medium mb-2 text-muted-foreground">Month</label>
                 <div className="grid grid-cols-3 gap-2">
                   {months.map((m, idx) => (
                     <button
                       key={m}
                       onClick={() => goToMonth(idx)}
                       className={cn(
-                        "px-3 py-2 text-sm rounded-lg transition-colors",
+                        "px-3 py-2 text-sm rounded-lg transition-all hover:scale-105",
                         idx === currentDate.getMonth() && year === currentDate.getFullYear()
-                          ? "bg-primary text-primary-foreground"
+                          ? "bg-primary text-primary-foreground shadow-lg shadow-primary/25"
                           : "hover:bg-muted"
                       )}
                     >
@@ -494,24 +542,34 @@ export default function CalendarPage() {
               {/* Today button */}
               <button
                 onClick={goToToday}
-                className="w-full px-4 py-2 text-sm font-medium bg-muted hover:bg-muted/80 rounded-lg transition-colors"
+                className="w-full px-4 py-2.5 text-sm font-medium bg-gradient-to-r from-primary/10 to-purple-500/10 hover:from-primary/20 hover:to-purple-500/20 border border-primary/20 rounded-xl transition-all hover:scale-[1.02]"
               >
+                <Sparkles className="w-4 h-4 inline mr-2" />
                 Go to Today
               </button>
             </div>
           )}
         </div>
 
-        <button onClick={nextMonth} className="p-2 hover:bg-muted rounded-lg">
+        <button
+          onClick={nextMonth}
+          className="p-2.5 hover:bg-muted rounded-xl hover:scale-110 transition-all"
+        >
           <ChevronRight className="w-5 h-5" />
         </button>
       </div>
 
       {/* Calendar Grid */}
-      <div className="border rounded-lg overflow-hidden">
-        <div className="grid grid-cols-7 bg-muted/50">
-          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day) => (
-            <div key={day} className="p-3 text-center font-medium text-sm border-b">
+      <div className="border rounded-2xl overflow-hidden shadow-sm animate-fade-in animation-delay-200">
+        <div className="grid grid-cols-7 bg-gradient-to-r from-muted/80 via-muted/50 to-muted/80">
+          {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((day, i) => (
+            <div
+              key={day}
+              className={cn(
+                'p-3 text-center font-semibold text-sm border-b',
+                (i === 0 || i === 6) && 'text-muted-foreground'
+              )}
+            >
               {day}
             </div>
           ))}
@@ -524,16 +582,19 @@ export default function CalendarPage() {
               ? `${year}-${String(currentDate.getMonth() + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`
               : '';
             const isFirstCol = index % 7 === 0;
-            const isFirstRow = index < 7;
+            const isWeekend = index % 7 === 0 || index % 7 === 6;
+            const hasItems = dayItems.length > 0;
 
             return (
               <div
                 key={index}
                 className={cn(
-                  'min-h-[120px] p-2 border-b border-r cursor-pointer hover:bg-muted/30 transition-colors',
+                  'min-h-[120px] p-2 border-b border-r cursor-pointer transition-all duration-200',
                   isFirstCol && 'border-l-0',
-                  day ? 'bg-card' : 'bg-muted/30 cursor-default',
-                  isToday(day!) && 'bg-primary/5'
+                  day ? 'bg-card hover:bg-muted/50' : 'bg-muted/20 cursor-default',
+                  isToday(day!) && 'bg-primary/5 ring-2 ring-inset ring-primary/20',
+                  isWeekend && day && 'bg-muted/30',
+                  hasItems && 'hover:shadow-inner'
                 )}
                 onClick={() => day && openAddModal(dateStr)}
               >
@@ -541,13 +602,15 @@ export default function CalendarPage() {
                   <>
                     <span
                       className={cn(
-                        'inline-flex items-center justify-center w-7 h-7 text-sm rounded-full',
-                        isToday(day) && 'bg-primary text-primary-foreground font-bold'
+                        'inline-flex items-center justify-center w-8 h-8 text-sm rounded-full transition-all',
+                        isToday(day)
+                          ? 'bg-primary text-primary-foreground font-bold shadow-lg shadow-primary/30 animate-pulse-slow'
+                          : 'hover:bg-muted'
                       )}
                     >
                       {day}
                     </span>
-                    <div className="mt-1 space-y-1">
+                    <div className="mt-1 space-y-1 stagger-children">
                       {dayItems.map((item) => (
                         <div
                           key={item.id}
@@ -556,29 +619,29 @@ export default function CalendarPage() {
                             openEditModal(item);
                           }}
                           className={cn(
-                            'px-2 py-1 rounded text-xs border-l-2 group relative cursor-pointer hover:opacity-80',
+                            'px-2 py-1.5 rounded-lg text-xs border-l-3 group relative cursor-pointer transition-all hover:scale-[1.02] hover:shadow-sm',
                             statusColors[item.status] || statusColors.idea
                           )}
                           title={item.title}
                         >
-                          <div className="flex items-center gap-1">
+                          <div className="flex items-center gap-1.5">
                             {item.contentType === 'short' ? (
                               <Clock className="w-3 h-3 flex-shrink-0" />
                             ) : (
                               <Video className="w-3 h-3 flex-shrink-0" />
                             )}
-                            <span className="truncate">{item.title}</span>
+                            <span className="truncate font-medium">{item.title}</span>
                             <div className="hidden group-hover:flex ml-auto gap-0.5">
                               <button
                                 onClick={(e) => handleDuplicateItem(item, e)}
-                                className="p-0.5 hover:bg-black/10 rounded"
+                                className="p-1 hover:bg-black/10 rounded-md transition-colors"
                                 title="Duplicate"
                               >
                                 <Copy className="w-3 h-3" />
                               </button>
                               <button
                                 onClick={(e) => handleDeleteItem(item.id, e)}
-                                className="p-0.5 hover:bg-black/10 rounded"
+                                className="p-1 hover:bg-red-500/20 rounded-md transition-colors"
                                 title="Delete"
                               >
                                 <Trash2 className="w-3 h-3" />
@@ -597,23 +660,32 @@ export default function CalendarPage() {
       </div>
 
       {/* Legend */}
-      <div className="flex flex-wrap gap-4">
+      <div className="flex flex-wrap gap-3 p-4 bg-card border rounded-2xl animate-fade-in animation-delay-300">
+        <span className="text-sm font-medium text-muted-foreground mr-2">Status:</span>
         {Object.entries(statusColors).map(([status, color]) => (
-          <div key={status} className="flex items-center gap-2">
-            <div className={cn('w-3 h-3 rounded', color.split(' ')[0])} />
-            <span className="text-sm capitalize">{status}</span>
+          <div
+            key={status}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-muted/50 hover:bg-muted transition-colors cursor-default"
+          >
+            <div className={cn('w-2.5 h-2.5 rounded-full', color.split(' ')[0])} />
+            <span className="text-sm capitalize font-medium">{status}</span>
           </div>
         ))}
       </div>
 
       {/* Add/Edit Content Modal */}
       {showModal && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50">
-          <div className="bg-card border rounded-lg p-6 w-full max-w-md max-h-[90vh] overflow-y-auto">
-            <div className="flex items-center justify-between mb-4">
-              <h3 className="text-lg font-semibold">
-                {editingItem ? 'Edit Calendar Item' : 'Add Content to Calendar'}
-              </h3>
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm animate-fade-in">
+          <div className="bg-card border rounded-2xl p-6 w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl animate-scale-in">
+            <div className="flex items-center justify-between mb-6">
+              <div className="flex items-center gap-3">
+                <div className="p-2 rounded-xl bg-primary/10">
+                  <Calendar className="w-5 h-5 text-primary" />
+                </div>
+                <h3 className="text-lg font-semibold">
+                  {editingItem ? 'Edit Calendar Item' : 'Add Content to Calendar'}
+                </h3>
+              </div>
               <button
                 onClick={() => {
                   if (hasUnsavedChanges) {
@@ -626,53 +698,53 @@ export default function CalendarPage() {
                     resetForm();
                   }
                 }}
-                className="p-1 hover:bg-muted rounded"
+                className="p-2 hover:bg-muted rounded-xl transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
             </div>
 
-            <div className="space-y-4">
+            <div className="space-y-5">
               <div>
-                <label className="block text-sm font-medium mb-1">Title *</label>
+                <label className="block text-sm font-medium mb-2">Title *</label>
                 <input
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
-                  className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                  className="w-full px-4 py-2.5 border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   placeholder="Video title..."
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Date *</label>
+                  <label className="block text-sm font-medium mb-2">Date *</label>
                   <input
                     type="date"
                     value={formData.scheduledDate}
                     onChange={(e) => setFormData({ ...formData, scheduledDate: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-4 py-2.5 border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   />
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">Time</label>
+                  <label className="block text-sm font-medium mb-2">Time</label>
                   <input
                     type="time"
                     value={formData.scheduledTime}
                     onChange={(e) => setFormData({ ...formData, scheduledTime: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-4 py-2.5 border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div>
-                  <label className="block text-sm font-medium mb-1">Status</label>
+                  <label className="block text-sm font-medium mb-2">Status</label>
                   <select
                     value={formData.status}
                     onChange={(e) => setFormData({ ...formData, status: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-4 py-2.5 border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   >
                     <option value="idea">Idea</option>
                     <option value="scripting">Scripting</option>
@@ -685,11 +757,11 @@ export default function CalendarPage() {
                 </div>
 
                 <div>
-                  <label className="block text-sm font-medium mb-1">Content Type</label>
+                  <label className="block text-sm font-medium mb-2">Content Type</label>
                   <select
                     value={formData.contentType}
                     onChange={(e) => setFormData({ ...formData, contentType: e.target.value })}
-                    className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary"
+                    className="w-full px-4 py-2.5 border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-primary transition-all"
                   >
                     <option value="long_form">Long Form Video</option>
                     <option value="short">Short</option>
@@ -698,24 +770,24 @@ export default function CalendarPage() {
               </div>
 
               <div>
-                <label className="block text-sm font-medium mb-1">Notes</label>
+                <label className="block text-sm font-medium mb-2">Notes</label>
                 <textarea
                   value={formData.notes}
                   onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
                   rows={3}
-                  className="w-full px-3 py-2 border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none"
+                  className="w-full px-4 py-2.5 border rounded-xl bg-background focus:outline-none focus:ring-2 focus:ring-primary resize-none transition-all"
                   placeholder="Additional notes..."
                 />
               </div>
             </div>
 
-            <div className="flex justify-between gap-2 mt-6">
+            <div className="flex justify-between gap-2 mt-6 pt-4 border-t">
               <div className="flex gap-2">
                 {editingItem && (
                   <>
                     <button
                       onClick={() => handleDeleteItem(editingItem.id)}
-                      className="px-4 py-2 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-lg"
+                      className="px-4 py-2.5 text-sm font-medium text-destructive hover:bg-destructive/10 rounded-xl transition-all"
                     >
                       Delete
                     </button>
@@ -725,7 +797,7 @@ export default function CalendarPage() {
                         setShowModal(false);
                         resetForm();
                       }}
-                      className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg"
+                      className="px-4 py-2.5 text-sm font-medium hover:bg-muted rounded-xl transition-all"
                     >
                       Duplicate
                     </button>
@@ -745,16 +817,21 @@ export default function CalendarPage() {
                       resetForm();
                     }
                   }}
-                  className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg"
+                  className="px-4 py-2.5 text-sm font-medium hover:bg-muted rounded-xl transition-all"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={handleSaveItem}
                   disabled={saving || !formData.title || !formData.scheduledDate}
-                  className="px-4 py-2 text-sm font-medium bg-primary text-primary-foreground rounded-lg hover:bg-primary/90 disabled:opacity-50"
+                  className="px-5 py-2.5 text-sm font-medium bg-primary text-primary-foreground rounded-xl hover:bg-primary/90 hover:shadow-lg hover:shadow-primary/25 disabled:opacity-50 transition-all"
                 >
-                  {saving ? 'Saving...' : editingItem ? 'Save Changes' : 'Add to Calendar'}
+                  {saving ? (
+                    <span className="flex items-center gap-2">
+                      <RefreshCw className="w-4 h-4 animate-spin" />
+                      Saving...
+                    </span>
+                  ) : editingItem ? 'Save Changes' : 'Add to Calendar'}
                 </button>
               </div>
             </div>

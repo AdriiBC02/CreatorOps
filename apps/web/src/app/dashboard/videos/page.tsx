@@ -1,7 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Plus, Search, RefreshCw, Play, Edit, Download, Copy, ExternalLink, X, ChevronUp, ChevronDown, Calendar, Sparkles, BarChart3, Lightbulb, Target, Users } from 'lucide-react';
+import { Plus, Search, RefreshCw, Play, Edit, Download, Copy, ExternalLink, X, ChevronUp, ChevronDown, Calendar, Sparkles, BarChart3, Lightbulb, Target, Users, TrendingUp } from 'lucide-react';
+import { Skeleton, SkeletonTable } from '@/components/ui/skeleton';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
 
@@ -280,23 +281,50 @@ export default function VideosPage() {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-64">
-        <RefreshCw className="w-8 h-8 animate-spin text-muted-foreground" />
+      <div className="space-y-6 animate-fade-in">
+        <div className="flex items-center justify-between">
+          <div>
+            <h1 className="text-3xl font-bold">Videos</h1>
+            <Skeleton className="h-4 w-48 mt-2" />
+          </div>
+          <div className="flex gap-2">
+            <Skeleton className="h-10 w-10 rounded-lg" />
+            <Skeleton className="h-10 w-36 rounded-lg" />
+            <Skeleton className="h-10 w-32 rounded-lg" />
+          </div>
+        </div>
+
+        <div className="flex gap-4">
+          <Skeleton className="h-10 flex-1 max-w-md rounded-lg" />
+          <Skeleton className="h-10 w-24 rounded-lg" />
+        </div>
+
+        <SkeletonTable rows={6} cols={6} />
+
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted/30 rounded-lg">
+          {Array.from({ length: 4 }).map((_, i) => (
+            <div key={i} className="text-center">
+              <Skeleton className="h-8 w-16 mx-auto mb-1" />
+              <Skeleton className="h-4 w-20 mx-auto" />
+            </div>
+          ))}
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 animate-fade-in">
       {/* Copied notification */}
       {copied && (
-        <div className="fixed top-4 right-4 bg-primary text-primary-foreground px-4 py-2 rounded-lg shadow-lg z-50">
+        <div className="fixed top-4 right-4 flex items-center gap-2 bg-primary text-primary-foreground px-4 py-2.5 rounded-xl shadow-lg z-50 animate-slide-in-right">
+          <TrendingUp className="w-4 h-4" />
           Copied to clipboard!
         </div>
       )}
 
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-3xl font-bold">Videos</h1>
           <p className="text-muted-foreground mt-1">
@@ -306,13 +334,14 @@ export default function VideosPage() {
                 · Last synced: {new Date(channel.lastSyncedAt).toLocaleString()}
               </span>
             )}
+            <span className="hidden sm:inline"> · Press <kbd className="px-1.5 py-0.5 rounded bg-muted text-xs font-mono">⌘S</kbd> to sync</span>
           </p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={exportToCSV}
             disabled={videos.length === 0}
-            className="flex items-center gap-2 px-3 py-2 bg-secondary text-secondary-foreground rounded-lg font-medium hover:bg-secondary/80 transition-colors disabled:opacity-50"
+            className="btn-secondary px-3 py-2"
             title="Export to CSV"
           >
             <Download className="w-4 h-4" />
@@ -320,25 +349,27 @@ export default function VideosPage() {
           <button
             onClick={syncVideos}
             disabled={syncing}
-            className="flex items-center gap-2 px-4 py-2 bg-secondary text-secondary-foreground rounded-lg font-medium hover:bg-secondary/80 transition-colors disabled:opacity-50"
+            className="btn-secondary px-4 py-2"
           >
             <RefreshCw className={cn('w-4 h-4', syncing && 'animate-spin')} />
-            {syncing ? 'Syncing...' : 'Sync from YouTube'}
+            <span className="hidden sm:inline">{syncing ? 'Syncing...' : 'Sync'}</span>
           </button>
           <Link
             href="/dashboard/videos/upload"
-            className="flex items-center gap-2 px-4 py-2 bg-primary text-primary-foreground rounded-lg font-medium hover:bg-primary/90 transition-colors"
+            className="btn-primary px-4 py-2 shadow-lg shadow-primary/25"
           >
             <Plus size={20} />
-            Upload Video
+            <span className="hidden sm:inline">Upload Video</span>
           </Link>
         </div>
       </div>
 
       {/* Sync Message */}
       {syncMessage && (
-        <div className="p-3 rounded-lg bg-primary/10 text-primary text-sm flex items-center gap-2">
-          <RefreshCw className="w-4 h-4" />
+        <div className="p-4 rounded-xl bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 text-green-700 dark:text-green-300 text-sm flex items-center gap-3 animate-fade-in">
+          <div className="p-2 rounded-lg bg-green-100 dark:bg-green-900/50">
+            <RefreshCw className="w-4 h-4" />
+          </div>
           {syncMessage}
         </div>
       )}
@@ -499,6 +530,7 @@ export default function VideosPage() {
                               src={video.thumbnailUrl}
                               alt={video.title}
                               className="w-32 h-18 object-cover rounded cursor-pointer"
+                              referrerPolicy="no-referrer"
                             />
                           </button>
                         ) : (
@@ -588,20 +620,32 @@ export default function VideosPage() {
 
       {/* Stats summary */}
       {videos.length > 0 && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-4 bg-muted/30 rounded-lg">
-          <div className="text-center">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-4 p-5 bg-muted/30 rounded-2xl border">
+          <div className="text-center p-3 rounded-xl hover:bg-background/50 transition-colors">
+            <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-blue-100 dark:bg-blue-900/30 flex items-center justify-center">
+              <Play className="w-5 h-5 text-blue-500" />
+            </div>
             <p className="text-2xl font-bold">{videos.length}</p>
             <p className="text-sm text-muted-foreground">Total Videos</p>
           </div>
-          <div className="text-center">
+          <div className="text-center p-3 rounded-xl hover:bg-background/50 transition-colors">
+            <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-green-100 dark:bg-green-900/30 flex items-center justify-center">
+              <BarChart3 className="w-5 h-5 text-green-500" />
+            </div>
             <p className="text-2xl font-bold">{formatNumber(videos.reduce((acc, v) => acc + v.viewCount, 0))}</p>
             <p className="text-sm text-muted-foreground">Total Views</p>
           </div>
-          <div className="text-center">
+          <div className="text-center p-3 rounded-xl hover:bg-background/50 transition-colors">
+            <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-red-100 dark:bg-red-900/30 flex items-center justify-center">
+              <Target className="w-5 h-5 text-red-500" />
+            </div>
             <p className="text-2xl font-bold">{formatNumber(videos.reduce((acc, v) => acc + v.likeCount, 0))}</p>
             <p className="text-sm text-muted-foreground">Total Likes</p>
           </div>
-          <div className="text-center">
+          <div className="text-center p-3 rounded-xl hover:bg-background/50 transition-colors">
+            <div className="w-10 h-10 mx-auto mb-2 rounded-xl bg-purple-100 dark:bg-purple-900/30 flex items-center justify-center">
+              <Users className="w-5 h-5 text-purple-500" />
+            </div>
             <p className="text-2xl font-bold">{formatNumber(videos.reduce((acc, v) => acc + v.commentCount, 0))}</p>
             <p className="text-sm text-muted-foreground">Total Comments</p>
           </div>
@@ -626,6 +670,7 @@ export default function VideosPage() {
                 src={previewVideo.thumbnailUrl.replace('mqdefault', 'maxresdefault')}
                 alt={previewVideo.title}
                 className="w-full h-auto rounded-lg"
+                referrerPolicy="no-referrer"
                 onError={(e) => {
                   // Fallback to hqdefault if maxresdefault doesn't exist
                   const img = e.target as HTMLImageElement;
@@ -673,6 +718,7 @@ export default function VideosPage() {
                   src={analyzingVideo.thumbnailUrl}
                   alt={analyzingVideo.title}
                   className="w-32 h-auto rounded"
+                  referrerPolicy="no-referrer"
                 />
               )}
               <div>
@@ -698,14 +744,14 @@ export default function VideosPage() {
             ) : aiAnalysis ? (
               <div className="space-y-4">
                 {/* Title Analysis */}
-                {aiAnalysis.analysis?.titleScore !== undefined && (
+                {typeof aiAnalysis.analysis === 'object' && aiAnalysis.analysis?.titleScore !== undefined && (
                   <div className="p-3 bg-muted/30 rounded-lg">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-medium">Title Score</h4>
                       <span className={cn(
                         'px-2 py-1 rounded text-sm font-bold',
-                        aiAnalysis.analysis.titleScore >= 8 ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' :
-                        aiAnalysis.analysis.titleScore >= 5 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' :
+                        (aiAnalysis.analysis.titleScore ?? 0) >= 8 ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' :
+                        (aiAnalysis.analysis.titleScore ?? 0) >= 5 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' :
                         'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
                       )}>
                         {aiAnalysis.analysis.titleScore}/10
@@ -718,7 +764,7 @@ export default function VideosPage() {
                 )}
 
                 {/* Performance Insights */}
-                {aiAnalysis.analysis?.performanceInsights && (
+                {typeof aiAnalysis.analysis === 'object' && aiAnalysis.analysis?.performanceInsights && (
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <Target className="w-4 h-4 text-purple-500" />
@@ -765,7 +811,7 @@ export default function VideosPage() {
                 )}
 
                 {/* Analysis from nested suggestions */}
-                {aiAnalysis.analysis?.suggestions && aiAnalysis.analysis.suggestions.length > 0 && (
+                {typeof aiAnalysis.analysis === 'object' && aiAnalysis.analysis?.suggestions && aiAnalysis.analysis.suggestions.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-2">
                       <Lightbulb className="w-4 h-4 text-yellow-500" />

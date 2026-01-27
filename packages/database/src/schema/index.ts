@@ -7,3 +7,4 @@ export * from './experiments';
 export * from './social';
 export * from './jobs';
 export * from './goals';
+export * from './notifications';

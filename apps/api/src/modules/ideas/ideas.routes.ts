@@ -11,6 +11,7 @@ router.use(authMiddleware);
 // Ideas CRUD
 router.get('/', ideasController.getIdeas);
 router.post('/', ideasController.createIdea);
+router.post('/reorder', ideasController.reorderIdeas);
 router.put('/:id', ideasController.updateIdea);
 router.delete('/:id', ideasController.deleteIdea);
 
