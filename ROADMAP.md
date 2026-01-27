@@ -93,18 +93,23 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 - [ ] Datos agregados de todos los canales
 
 #### Notificaciones
-- [ ] Sistema de notificaciones in-app
+- [x] Sistema de notificaciones in-app
 - [ ] Alertas para eventos del calendario
-- [ ] Notificaciones de milestones (10K views, etc.)
+- [x] Notificaciones de milestones (10K views, etc.)
 - [ ] Email digest semanal
 - [ ] Push notifications (PWA)
+
+#### Sincronización Automática
+- [x] Sync automático cada 5 minutos con YouTube
+- [x] Cola de trabajos con BullMQ/Redis
+- [x] Detección de milestones automática
 
 ### Prioridad Media (Mejoras UX)
 
 #### Búsqueda Global
-- [ ] Barra de búsqueda unificada (Cmd+K)
-- [ ] Buscar en videos, ideas y calendario
-- [ ] Resultados agrupados por tipo
+- [x] Barra de búsqueda unificada (Cmd+K)
+- [x] Buscar en videos, ideas y calendario
+- [x] Resultados agrupados por tipo
 - [ ] Búsqueda con filtros avanzados
 
 #### Bulk Actions
@@ -120,7 +125,7 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 - [ ] Tags con colores personalizados
 
 #### Vistas Alternativas
-- [ ] Vista de lista para Ideas (alternar con kanban)
+- [x] Vista de lista para Ideas (alternar con kanban)
 - [ ] Vista de timeline para Calendar
 - [ ] Vista compacta para Videos
 - [ ] Vista de galería de thumbnails
@@ -132,7 +137,7 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 - [ ] Biblioteca de templates compartidos
 
 #### Keyboard Shortcuts
-- [ ] Modal con guía de shortcuts (?)
+- [x] Modal con guía de shortcuts (?)
 - [ ] Shortcuts personalizables
 - [ ] Navegación con teclado entre secciones
 - [ ] Vim-like navigation (j/k)
@@ -294,7 +299,16 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 
 ## Changelog
 
-### v0.3.1 (Current)
+### v0.4.0 (Current)
+- Global search (Cmd+K): Search videos, ideas, calendar across the app
+- Ideas list view: Toggle between kanban and list view
+- Automatic YouTube sync every 5 minutes with BullMQ
+- Milestone notifications (subscribers, views)
+- Keyboard shortcuts modal
+- macOS-style glassmorphism UI
+- Full i18n support (Spanish/English)
+
+### v0.3.1
 - AI Actions: Create, read, update, delete calendar events and ideas from chat
 - Smart Ideas: AI researches and suggests specific ideas based on topics
 - Confirmation system for smart ideas (accept/reject individually)
@@ -340,4 +354,4 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 
 ---
 
-*Última actualización: 27 Enero 2026*
+*Última actualización: 27 Enero 2026 - v0.4.0*

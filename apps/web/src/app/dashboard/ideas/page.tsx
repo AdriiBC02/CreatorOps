@@ -263,7 +263,12 @@ export default function IdeasPage() {
   const [showFilters, setShowFilters] = useState(false);
   const [priorityFilter, setPriorityFilter] = useState<number | 'all'>('all');
   const [contentTypeFilter, setContentTypeFilter] = useState<string | 'all'>('all');
-  const [viewMode, setViewMode] = useState<'kanban' | 'list'>('kanban');
+  const [viewMode, setViewMode] = useState<'kanban' | 'list'>(() => {
+    if (typeof window !== 'undefined') {
+      return (localStorage.getItem('ideas-view-mode') as 'kanban' | 'list') || 'kanban';
+    }
+    return 'kanban';
+  });
 
   const [formData, setFormData] = useState({
     title: '',
@@ -378,6 +383,11 @@ export default function IdeasPage() {
     window.addEventListener('beforeunload', handleBeforeUnload);
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasUnsavedChanges]);
+
+  // Persist view mode preference
+  useEffect(() => {
+    localStorage.setItem('ideas-view-mode', viewMode);
+  }, [viewMode]);
 
   const fetchChannel = async () => {
     try {
