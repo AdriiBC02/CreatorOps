@@ -191,7 +191,7 @@ export default function AnalyticsPage() {
         </div>
         <button
           onClick={fetchData}
-          className="p-2.5 rounded-xl border bg-card hover:bg-muted hover:rotate-180 transition-all duration-500"
+          className="btn-glass p-2.5 rounded-xl hover:rotate-180 transition-all duration-500"
           title={t('refresh.button')}
         >
           <RefreshCw className="w-5 h-5" />
@@ -203,11 +203,11 @@ export default function AnalyticsPage() {
         {stats.map((stat, index) => (
           <div
             key={stat.name}
-            className="group relative p-6 rounded-2xl card hover:shadow-xl hover:-translate-y-1 transition-all duration-500 overflow-hidden"
+            className="group relative p-6 rounded-2xl card-glass spring-bounce overflow-hidden"
           >
             {/* Animated background gradient */}
             <div className={cn(
-              'absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-10 transition-all duration-500',
+              'absolute inset-0 bg-gradient-to-br opacity-0 group-hover:opacity-15 transition-all duration-500',
               stat.color
             )} />
 
@@ -216,10 +216,16 @@ export default function AnalyticsPage() {
               <div className="absolute inset-0 shimmer" />
             </div>
 
+            {/* Top accent line */}
+            <div className={cn(
+              'absolute top-0 left-4 right-4 h-0.5 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300',
+              `bg-gradient-to-r ${stat.color}`
+            )} />
+
             <div className="relative">
               <div className="flex items-center justify-between mb-4">
                 <div className={cn(
-                  'p-3 rounded-xl transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3',
+                  'p-3 rounded-xl transition-all duration-300 group-hover:scale-110 group-hover:rotate-3 group-hover:shadow-lg',
                   stat.bgColor
                 )}>
                   <stat.icon className={cn('w-5 h-5', stat.iconColor)} />

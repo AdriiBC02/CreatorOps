@@ -248,7 +248,7 @@ export default function SettingsPage() {
 
       <div className="flex flex-col lg:flex-row gap-6 animate-fade-in animation-delay-100">
         {/* Sidebar */}
-        <nav className="lg:w-64 space-y-1.5 p-4 rounded-2xl card/50 backdrop-blur-sm">
+        <nav className="lg:w-64 space-y-1.5 p-4 rounded-2xl glass-card">
           {tabs.map((tab, index) => (
             <button
               key={tab.id}

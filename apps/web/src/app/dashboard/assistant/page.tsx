@@ -17,6 +17,7 @@ import {
   X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { FloatingShapes, GlowingBadge } from '@/components/ui/decorative';
 import { emitCalendarUpdate, emitIdeasUpdate } from '@/lib/events';
 import { useTranslation } from 'react-i18next';
 
@@ -603,14 +604,22 @@ export default function AssistantPage() {
   }
 
   return (
-    <div className="flex flex-col h-[calc(100vh-8rem)]">
+    <div className="relative flex flex-col h-[calc(100vh-8rem)]">
+      {/* Background decoration */}
+      <FloatingShapes className="fixed" />
+
       {/* Header */}
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold flex items-center gap-2">
-          <Sparkles className="w-8 h-8 text-primary" />
-          {t('header.title')}
-        </h1>
-        <p className="text-muted-foreground mt-1">
+      <div className="relative mb-6 animate-fade-in">
+        <div className="flex items-center gap-3 mb-1">
+          <h1 className="text-3xl font-bold flex items-center gap-2">
+            <Sparkles className="w-8 h-8 text-primary" />
+            {t('header.title')}
+          </h1>
+          <GlowingBadge color="primary">
+            AI
+          </GlowingBadge>
+        </div>
+        <p className="text-muted-foreground">
           {t('header.subtitle')}
         </p>
       </div>
@@ -621,17 +630,19 @@ export default function AssistantPage() {
           <button
             key={action.id}
             onClick={action.action}
-            className="p-4 rounded-lg border bg-card hover:bg-muted/50 transition-colors text-left"
+            className="group p-4 rounded-2xl card hover:shadow-lg hover:-translate-y-0.5 transition-all text-left"
           >
-            <action.icon className="w-5 h-5 text-primary mb-2" />
+            <div className="p-2 rounded-xl bg-primary/10 w-fit mb-3 group-hover:scale-110 transition-transform">
+              <action.icon className="w-5 h-5 text-primary" />
+            </div>
             <p className="font-medium text-sm">{action.label}</p>
-            <p className="text-xs text-muted-foreground">{action.description}</p>
+            <p className="text-xs text-muted-foreground mt-1">{action.description}</p>
           </button>
         ))}
       </div>
 
       {/* Chat Container */}
-      <div className="flex-1 flex flex-col border rounded-lg bg-card overflow-hidden">
+      <div className="flex-1 flex flex-col rounded-2xl glass-card overflow-hidden">
         {/* Messages */}
         <div className="flex-1 overflow-y-auto p-4 space-y-4">
           {messages.length === 0 ? (

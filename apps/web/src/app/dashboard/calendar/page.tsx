@@ -461,14 +461,14 @@ export default function CalendarPage() {
           <button
             onClick={exportToCSV}
             disabled={items.length === 0}
-            className="flex items-center gap-2 px-3 py-2.5 bg-secondary text-secondary-foreground rounded-xl font-medium hover:bg-secondary/80 hover:scale-105 transition-all disabled:opacity-50"
+            className="btn-glass px-3 py-2.5 rounded-xl disabled:opacity-50"
             title={t('actions.export')}
           >
             <Download className="w-4 h-4" />
           </button>
           <button
             onClick={() => openAddModal()}
-            className="group flex items-center gap-2 px-4 py-2.5 bg-primary text-primary-foreground rounded-xl font-medium hover:bg-primary/90 hover:scale-105 hover:shadow-lg hover:shadow-primary/25 transition-all"
+            className="btn-primary px-4 py-2.5 rounded-xl"
           >
             <Plus size={20} className="group-hover:rotate-90 transition-transform" />
             {t('actions.addContent')}

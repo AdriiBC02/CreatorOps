@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
 import { Plus, RefreshCw, Lightbulb, GripVertical, Trash2, ExternalLink, Search, X, Copy, Download, Sparkles, Check, Filter, ChevronDown } from 'lucide-react';
 import { SkeletonKanban } from '@/components/ui/skeleton';
+import { FloatingShapes, GlowingBadge } from '@/components/ui/decorative';
 import { cn } from '@/lib/utils';
 import { onIdeasUpdate } from '@/lib/events';
 import {
@@ -811,27 +812,35 @@ export default function IdeasPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="relative space-y-6">
+      {/* Background decoration */}
+      <FloatingShapes className="fixed" />
+
       {/* Header */}
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+      <div className="relative flex flex-col sm:flex-row sm:items-center justify-between gap-4 animate-fade-in">
         <div>
-          <h1 className="text-3xl font-bold">{t('header.title')}</h1>
-          <p className="text-muted-foreground mt-1">
+          <div className="flex items-center gap-3 mb-1">
+            <h1 className="text-3xl font-bold">{t('header.title')}</h1>
+            <GlowingBadge color="purple">
+              <Lightbulb className="w-3 h-3 mr-1" />
+              {ideas.length}
+            </GlowingBadge>
+          </div>
+          <p className="text-muted-foreground">
             {t('header.subtitle')}
-            <span className="hidden sm:inline"> · <span dangerouslySetInnerHTML={{ __html: t('header.pressN') }} /></span>
           </p>
         </div>
         <div className="flex gap-2">
           <button
             onClick={exportToCSV}
-            className="btn-secondary px-3 py-2"
+            className="btn-glass px-3 py-2 rounded-xl"
             title={t('actions.export')}
           >
             <Download className="w-4 h-4" />
           </button>
           <button
             onClick={openAiSuggestionsModal}
-            className="btn px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-[1.02] active:scale-[0.98]"
+            className="btn px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-[1.02] active:scale-[0.98]"
             title={t('actions.suggestAI')}
           >
             <Sparkles className="w-4 h-4" />
@@ -839,7 +848,7 @@ export default function IdeasPage() {
           </button>
           <button
             onClick={openAddModal}
-            className="btn-primary px-4 py-2 shadow-lg shadow-primary/25"
+            className="btn-primary px-4 py-2 rounded-xl"
           >
             <Plus size={20} />
             <span className="hidden sm:inline">{t('actions.newIdea')}</span>
