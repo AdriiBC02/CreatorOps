@@ -55,7 +55,16 @@ export default function VideosPage() {
 
   // AI Analysis states
   const [analyzingVideo, setAnalyzingVideo] = useState<Video | null>(null);
-  const [aiAnalysis, setAiAnalysis] = useState<{ analysis: string; suggestions: string[] } | null>(null);
+  const [aiAnalysis, setAiAnalysis] = useState<{
+    analysis: string | {
+      titleScore?: number;
+      titleFeedback?: string;
+      performanceInsights?: string;
+      suggestions?: string[];
+      [key: string]: unknown;
+    };
+    suggestions: string[]
+  } | null>(null);
   const [aiLoading, setAiLoading] = useState(false);
 
   useEffect(() => {
@@ -688,16 +697,53 @@ export default function VideosPage() {
               </div>
             ) : aiAnalysis ? (
               <div className="space-y-4">
-                <div>
-                  <div className="flex items-center gap-2 mb-2">
-                    <Target className="w-4 h-4 text-purple-500" />
-                    <h4 className="font-medium">Analysis</h4>
+                {/* Title Analysis */}
+                {aiAnalysis.analysis?.titleScore !== undefined && (
+                  <div className="p-3 bg-muted/30 rounded-lg">
+                    <div className="flex items-center justify-between mb-2">
+                      <h4 className="font-medium">Title Score</h4>
+                      <span className={cn(
+                        'px-2 py-1 rounded text-sm font-bold',
+                        aiAnalysis.analysis.titleScore >= 8 ? 'bg-green-100 text-green-700 dark:bg-green-900 dark:text-green-300' :
+                        aiAnalysis.analysis.titleScore >= 5 ? 'bg-yellow-100 text-yellow-700 dark:bg-yellow-900 dark:text-yellow-300' :
+                        'bg-red-100 text-red-700 dark:bg-red-900 dark:text-red-300'
+                      )}>
+                        {aiAnalysis.analysis.titleScore}/10
+                      </span>
+                    </div>
+                    {aiAnalysis.analysis.titleFeedback && (
+                      <p className="text-sm text-muted-foreground">{aiAnalysis.analysis.titleFeedback}</p>
+                    )}
                   </div>
-                  <p className="text-sm text-muted-foreground whitespace-pre-wrap">
-                    {aiAnalysis.analysis}
-                  </p>
-                </div>
+                )}
 
+                {/* Performance Insights */}
+                {aiAnalysis.analysis?.performanceInsights && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Target className="w-4 h-4 text-purple-500" />
+                      <h4 className="font-medium">Performance Insights</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {aiAnalysis.analysis.performanceInsights}
+                    </p>
+                  </div>
+                )}
+
+                {/* Raw analysis as fallback */}
+                {typeof aiAnalysis.analysis === 'string' && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Target className="w-4 h-4 text-purple-500" />
+                      <h4 className="font-medium">Analysis</h4>
+                    </div>
+                    <p className="text-sm text-muted-foreground whitespace-pre-wrap">
+                      {aiAnalysis.analysis}
+                    </p>
+                  </div>
+                )}
+
+                {/* Suggestions */}
                 {aiAnalysis.suggestions && aiAnalysis.suggestions.length > 0 && (
                   <div>
                     <div className="flex items-center gap-2 mb-2">
@@ -706,6 +752,27 @@ export default function VideosPage() {
                     </div>
                     <ul className="space-y-2">
                       {aiAnalysis.suggestions.map((suggestion, index) => (
+                        <li
+                          key={index}
+                          className="flex items-start gap-2 text-sm text-muted-foreground"
+                        >
+                          <span className="text-primary mt-0.5">•</span>
+                          {typeof suggestion === 'string' ? suggestion : JSON.stringify(suggestion)}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                {/* Analysis from nested suggestions */}
+                {aiAnalysis.analysis?.suggestions && aiAnalysis.analysis.suggestions.length > 0 && (
+                  <div>
+                    <div className="flex items-center gap-2 mb-2">
+                      <Lightbulb className="w-4 h-4 text-yellow-500" />
+                      <h4 className="font-medium">Recommendations</h4>
+                    </div>
+                    <ul className="space-y-2">
+                      {aiAnalysis.analysis.suggestions.map((suggestion: string, index: number) => (
                         <li
                           key={index}
                           className="flex items-start gap-2 text-sm text-muted-foreground"

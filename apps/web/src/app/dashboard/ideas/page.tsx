@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react';
 import { Plus, RefreshCw, Lightbulb, GripVertical, Trash2, ExternalLink, Search, X, Copy, Download, Sparkles } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { onIdeasUpdate } from '@/lib/events';
 import {
   DndContext,
   DragOverlay,
@@ -11,10 +12,11 @@ import {
   PointerSensor,
   useSensor,
   useSensors,
+  useDroppable,
   type DragEndEvent,
   type DragStartEvent,
 } from '@dnd-kit/core';
-import { useSortable } from '@dnd-kit/sortable';
+import { useSortable, SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
 
 interface Idea {
@@ -167,6 +169,73 @@ function DraggableIdeaCard({
   );
 }
 
+// Droppable Column Component
+function DroppableColumn({
+  id,
+  title,
+  color,
+  ideas,
+  onEdit,
+  onDelete,
+  onDuplicate,
+  onCopy,
+}: {
+  id: string;
+  title: string;
+  color: string;
+  ideas: Idea[];
+  onEdit: (idea: Idea) => void;
+  onDelete: (id: string) => void;
+  onDuplicate: (idea: Idea) => void;
+  onCopy: (text: string) => void;
+}) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: id,
+  });
+
+  return (
+    <div className="space-y-3">
+      <div className={cn('flex items-center gap-2 pb-2 border-b-2', color)}>
+        <h3 className="font-semibold">{title}</h3>
+        <span className="text-sm text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
+          {ideas.length}
+        </span>
+      </div>
+
+      <div
+        ref={setNodeRef}
+        className={cn(
+          'space-y-3 min-h-[200px] p-2 rounded-lg transition-colors',
+          isOver ? 'bg-primary/10 ring-2 ring-primary/50' : 'bg-muted/30'
+        )}
+      >
+        <SortableContext items={ideas.map(i => i.id)} strategy={verticalListSortingStrategy}>
+          {ideas.map((idea) => (
+            <DraggableIdeaCard
+              key={idea.id}
+              idea={idea}
+              onEdit={onEdit}
+              onDelete={onDelete}
+              onDuplicate={onDuplicate}
+              onCopy={onCopy}
+            />
+          ))}
+        </SortableContext>
+
+        {ideas.length === 0 && (
+          <div className={cn(
+            'flex flex-col items-center justify-center py-8 text-muted-foreground',
+            isOver && 'text-primary'
+          )}>
+            <Lightbulb className="w-8 h-8 mb-2" />
+            <p className="text-sm">{isOver ? 'Drop here!' : 'Drop ideas here'}</p>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+}
+
 export default function IdeasPage() {
   const [channel, setChannel] = useState<Channel | null>(null);
   const [ideas, setIdeas] = useState<Idea[]>([]);
@@ -192,6 +261,7 @@ export default function IdeasPage() {
   const [showAiSuggestions, setShowAiSuggestions] = useState(false);
   const [aiSuggestions, setAiSuggestions] = useState<Array<{ title: string; description: string; reason: string }>>([]);
   const [generatingDescription, setGeneratingDescription] = useState(false);
+  const [aiPrompt, setAiPrompt] = useState(''); // Custom prompt for AI suggestions
 
   const sensors = useSensors(
     useSensor(PointerSensor, {
@@ -210,6 +280,16 @@ export default function IdeasPage() {
     if (channel) {
       fetchIdeas();
     }
+  }, [channel]);
+
+  // Listen for AI-triggered ideas updates
+  useEffect(() => {
+    const unsubscribe = onIdeasUpdate(() => {
+      if (channel) {
+        fetchIdeas();
+      }
+    });
+    return unsubscribe;
   }, [channel]);
 
   // Check for unsaved changes
@@ -447,12 +527,12 @@ export default function IdeasPage() {
   };
 
   // AI Functions
-  const generateAiSuggestions = async () => {
+  const generateAiSuggestions = async (customPrompt?: string) => {
     if (!channel) return;
 
     try {
       setAiLoading(true);
-      setShowAiSuggestions(true);
+      if (!showAiSuggestions) setShowAiSuggestions(true);
 
       const res = await fetch('http://localhost:4000/ai/generate/ideas', {
         method: 'POST',
@@ -462,6 +542,7 @@ export default function IdeasPage() {
           channelId: channel.id,
           count: 5,
           basedOn: 'performance',
+          customPrompt: customPrompt || aiPrompt || undefined,
         }),
       });
 
@@ -474,6 +555,12 @@ export default function IdeasPage() {
     } finally {
       setAiLoading(false);
     }
+  };
+
+  const openAiSuggestionsModal = () => {
+    setAiPrompt('');
+    setAiSuggestions([]);
+    setShowAiSuggestions(true);
   };
 
   const generateAiDescription = async () => {
@@ -601,12 +688,11 @@ export default function IdeasPage() {
             <Download className="w-4 h-4" />
           </button>
           <button
-            onClick={generateAiSuggestions}
-            disabled={aiLoading}
-            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:opacity-90 transition-all disabled:opacity-50"
+            onClick={openAiSuggestionsModal}
+            className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg font-medium hover:opacity-90 transition-all"
             title="Get AI suggestions"
           >
-            <Sparkles className={cn('w-4 h-4', aiLoading && 'animate-spin')} />
+            <Sparkles className="w-4 h-4" />
             Suggest with AI
           </button>
           <button
@@ -654,42 +740,19 @@ export default function IdeasPage() {
         onDragEnd={handleDragEnd}
       >
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {statusColumns.map((column) => {
-            const columnIdeas = getIdeasByStatus(column.id);
-            return (
-              <div key={column.id} className="space-y-3">
-                <div className={cn('flex items-center gap-2 pb-2 border-b-2', column.color)}>
-                  <h3 className="font-semibold">{column.title}</h3>
-                  <span className="text-sm text-muted-foreground bg-muted px-2 py-0.5 rounded-full">
-                    {columnIdeas.length}
-                  </span>
-                </div>
-
-                <div
-                  className="space-y-3 min-h-[200px] p-2 rounded-lg bg-muted/30"
-                  id={column.id}
-                >
-                  {columnIdeas.map((idea) => (
-                    <DraggableIdeaCard
-                      key={idea.id}
-                      idea={idea}
-                      onEdit={openEditModal}
-                      onDelete={deleteIdea}
-                      onDuplicate={duplicateIdea}
-                      onCopy={copyToClipboard}
-                    />
-                  ))}
-
-                  {columnIdeas.length === 0 && (
-                    <div className="flex flex-col items-center justify-center py-8 text-muted-foreground">
-                      <Lightbulb className="w-8 h-8 mb-2" />
-                      <p className="text-sm">Drop ideas here</p>
-                    </div>
-                  )}
-                </div>
-              </div>
-            );
-          })}
+          {statusColumns.map((column) => (
+            <DroppableColumn
+              key={column.id}
+              id={column.id}
+              title={column.title}
+              color={column.color}
+              ideas={getIdeasByStatus(column.id)}
+              onEdit={openEditModal}
+              onDelete={deleteIdea}
+              onDuplicate={duplicateIdea}
+              onCopy={copyToClipboard}
+            />
+          ))}
         </div>
 
         <DragOverlay>
@@ -881,15 +944,50 @@ export default function IdeasPage() {
               </button>
             </div>
 
+            {/* Custom Prompt Input */}
+            <div className="mb-4 p-4 bg-muted/30 rounded-lg">
+              <label className="block text-sm font-medium mb-2">
+                What type of content do you want ideas for? (optional)
+              </label>
+              <div className="flex gap-2">
+                <input
+                  type="text"
+                  value={aiPrompt}
+                  onChange={(e) => setAiPrompt(e.target.value)}
+                  onKeyDown={(e) => e.key === 'Enter' && !aiLoading && generateAiSuggestions()}
+                  placeholder="e.g., gameplay of Minecraft, analysis of tech products, cooking tutorials..."
+                  className="flex-1 px-3 py-2 text-sm border rounded-lg bg-background focus:outline-none focus:ring-2 focus:ring-purple-500"
+                  disabled={aiLoading}
+                />
+                <button
+                  onClick={() => generateAiSuggestions()}
+                  disabled={aiLoading}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:opacity-90 disabled:opacity-50"
+                >
+                  {aiLoading ? (
+                    <RefreshCw className="w-4 h-4 animate-spin" />
+                  ) : (
+                    <Sparkles className="w-4 h-4" />
+                  )}
+                  Generate
+                </button>
+              </div>
+              <p className="text-xs text-muted-foreground mt-2">
+                Leave empty for general ideas based on your channel, or specify a topic for targeted suggestions.
+              </p>
+            </div>
+
             {aiLoading ? (
               <div className="flex flex-col items-center justify-center py-12">
                 <RefreshCw className="w-8 h-8 animate-spin text-purple-500 mb-4" />
-                <p className="text-muted-foreground">Generating ideas based on your channel...</p>
+                <p className="text-muted-foreground">
+                  {aiPrompt ? `Generating ideas about "${aiPrompt}"...` : 'Generating ideas based on your channel...'}
+                </p>
               </div>
             ) : aiSuggestions.length > 0 ? (
               <div className="space-y-4">
                 <p className="text-sm text-muted-foreground">
-                  Based on your channel performance, here are some content ideas:
+                  {aiPrompt ? `Ideas about "${aiPrompt}":` : 'Based on your channel performance, here are some content ideas:'}
                 </p>
                 {aiSuggestions.map((suggestion, index) => (
                   <div
@@ -909,9 +1007,10 @@ export default function IdeasPage() {
                 ))}
               </div>
             ) : (
-              <div className="text-center py-12 text-muted-foreground">
+              <div className="text-center py-8 text-muted-foreground">
                 <Lightbulb className="w-12 h-12 mx-auto mb-4 opacity-50" />
-                <p>No suggestions available. Try again later.</p>
+                <p className="mb-2">Enter a topic above and click Generate</p>
+                <p className="text-xs">Or leave it empty for general channel-based ideas</p>
               </div>
             )}
 
@@ -921,14 +1020,6 @@ export default function IdeasPage() {
                 className="px-4 py-2 text-sm font-medium hover:bg-muted rounded-lg"
               >
                 Close
-              </button>
-              <button
-                onClick={generateAiSuggestions}
-                disabled={aiLoading}
-                className="flex items-center gap-2 px-4 py-2 text-sm font-medium bg-gradient-to-r from-purple-500 to-pink-500 text-white rounded-lg hover:opacity-90 disabled:opacity-50"
-              >
-                <RefreshCw className={cn('w-4 h-4', aiLoading && 'animate-spin')} />
-                Regenerate
               </button>
             </div>
           </div>

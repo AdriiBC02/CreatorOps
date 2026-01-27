@@ -46,9 +46,12 @@ export interface TaskContext {
   userId?: string;
   channelData?: {
     title: string;
+    description?: string;
     subscriberCount: number;
     videoCount: number;
     viewCount: number;
+    thumbnailUrl?: string;
+    customUrl?: string;
   };
   videoData?: {
     title: string;
@@ -58,6 +61,20 @@ export interface TaskContext {
     commentCount: number;
     publishedAt: string | null;
   };
+  // Array of videos from the channel
+  videosData?: Array<{
+    title: string;
+    description: string;
+    viewCount: number;
+    likeCount: number;
+    commentCount: number;
+    publishedAt: string | null;
+  }>;
+  // Existing ideas in the channel
+  existingIdeas?: Array<{
+    title: string;
+    status: string;
+  }>;
 }
 
 export interface TaskOutput {
@@ -110,6 +127,7 @@ export interface GenerateIdeasRequest {
   count?: number;
   basedOn?: 'trends' | 'performance' | 'audience' | 'general';
   contentType?: 'long_form' | 'short';
+  customPrompt?: string; // User-provided topic/instructions for ideas
 }
 
 export interface GenerateIdeasResponse {

@@ -34,6 +34,7 @@ const generateIdeasSchema = z.object({
   count: z.number().int().min(1).max(10).optional(),
   basedOn: z.enum(['trends', 'performance', 'audience', 'general']).optional(),
   contentType: z.enum(['long_form', 'short']).optional(),
+  customPrompt: z.string().max(500).optional(),
 });
 
 const analyzeVideoSchema = z.object({

@@ -133,11 +133,17 @@ pnpm db:studio        # Abrir Drizzle Studio
 - [x] Tema claro/oscuro/sistema
 - [x] Selector de idioma (EN/ES)
 
+### AI Assistant (Implementado)
+- [x] Chat conversacional con contexto del canal
+- [x] Acciones automáticas (crear/editar/eliminar eventos e ideas)
+- [x] Ideas inteligentes con investigación de temas
+- [x] Widget flotante en todas las páginas
+- [x] Auto-refresh de páginas afectadas
+
 ### Próximas Fases
 - [ ] Analytics avanzado con gráficos
 - [ ] Multi-canal
 - [ ] Notificaciones in-app
-- [ ] AI Assistant
 - [ ] Colaboración en equipo
 - [ ] Integraciones (TikTok, Instagram, X)
 

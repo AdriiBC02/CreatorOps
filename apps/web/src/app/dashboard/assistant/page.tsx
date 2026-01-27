@@ -14,8 +14,18 @@ import {
   Bot,
   User,
   Wand2,
+  X,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { emitCalendarUpdate, emitIdeasUpdate } from '@/lib/events';
+
+interface SmartIdea {
+  title: string;
+  description: string;
+  accepted?: boolean;
+  rejected?: boolean;
+  created?: boolean;
+}
 
 interface Message {
   id: string;
@@ -23,6 +33,30 @@ interface Message {
   content: string;
   timestamp: Date;
   provider?: string;
+  action?: AIAction;
+  actionExecuted?: boolean;
+  actionData?: CalendarEvent[] | Idea[];
+  pendingIdeas?: SmartIdea[];
+}
+
+interface AIAction {
+  action: string;
+  data: Record<string, unknown>;
+  message: string;
+}
+
+interface CalendarEvent {
+  id: string;
+  title: string;
+  scheduledDate: string;
+  status: string;
+}
+
+interface Idea {
+  id: string;
+  title: string;
+  status: string;
+  description: string | null;
 }
 
 interface Channel {
@@ -74,7 +108,7 @@ export default function AssistantPage() {
         setChannel(data.data[0]);
       }
     } catch (err) {
-      console.error('Failed to fetch channel:', err);
+      // Failed to fetch channel
     } finally {
       setInitialLoading(false);
     }
@@ -82,6 +116,89 @@ export default function AssistantPage() {
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+  };
+
+  const toggleIdeaAcceptance = (messageId: string, ideaIndex: number) => {
+    setMessages(prev => prev.map(m => {
+      if (m.id === messageId && m.pendingIdeas) {
+        const newPendingIdeas = [...m.pendingIdeas];
+        const idea = newPendingIdeas[ideaIndex];
+        if (!idea.created) {
+          idea.accepted = !idea.accepted;
+          idea.rejected = false;
+        }
+        return { ...m, pendingIdeas: newPendingIdeas };
+      }
+      return m;
+    }));
+  };
+
+  const rejectIdea = (messageId: string, ideaIndex: number) => {
+    setMessages(prev => prev.map(m => {
+      if (m.id === messageId && m.pendingIdeas) {
+        const newPendingIdeas = [...m.pendingIdeas];
+        const idea = newPendingIdeas[ideaIndex];
+        if (!idea.created) {
+          idea.rejected = true;
+          idea.accepted = false;
+        }
+        return { ...m, pendingIdeas: newPendingIdeas };
+      }
+      return m;
+    }));
+  };
+
+  const acceptAllIdeas = (messageId: string) => {
+    setMessages(prev => prev.map(m => {
+      if (m.id === messageId && m.pendingIdeas) {
+        const newPendingIdeas = m.pendingIdeas.map(idea =>
+          idea.created ? idea : { ...idea, accepted: true, rejected: false }
+        );
+        return { ...m, pendingIdeas: newPendingIdeas };
+      }
+      return m;
+    }));
+  };
+
+  const createAcceptedIdeas = async (messageId: string) => {
+    const message = messages.find(m => m.id === messageId);
+    if (!message?.pendingIdeas || !channel) return;
+
+    const ideasToCreate = message.pendingIdeas.filter(i => i.accepted && !i.created);
+    if (ideasToCreate.length === 0) return;
+
+    for (const idea of ideasToCreate) {
+      const res = await fetch('http://localhost:4000/ideas', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify({
+          channelId: channel.id,
+          title: idea.title,
+          description: idea.description || null,
+          contentType: 'long_form',
+          priority: 1,
+          status: 'new',
+        }),
+      });
+      if (res.ok) {
+        idea.created = true;
+      }
+    }
+
+    setMessages(prev => prev.map(m => {
+      if (m.id === messageId && m.pendingIdeas) {
+        const allProcessed = m.pendingIdeas.every(i => i.created || i.rejected);
+        return {
+          ...m,
+          pendingIdeas: [...m.pendingIdeas],
+          actionExecuted: allProcessed
+        };
+      }
+      return m;
+    }));
+
+    emitIdeasUpdate();
   };
 
   const sendMessage = async () => {
@@ -112,19 +229,50 @@ export default function AssistantPage() {
       const data = await res.json();
 
       if (data.success) {
-        const assistantMessage: Message = {
-          id: (Date.now() + 1).toString(),
-          role: 'assistant',
-          content: data.data.response,
-          timestamp: new Date(),
-          provider: data.data.provider,
-        };
-        setMessages((prev) => [...prev, assistantMessage]);
+        const response = data.data.response;
+        const action = parseActionResponse(response);
+
+        // For CREATE_SMART_IDEAS, don't auto-execute - show for review
+        if (action?.action === 'CREATE_SMART_IDEAS') {
+          const smartData = action.data as { ideas: Array<{ title: string; description: string }>; topic: string };
+          const assistantMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: action.message,
+            timestamp: new Date(),
+            provider: data.data.provider,
+            action: action,
+            actionExecuted: false,
+            pendingIdeas: smartData.ideas.map(idea => ({
+              title: idea.title,
+              description: idea.description,
+              accepted: false,
+              rejected: false,
+              created: false,
+            })),
+          };
+          setMessages((prev) => [...prev, assistantMessage]);
+        } else {
+          const assistantMessage: Message = {
+            id: (Date.now() + 1).toString(),
+            role: 'assistant',
+            content: action ? action.message : response,
+            timestamp: new Date(),
+            provider: data.data.provider,
+            action: action || undefined,
+            actionExecuted: false,
+          };
+          setMessages((prev) => [...prev, assistantMessage]);
+
+          // Auto-execute the action
+          if (action) {
+            executeAction(action, assistantMessage.id);
+          }
+        }
       } else {
         throw new Error(data.error?.message || 'Failed to get response');
       }
-    } catch (err) {
-      console.error('Chat error:', err);
+    } catch {
       const errorMessage: Message = {
         id: (Date.now() + 1).toString(),
         role: 'assistant',
@@ -150,8 +298,205 @@ export default function AssistantPage() {
       await navigator.clipboard.writeText(text);
       setCopiedId(id);
       setTimeout(() => setCopiedId(null), 2000);
-    } catch (err) {
-      console.error('Failed to copy:', err);
+    } catch {
+      // Failed to copy
+    }
+  };
+
+  // Parse AI response for potential actions
+  const parseActionResponse = (response: string): AIAction | null => {
+    try {
+      const jsonMatch = response.match(/\{[\s\S]*\}/);
+      if (jsonMatch) {
+        const parsed = JSON.parse(jsonMatch[0]);
+        if (parsed.action && parsed.message) {
+          return parsed as AIAction;
+        }
+      }
+    } catch {
+      // Not a JSON action response
+    }
+    return null;
+  };
+
+  // Execute an AI action
+  const executeAction = async (action: AIAction, messageId: string) => {
+    try {
+      if (action.action === 'CREATE_CALENDAR_EVENT' && channel) {
+        const eventData = action.data as { title: string; date: string; type: string };
+        const contentType = eventData.type === 'short' ? 'short' : 'long_form';
+        const res = await fetch('http://localhost:4000/calendar', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            channelId: channel.id,
+            title: eventData.title,
+            scheduledDate: eventData.date,
+            contentType,
+            status: 'scheduled',
+          }),
+        });
+        if (res.ok) {
+          setMessages(prev => prev.map(m =>
+            m.id === messageId ? { ...m, actionExecuted: true } : m
+          ));
+          emitCalendarUpdate();
+        }
+      } else if (action.action === 'CREATE_IDEA' && channel) {
+        const ideaData = action.data as { title: string; description?: string };
+        const res = await fetch('http://localhost:4000/ideas', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({
+            channelId: channel.id,
+            title: ideaData.title,
+            description: ideaData.description || null,
+            contentType: 'long_form',
+            priority: 1,
+            status: 'new',
+          }),
+        });
+        if (res.ok) {
+          setMessages(prev => prev.map(m =>
+            m.id === messageId ? { ...m, actionExecuted: true } : m
+          ));
+          emitIdeasUpdate();
+        }
+      } else if (action.action === 'READ_CALENDAR' && channel) {
+        const res = await fetch(`http://localhost:4000/calendar?channelId=${channel.id}`, {
+          credentials: 'include',
+        });
+        const data = await res.json();
+        if (data.success) {
+          const events = data.data as CalendarEvent[];
+          const upcoming = events
+            .filter(e => new Date(e.scheduledDate) >= new Date())
+            .sort((a, b) => new Date(a.scheduledDate).getTime() - new Date(b.scheduledDate).getTime())
+            .slice(0, 5);
+          setMessages(prev => prev.map(m =>
+            m.id === messageId ? { ...m, actionExecuted: true, actionData: upcoming } : m
+          ));
+        }
+      } else if (action.action === 'READ_IDEAS' && channel) {
+        const res = await fetch(`http://localhost:4000/ideas?channelId=${channel.id}`, {
+          credentials: 'include',
+        });
+        const data = await res.json();
+        if (data.success) {
+          const ideas = (data.data as Idea[]).slice(0, 5);
+          setMessages(prev => prev.map(m =>
+            m.id === messageId ? { ...m, actionExecuted: true, actionData: ideas } : m
+          ));
+        }
+      } else if (action.action === 'UPDATE_CALENDAR_EVENT' && channel) {
+        const updateData = action.data as { searchTitle: string; newTitle?: string; newDate?: string };
+        const res = await fetch(`http://localhost:4000/calendar?channelId=${channel.id}`, {
+          credentials: 'include',
+        });
+        const data = await res.json();
+        if (data.success) {
+          const event = (data.data as CalendarEvent[]).find(e =>
+            e.title.toLowerCase().includes(updateData.searchTitle.toLowerCase())
+          );
+          if (event) {
+            const updatePayload: Record<string, string> = {};
+            if (updateData.newTitle) updatePayload.title = updateData.newTitle;
+            if (updateData.newDate) updatePayload.scheduledDate = updateData.newDate;
+            const updateRes = await fetch(`http://localhost:4000/calendar/${event.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify(updatePayload),
+            });
+            if (updateRes.ok) {
+              setMessages(prev => prev.map(m =>
+                m.id === messageId ? { ...m, actionExecuted: true } : m
+              ));
+              emitCalendarUpdate();
+            }
+          }
+        }
+      } else if (action.action === 'UPDATE_IDEA' && channel) {
+        const updateData = action.data as { searchTitle: string; newTitle?: string; newDescription?: string; newStatus?: string };
+        const res = await fetch(`http://localhost:4000/ideas?channelId=${channel.id}`, {
+          credentials: 'include',
+        });
+        const data = await res.json();
+        if (data.success) {
+          const idea = (data.data as Idea[]).find(i =>
+            i.title.toLowerCase().includes(updateData.searchTitle.toLowerCase())
+          );
+          if (idea) {
+            const updatePayload: Record<string, string> = {};
+            if (updateData.newTitle) updatePayload.title = updateData.newTitle;
+            if (updateData.newDescription) updatePayload.description = updateData.newDescription;
+            if (updateData.newStatus) updatePayload.status = updateData.newStatus;
+            const updateRes = await fetch(`http://localhost:4000/ideas/${idea.id}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              credentials: 'include',
+              body: JSON.stringify(updatePayload),
+            });
+            if (updateRes.ok) {
+              setMessages(prev => prev.map(m =>
+                m.id === messageId ? { ...m, actionExecuted: true } : m
+              ));
+              emitIdeasUpdate();
+            }
+          }
+        }
+      } else if (action.action === 'DELETE_CALENDAR_EVENT' && channel) {
+        const deleteData = action.data as { searchTitle: string };
+        const res = await fetch(`http://localhost:4000/calendar?channelId=${channel.id}`, {
+          credentials: 'include',
+        });
+        const data = await res.json();
+        if (data.success) {
+          const event = (data.data as CalendarEvent[]).find(e =>
+            e.title.toLowerCase().includes(deleteData.searchTitle.toLowerCase())
+          );
+          if (event) {
+            const deleteRes = await fetch(`http://localhost:4000/calendar/${event.id}`, {
+              method: 'DELETE',
+              credentials: 'include',
+            });
+            if (deleteRes.ok) {
+              setMessages(prev => prev.map(m =>
+                m.id === messageId ? { ...m, actionExecuted: true } : m
+              ));
+              emitCalendarUpdate();
+            }
+          }
+        }
+      } else if (action.action === 'DELETE_IDEA' && channel) {
+        const deleteData = action.data as { searchTitle: string };
+        const res = await fetch(`http://localhost:4000/ideas?channelId=${channel.id}`, {
+          credentials: 'include',
+        });
+        const data = await res.json();
+        if (data.success) {
+          const idea = (data.data as Idea[]).find(i =>
+            i.title.toLowerCase().includes(deleteData.searchTitle.toLowerCase())
+          );
+          if (idea) {
+            const deleteRes = await fetch(`http://localhost:4000/ideas/${idea.id}`, {
+              method: 'DELETE',
+              credentials: 'include',
+            });
+            if (deleteRes.ok) {
+              setMessages(prev => prev.map(m =>
+                m.id === messageId ? { ...m, actionExecuted: true } : m
+              ));
+              emitIdeasUpdate();
+            }
+          }
+        }
+      }
+      // CREATE_SMART_IDEAS is handled separately with user confirmation
+    } catch {
+      // Action failed silently
     }
   };
 
@@ -174,8 +519,8 @@ export default function AssistantPage() {
       if (data.success) {
         setGeneratedTitles(data.data.titles);
       }
-    } catch (err) {
-      console.error('Failed to generate titles:', err);
+    } catch {
+      // Failed to generate titles
     } finally {
       setGenerating(false);
     }
@@ -200,8 +545,8 @@ export default function AssistantPage() {
       if (data.success) {
         setGeneratedIdeas(data.data.ideas);
       }
-    } catch (err) {
-      console.error('Failed to generate ideas:', err);
+    } catch {
+      // Failed to generate ideas
     } finally {
       setGenerating(false);
     }
@@ -241,7 +586,7 @@ export default function AssistantPage() {
       icon: Wand2,
       description: 'Optimize for search',
       action: () => {
-        setInput('What are the best SEO practices for YouTube in 2024?');
+        setInput('What are the best SEO practices for YouTube right now?');
         inputRef.current?.focus();
       },
     },
@@ -318,6 +663,167 @@ export default function AssistantPage() {
                   )}
                 >
                   <p className="whitespace-pre-wrap">{message.content}</p>
+                  {message.action && !['READ_CALENDAR', 'READ_IDEAS', 'CREATE_SMART_IDEAS'].includes(message.action.action) && message.action.data && (
+                    <div className={cn(
+                      'mt-2 p-2 rounded text-sm',
+                      message.actionExecuted
+                        ? 'bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300'
+                        : 'bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300'
+                    )}>
+                      {message.action.action === 'CREATE_CALENDAR_EVENT' && (
+                        <div className="flex items-center gap-2">
+                          <span>{message.actionExecuted ? '✓' : '📅'}</span>
+                          <span>
+                            {message.actionExecuted
+                              ? `Evento creado: "${(message.action.data as { title: string }).title}"`
+                              : `Creando evento...`}
+                          </span>
+                        </div>
+                      )}
+                      {message.action.action === 'CREATE_IDEA' && (
+                        <div className="flex items-center gap-2">
+                          <span>{message.actionExecuted ? '✓' : '💡'}</span>
+                          <span>
+                            {message.actionExecuted
+                              ? `Idea añadida: "${(message.action.data as { title: string }).title}"`
+                              : `Creando idea...`}
+                          </span>
+                        </div>
+                      )}
+                      {message.action.action === 'UPDATE_CALENDAR_EVENT' && (
+                        <div className="flex items-center gap-2">
+                          <span>{message.actionExecuted ? '✓' : '📅'}</span>
+                          <span>{message.actionExecuted ? 'Evento actualizado' : 'Actualizando evento...'}</span>
+                        </div>
+                      )}
+                      {message.action.action === 'UPDATE_IDEA' && (
+                        <div className="flex items-center gap-2">
+                          <span>{message.actionExecuted ? '✓' : '💡'}</span>
+                          <span>{message.actionExecuted ? 'Idea actualizada' : 'Actualizando idea...'}</span>
+                        </div>
+                      )}
+                      {message.action.action === 'DELETE_CALENDAR_EVENT' && (
+                        <div className="flex items-center gap-2">
+                          <span>{message.actionExecuted ? '✓' : '🗑️'}</span>
+                          <span>{message.actionExecuted ? 'Evento eliminado' : 'Eliminando evento...'}</span>
+                        </div>
+                      )}
+                      {message.action.action === 'DELETE_IDEA' && (
+                        <div className="flex items-center gap-2">
+                          <span>{message.actionExecuted ? '✓' : '🗑️'}</span>
+                          <span>{message.actionExecuted ? 'Idea eliminada' : 'Eliminando idea...'}</span>
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {message.action?.action === 'READ_CALENDAR' && message.actionData && (
+                    <div className="mt-2 space-y-1">
+                      {(message.actionData as CalendarEvent[]).length > 0 ? (
+                        (message.actionData as CalendarEvent[]).map((event) => (
+                          <div key={event.id} className="text-xs p-2 bg-muted/50 rounded flex justify-between items-center">
+                            <span className="font-medium truncate">{event.title}</span>
+                            <span className="text-muted-foreground ml-2">{new Date(event.scheduledDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'short' })}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-xs p-2 bg-muted/50 rounded text-muted-foreground">
+                          No hay eventos próximos
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {message.action?.action === 'READ_IDEAS' && message.actionData && (
+                    <div className="mt-2 space-y-1">
+                      {(message.actionData as Idea[]).length > 0 ? (
+                        (message.actionData as Idea[]).map((idea) => (
+                          <div key={idea.id} className="text-xs p-2 bg-muted/50 rounded">
+                            <div className="font-medium truncate">{idea.title}</div>
+                            <div className="text-muted-foreground capitalize">{idea.status.replace('_', ' ')}</div>
+                          </div>
+                        ))
+                      ) : (
+                        <div className="text-xs p-2 bg-muted/50 rounded text-muted-foreground">
+                          No tienes ideas guardadas
+                        </div>
+                      )}
+                    </div>
+                  )}
+                  {message.action?.action === 'CREATE_SMART_IDEAS' && message.pendingIdeas && (
+                    <div className="mt-3 space-y-2">
+                      <div className="text-xs text-muted-foreground font-medium">Selecciona las ideas que quieres crear:</div>
+                      {message.pendingIdeas.map((idea, idx) => (
+                        <div
+                          key={idx}
+                          className={cn(
+                            'p-3 rounded-lg border transition-all',
+                            idea.created
+                              ? 'bg-green-50 dark:bg-green-950/30 border-green-300 dark:border-green-800'
+                              : idea.rejected
+                              ? 'bg-muted/30 border-muted opacity-50'
+                              : idea.accepted
+                              ? 'bg-blue-50 dark:bg-blue-950/30 border-blue-300 dark:border-blue-800'
+                              : 'bg-background border-border'
+                          )}
+                        >
+                          <div className="flex items-start justify-between gap-3">
+                            <div className="flex-1 min-w-0">
+                              <div className={cn(
+                                'font-medium',
+                                idea.created ? 'text-green-700 dark:text-green-300' :
+                                idea.rejected ? 'line-through text-muted-foreground' :
+                                idea.accepted ? 'text-blue-700 dark:text-blue-300' : ''
+                              )}>
+                                {idea.created && '✓ '}{idea.title}
+                              </div>
+                              {idea.description && !idea.rejected && (
+                                <div className="text-sm text-muted-foreground mt-1">{idea.description}</div>
+                              )}
+                            </div>
+                            {!idea.created && !idea.rejected && (
+                              <div className="flex gap-2 flex-shrink-0">
+                                <button
+                                  onClick={() => toggleIdeaAcceptance(message.id, idx)}
+                                  className={cn(
+                                    'p-1.5 rounded transition-colors',
+                                    idea.accepted
+                                      ? 'bg-blue-500 text-white'
+                                      : 'bg-muted hover:bg-blue-100 dark:hover:bg-blue-900/30'
+                                  )}
+                                  title={idea.accepted ? 'Deseleccionar' : 'Seleccionar'}
+                                >
+                                  <Check className="w-4 h-4" />
+                                </button>
+                                <button
+                                  onClick={() => rejectIdea(message.id, idx)}
+                                  className="p-1.5 rounded bg-muted hover:bg-red-100 dark:hover:bg-red-900/30 text-muted-foreground hover:text-red-600 transition-colors"
+                                  title="Descartar"
+                                >
+                                  <X className="w-4 h-4" />
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                      {message.pendingIdeas.some(i => !i.created && !i.rejected) && (
+                        <div className="flex gap-3 mt-3">
+                          <button
+                            onClick={() => acceptAllIdeas(message.id)}
+                            className="flex-1 py-2 px-4 bg-muted hover:bg-muted/80 rounded-lg text-sm font-medium transition-colors"
+                          >
+                            Seleccionar todas
+                          </button>
+                          <button
+                            onClick={() => createAcceptedIdeas(message.id)}
+                            disabled={!message.pendingIdeas.some(i => i.accepted && !i.created)}
+                            className="flex-1 py-2 px-4 bg-primary text-primary-foreground rounded-lg text-sm font-medium hover:bg-primary/90 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                          >
+                            Crear seleccionadas
+                          </button>
+                        </div>
+                      )}
+                    </div>
+                  )}
                   {message.role === 'assistant' && (
                     <div className="flex items-center justify-between mt-2 pt-2 border-t border-border/50">
                       <span className="text-xs text-muted-foreground">

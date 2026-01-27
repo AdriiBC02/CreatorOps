@@ -66,6 +66,11 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 - [x] Chat conversacional integrado
 - [x] Integración con página de Ideas
 - [x] Integración con página de Videos
+- [x] Acciones automáticas (CRUD calendario e ideas desde chat)
+- [x] Lectura de eventos e ideas existentes
+- [x] Ideas inteligentes con investigación (CREATE_SMART_IDEAS)
+- [x] Sistema de confirmación para ideas inteligentes
+- [x] Auto-refresh de páginas al crear/editar/eliminar desde IA
 
 ---
 
@@ -289,7 +294,13 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 
 ## Changelog
 
-### v0.3.0 (Current)
+### v0.3.1 (Current)
+- AI Actions: Create, read, update, delete calendar events and ideas from chat
+- Smart Ideas: AI researches and suggests specific ideas based on topics
+- Confirmation system for smart ideas (accept/reject individually)
+- Auto-refresh pages when AI makes changes
+
+### v0.3.0
 - AI Assistant with multi-provider support
 - Title generation, idea suggestions, video analysis
 - Floating widget + dedicated page

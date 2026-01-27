@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef } from 'react';
 import { ChevronLeft, ChevronRight, Plus, RefreshCw, Video, Clock, Trash2, Edit2, X, ChevronDown, Copy, Download } from 'lucide-react';
 import { cn } from '@/lib/utils';
+import { onCalendarUpdate } from '@/lib/events';
 
 interface CalendarItem {
   id: string;
@@ -65,6 +66,16 @@ export default function CalendarPage() {
     if (channel) {
       fetchCalendarItems();
     }
+  }, [channel]);
+
+  // Listen for AI-triggered calendar updates
+  useEffect(() => {
+    const unsubscribe = onCalendarUpdate(() => {
+      if (channel) {
+        fetchCalendarItems();
+      }
+    });
+    return unsubscribe;
   }, [channel]);
 
   // Check for unsaved changes

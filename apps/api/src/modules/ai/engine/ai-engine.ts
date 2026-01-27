@@ -89,21 +89,39 @@ export class AIEngine {
     return systemPrompts[promptKey];
   }
 
-  // Main method to run any AI task
+  // Main method to run any AI task with automatic fallback
   async run(
     task: AITask,
     prompt: string,
     options?: CompletionOptions
   ): Promise<{ result: string; provider: ProviderName }> {
-    const provider = this.getProvider(task);
     const systemPrompt = options?.systemPrompt || this.getSystemPrompt(task);
+    const preferredProvider = getProviderForTask(task);
 
-    const result = await provider.complete(prompt, {
-      ...options,
-      systemPrompt,
-    });
+    // Get ordered list of providers to try
+    const providersToTry: ProviderName[] = [preferredProvider, ...getFallbackProviders(preferredProvider)];
 
-    return { result, provider: provider.name };
+    let lastError: Error | null = null;
+
+    for (const providerName of providersToTry) {
+      const provider = this.providers.get(providerName);
+      if (!provider) continue;
+
+      try {
+        const result = await provider.complete(prompt, {
+          ...options,
+          systemPrompt,
+        });
+
+        return { result, provider: provider.name };
+      } catch (error) {
+        console.error(`[AIEngine] Provider ${providerName} failed:`, error instanceof Error ? error.message : error);
+        lastError = error instanceof Error ? error : new Error(String(error));
+        // Continue to next provider
+      }
+    }
+
+    throw lastError || new Error(`No AI provider available for task: ${task}`);
   }
 
   // Convenience methods for specific tasks
@@ -136,7 +154,7 @@ export class AIEngine {
 
   async generateIdeas(
     context: TaskContext,
-    options: { count?: number; basedOn?: string; contentType?: string } = {}
+    options: { count?: number; basedOn?: string; contentType?: string; customPrompt?: string } = {}
   ): Promise<{ ideas: Array<{ title: string; description: string; reason: string }>; provider: ProviderName }> {
     const prompt = buildIdeasPrompt(context, options);
     const { result, provider } = await this.run('generate_ideas', prompt);

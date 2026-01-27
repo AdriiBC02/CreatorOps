@@ -31,7 +31,7 @@ export class AIService {
     return this.engine.getAvailableProviders();
   }
 
-  // Build context from database
+  // Build context from database with full data
   private async buildChannelContext(channelId: string, userId: string, db: DbClient): Promise<TaskContext> {
     const channel = await db.query.channels.findFirst({
       where: and(eq(channels.id, channelId), eq(channels.userId, userId)),
@@ -41,15 +41,46 @@ export class AIService {
       throw new ForbiddenError('Channel not found or access denied');
     }
 
+    // Fetch actual videos from the channel
+    const channelVideos = await db.query.videos.findMany({
+      where: eq(videos.channelId, channelId),
+      orderBy: (videos, { desc }) => [desc(videos.viewCount)],
+      limit: 20,
+    });
+
+    // Fetch existing ideas
+    const channelIdeas = await db.query.contentIdeas.findMany({
+      where: eq(contentIdeas.channelId, channelId),
+      orderBy: (ideas, { desc }) => [desc(ideas.createdAt)],
+      limit: 10,
+    });
+
     return {
       channelId,
       userId,
       channelData: {
         title: channel.title,
+        description: channel.description || '',
         subscriberCount: channel.subscriberCount || 0,
-        videoCount: channel.videoCount || 0,
+        videoCount: channelVideos.length,
         viewCount: channel.viewCount || 0,
+        thumbnailUrl: channel.thumbnailUrl || '',
+        customUrl: channel.customUrl || '',
       },
+      // Include actual video data
+      videosData: channelVideos.map(v => ({
+        title: v.title,
+        description: v.description?.substring(0, 200) || '',
+        viewCount: v.viewCount || 0,
+        likeCount: v.likeCount || 0,
+        commentCount: v.commentCount || 0,
+        publishedAt: v.publishedAt?.toISOString() || null,
+      })),
+      // Include existing ideas
+      existingIdeas: channelIdeas.map(i => ({
+        title: i.title,
+        status: i.status,
+      })),
     };
   }
 
@@ -172,6 +203,7 @@ export class AIService {
       count: data.count || 5,
       basedOn: data.basedOn,
       contentType: data.contentType,
+      customPrompt: data.customPrompt,
     });
 
     return {

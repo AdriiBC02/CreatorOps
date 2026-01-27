@@ -14,6 +14,44 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [0.3.1] - 2026-01-27
+
+### Added - AI Actions (Chat Commands)
+- El asistente ahora puede ejecutar acciones directamente desde el chat
+- `CREATE_CALENDAR_EVENT` - Crear eventos en el calendario ("Añade un evento el 30 de enero")
+- `CREATE_IDEA` - Crear ideas simples ("Crea una idea sobre X")
+- `READ_CALENDAR` - Ver eventos próximos ("Qué tengo programado?")
+- `READ_IDEAS` - Ver ideas existentes ("Muéstrame mis ideas")
+- `UPDATE_CALENDAR_EVENT` - Editar eventos ("Cambia el título del evento X")
+- `UPDATE_IDEA` - Editar ideas ("Actualiza la descripción de la idea X")
+- `DELETE_CALENDAR_EVENT` - Eliminar eventos ("Elimina el evento X")
+- `DELETE_IDEA` - Eliminar ideas ("Borra la idea X")
+
+### Added - Smart Ideas (AI Research)
+- `CREATE_SMART_IDEAS` - Investigación inteligente de ideas
+- Cuando pides ideas sobre un tema específico (ej: "Crea ideas sobre videojuegos recientes con buenas críticas"), la IA investiga y sugiere ideas ESPECÍFICAS con ejemplos reales
+- Sistema de confirmación: selecciona individualmente qué ideas crear
+- Botones de aceptar/rechazar por idea
+- Botón "Seleccionar todas" para aceptar en bloque
+- Visualización de estado: pendiente, seleccionada, creada, rechazada
+
+### Added - Auto-Refresh
+- Sistema de eventos para sincronización entre componentes
+- Nuevo archivo `lib/events.ts` con custom event system
+- Las páginas de Calendario e Ideas se actualizan automáticamente cuando la IA crea/edita/elimina elementos
+- No requiere recargar la página manualmente
+
+### Changed
+- Mejorado el sistema de detección de intenciones en prompts
+- El widget flotante ahora tiene las mismas capacidades que la página del asistente
+- Las acciones de eliminación dan confirmación directa (sin preguntar "¿Estás seguro?")
+
+### Fixed
+- Fechas incorrectas en creación de eventos (ahora usa la fecha actual correcta)
+- Tipo de contenido en calendario (long_form en vez de video)
+
+---
+
 ## [0.3.0] - 2026-01-27
 
 ### Added - AI Assistant
