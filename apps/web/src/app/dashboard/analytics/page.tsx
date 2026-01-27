@@ -134,7 +134,7 @@ export default function AnalyticsPage() {
   const stats = [
     {
       name: t('stats.totalViews'),
-      value: channel.viewCount,
+      value: totalViews,
       icon: Eye,
       description: t('stats.totalViewsDesc'),
       color: 'from-blue-500 to-cyan-500',
