@@ -124,14 +124,19 @@ pnpm db:studio        # Abrir Drizzle Studio
 - [x] Login con Google OAuth2
 - [x] Conexión de canal YouTube
 - [x] Sincronización de videos desde YouTube
+- [x] **Sync automático cada 5 minutos** (BullMQ/Redis)
 - [x] Dashboard con stats en tiempo real
 - [x] Mini stats en sidebar con auto-refresh
 - [x] Calendario de contenido con drag & drop
 - [x] Gestión de ideas con Kanban board
+- [x] **Vista de lista alternativa para Ideas**
+- [x] **Vista de galería de thumbnails para Videos**
 - [x] Export a CSV (videos, ideas, calendario)
 - [x] Filtros avanzados y búsqueda
+- [x] **Búsqueda global (⌘K)** - videos, ideas, calendario
 - [x] Tema claro/oscuro/sistema
-- [x] Selector de idioma (EN/ES)
+- [x] **i18n completo** (Español/Inglés)
+- [x] **UI Glassmorphism** estilo macOS
 
 ### AI Assistant (Implementado)
 - [x] Chat conversacional con contexto del canal
@@ -140,10 +145,16 @@ pnpm db:studio        # Abrir Drizzle Studio
 - [x] Widget flotante en todas las páginas
 - [x] Auto-refresh de páginas afectadas
 
+### Notificaciones (Implementado)
+- [x] Sistema de notificaciones in-app
+- [x] Notificaciones de milestones (subscribers, views)
+- [x] Toasts con animaciones
+- [x] Campana con badge de no leídas
+
 ### Próximas Fases
 - [ ] Analytics avanzado con gráficos
 - [ ] Multi-canal
-- [ ] Notificaciones in-app
+- [ ] Tags y categorías para ideas
 - [ ] Colaboración en equipo
 - [ ] Integraciones (TikTok, Instagram, X)
 

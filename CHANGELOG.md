@@ -14,6 +14,73 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [0.4.0] - 2026-01-28
+
+### Added - Global Search (Cmd+K)
+- Componente `GlobalSearch` con modal estilo glassmorphism
+- Búsqueda unificada en videos, ideas y eventos de calendario
+- Resultados agrupados por tipo
+- Navegación con teclado (flechas, enter, escape)
+- Búsquedas recientes guardadas en localStorage
+- Accesos rápidos (Quick Links) a secciones principales
+- Botón de búsqueda visible en sidebar con indicador ⌘K
+
+### Added - Ideas List View
+- Toggle para alternar entre vista Kanban y Lista
+- Vista de tabla con columnas: título, estado, prioridad, tipo, fecha
+- Acciones directas en cada fila (copiar, duplicar, eliminar)
+- Click en fila para editar idea
+- Preferencia de vista persistida en localStorage
+
+### Added - Videos Gallery View
+- Toggle para alternar entre vista Tabla y Galería
+- Grid responsivo de thumbnails (1-4 columnas según pantalla)
+- Badge de duración sobre thumbnail
+- Badge de estado (public/private/unlisted)
+- Stats inline: vistas, likes, comentarios con iconos
+- Acciones en hover (analizar, copiar URL, abrir en YouTube)
+- Preferencia de vista persistida en localStorage
+
+### Added - Automatic YouTube Sync
+- Servicio `SyncSchedulerService` para sincronización automática
+- Sync cada 5 minutos usando BullMQ con Redis
+- Procesamiento concurrente (2 canales simultáneos)
+- Mínimo 3 minutos entre syncs del mismo canal
+- Detección automática de milestones post-sync
+- Cola `CHANNEL_SYNC` en package `queue-jobs`
+- Integración con ciclo de vida del servidor (init/shutdown)
+- Fallback graceful si Redis no está disponible
+
+### Added - Internationalization (i18n)
+- Sistema completo de traducciones con `react-i18next`
+- Soporte para Español (ES) e Inglés (EN)
+- Archivos de traducción por módulo: common, dashboard, videos, calendar, ideas, analytics, assistant, settings, notifications
+- Selector de idioma funcional en Settings
+- Persistencia de preferencia en localStorage
+- Sin cambios en URLs (client-side only)
+
+### Added - macOS Glassmorphism UI
+- Clases CSS: `.glass`, `.glass-card`, `.glass-sidebar`, `.glass-modal`, `.vibrancy`
+- Efectos de blur y transparencia
+- Sombras mejoradas con variantes soft y glow
+- Scrollbar estilo macOS
+- Botones con clase `.btn-glass`
+
+### Added - Keyboard Shortcuts Modal
+- Modal de atajos accesible con `?`
+- Secciones: General, Ideas, Videos, Calendar
+- Nuevo shortcut: `⌘K` para búsqueda global
+
+### Changed
+- Sidebar ahora incluye barra de búsqueda clickeable
+- Headers de páginas con toggle de vistas
+- Views/stats de analytics usan datos de videos sincronizados (no channel.viewCount)
+
+### Fixed
+- Analytics mostraba viewCount del canal en lugar de suma de videos sincronizados
+
+---
+
 ## [0.3.2] - 2026-01-27
 
 ### Added - Notifications Backend (`/notifications/*`)
