@@ -19,6 +19,7 @@ import {
   ChevronRight,
   Keyboard,
   Search,
+  MessageCircle,
 } from 'lucide-react';
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
@@ -50,6 +51,7 @@ const navigation = [
   { key: 'dashboard', href: '/dashboard', icon: LayoutDashboard },
   { key: 'assistant', href: '/dashboard/assistant', icon: Sparkles, gradient: true },
   { key: 'videos', href: '/dashboard/videos', icon: Video },
+  { key: 'comments', href: '/dashboard/comments', icon: MessageCircle },
   { key: 'analytics', href: '/dashboard/analytics', icon: BarChart3 },
   { key: 'calendar', href: '/dashboard/calendar', icon: Calendar },
   { key: 'ideas', href: '/dashboard/ideas', icon: Lightbulb },

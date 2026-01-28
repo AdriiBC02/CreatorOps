@@ -1,6 +1,7 @@
 export * from './users';
 export * from './channels';
 export * from './videos';
+export * from './comments';
 export * from './analytics';
 export * from './calendar';
 export * from './experiments';

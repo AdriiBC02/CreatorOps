@@ -146,9 +146,13 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 ### Prioridad Baja (Nice to Have)
 
 #### Gestión de Comentarios
-- [ ] Ver comentarios de videos
-- [ ] Responder desde la app
-- [ ] Filtrar spam/hate
+- [x] Ver comentarios de videos (v0.5.0)
+- [x] Responder desde la app (v0.5.0)
+- [x] Sincronizar comentarios de YouTube (v0.5.0)
+- [x] Moderar comentarios (publicar/retener/rechazar) (v0.5.0)
+- [x] Eliminar comentarios propios (v0.5.0)
+- [x] Stats de comentarios por video (v0.5.0)
+- [ ] Filtrar spam/hate automático
 - [ ] Marcar comentarios importantes
 - [ ] Analytics de sentimiento
 
@@ -210,9 +214,31 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 - [ ] Slack webhook
 - [ ] Zapier/Make integration
 
-### Video Upload
-- [ ] Subir videos directamente
+### Integración YouTube Avanzada
+
+#### Fase 1: Video Upload (En Videos)
+- [ ] Subir videos directamente desde la app
+- [ ] Upload resumible (continuar si se interrumpe)
+- [ ] Formulario de metadatos (título, descripción, tags)
+- [ ] Selector de privacidad y categoría
+- [ ] Upload de thumbnail personalizado
 - [ ] Programar publicación
+
+#### Fase 2: Video Management
+- [ ] Editar título, descripción, tags en YouTube
+- [ ] Cambiar privacidad desde la app
+- [ ] Cambiar thumbnail
+- [ ] Eliminar videos de YouTube
+
+#### Fase 4: Playlists
+- [ ] Sincronizar playlists existentes
+- [ ] Crear nuevas playlists
+- [ ] Editar título, descripción, privacidad
+- [ ] Añadir/quitar videos de playlists
+- [ ] Reordenar videos con drag & drop
+- [ ] Eliminar playlists
+
+### Video Upload (Avanzado)
 - [ ] Editor de thumbnails
 - [ ] A/B testing de thumbnails
 - [ ] Auto-generación de shorts
@@ -302,7 +328,18 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 
 ## Changelog
 
-### v0.4.0 (Current)
+### v0.5.0 (Current)
+- Comments management: View, reply, moderate, delete comments
+- Sync comments from YouTube for any video
+- Comment statistics per video (total, published, pending, rejected)
+- Filter comments by moderation status
+- Search within comments
+- Reply to comments directly from the app
+- Moderate comments (publish, hold for review, reject)
+- Delete your own comments
+- Comments page in navigation sidebar
+
+### v0.4.0
 - Global search (Cmd+K): Search videos, ideas, calendar across the app
 - Ideas list view: Toggle between kanban and list view
 - Bulk actions for Ideas (select multiple, change status, delete)
@@ -362,4 +399,4 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 
 ---
 
-*Última actualización: 28 Enero 2026 - v0.4.0*
+*Última actualización: 28 Enero 2026 - v0.5.0*

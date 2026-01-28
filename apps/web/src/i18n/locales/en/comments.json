@@ -1,0 +1,60 @@
+{
+  "title": "Comments",
+  "subtitle": "Manage and moderate comments on your videos",
+  "selectVideo": "Select a video",
+  "selectVideoPlaceholder": "Choose a video to view comments",
+  "noComments": "No comments found",
+  "noCommentsDescription": "This video doesn't have any comments yet, or you need to sync them from YouTube.",
+  "syncComments": "Sync Comments",
+  "syncing": "Syncing...",
+  "syncSuccess": "Synced {{count}} comments",
+  "syncError": "Failed to sync comments",
+  "syncPermissionError": "You need to reconnect your YouTube channel to get comment permissions. Go to Settings → Channels.",
+  "reply": "Reply",
+  "delete": "Delete",
+  "moderate": "Moderate",
+  "replyPlaceholder": "Write a reply...",
+  "sendReply": "Send Reply",
+  "sending": "Sending...",
+  "replySuccess": "Reply sent successfully",
+  "replyError": "Failed to send reply",
+  "deleteConfirm": "Are you sure you want to delete this comment?",
+  "deleteSuccess": "Comment deleted",
+  "deleteError": "Failed to delete comment",
+  "moderationStatus": {
+    "published": "Published",
+    "heldForReview": "Held for Review",
+    "rejected": "Rejected"
+  },
+  "moderateAction": {
+    "publish": "Publish",
+    "hold": "Hold for Review",
+    "reject": "Reject"
+  },
+  "moderateSuccess": "Comment moderation updated",
+  "moderateError": "Failed to moderate comment",
+  "filters": {
+    "all": "All",
+    "published": "Published",
+    "heldForReview": "Pending",
+    "rejected": "Rejected"
+  },
+  "stats": {
+    "total": "Total",
+    "published": "Published",
+    "pending": "Pending",
+    "rejected": "Rejected",
+    "ownerReplies": "Your Replies"
+  },
+  "replies": "{{count}} replies",
+  "repliesOne": "1 reply",
+  "likes": "{{count}} likes",
+  "likesOne": "1 like",
+  "showReplies": "Show replies",
+  "hideReplies": "Hide replies",
+  "ownerBadge": "You",
+  "loadingComments": "Loading comments...",
+  "loadMore": "Load more",
+  "banAuthor": "Ban author from channel",
+  "banAuthorDescription": "Prevent this user from commenting on your videos"
+}

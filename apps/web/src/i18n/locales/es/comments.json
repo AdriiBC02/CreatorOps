@@ -1,0 +1,60 @@
+{
+  "title": "Comentarios",
+  "subtitle": "Gestiona y modera los comentarios de tus videos",
+  "selectVideo": "Selecciona un video",
+  "selectVideoPlaceholder": "Elige un video para ver sus comentarios",
+  "noComments": "No hay comentarios",
+  "noCommentsDescription": "Este video aún no tiene comentarios, o necesitas sincronizarlos desde YouTube.",
+  "syncComments": "Sincronizar",
+  "syncing": "Sincronizando...",
+  "syncSuccess": "Se sincronizaron {{count}} comentarios",
+  "syncError": "Error al sincronizar comentarios",
+  "syncPermissionError": "Necesitas reconectar tu canal de YouTube para obtener permisos de comentarios. Ve a Ajustes → Canales.",
+  "reply": "Responder",
+  "delete": "Eliminar",
+  "moderate": "Moderar",
+  "replyPlaceholder": "Escribe una respuesta...",
+  "sendReply": "Enviar",
+  "sending": "Enviando...",
+  "replySuccess": "Respuesta enviada correctamente",
+  "replyError": "Error al enviar respuesta",
+  "deleteConfirm": "¿Estás seguro de que quieres eliminar este comentario?",
+  "deleteSuccess": "Comentario eliminado",
+  "deleteError": "Error al eliminar comentario",
+  "moderationStatus": {
+    "published": "Publicado",
+    "heldForReview": "En revisión",
+    "rejected": "Rechazado"
+  },
+  "moderateAction": {
+    "publish": "Publicar",
+    "hold": "Retener para revisión",
+    "reject": "Rechazar"
+  },
+  "moderateSuccess": "Moderación actualizada",
+  "moderateError": "Error al moderar comentario",
+  "filters": {
+    "all": "Todos",
+    "published": "Publicados",
+    "heldForReview": "Pendientes",
+    "rejected": "Rechazados"
+  },
+  "stats": {
+    "total": "Total",
+    "published": "Publicados",
+    "pending": "Pendientes",
+    "rejected": "Rechazados",
+    "ownerReplies": "Tus respuestas"
+  },
+  "replies": "{{count}} respuestas",
+  "repliesOne": "1 respuesta",
+  "likes": "{{count}} me gusta",
+  "likesOne": "1 me gusta",
+  "showReplies": "Ver respuestas",
+  "hideReplies": "Ocultar respuestas",
+  "ownerBadge": "Tú",
+  "loadingComments": "Cargando comentarios...",
+  "loadMore": "Cargar más",
+  "banAuthor": "Bloquear autor del canal",
+  "banAuthorDescription": "Impedir que este usuario comente en tus videos"
+}

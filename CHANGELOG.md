@@ -14,6 +14,62 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ---
 
+## [0.5.0] - 2026-01-28
+
+### Fixed
+- Bug en controlador de comentarios: `req.db` → `req.app.locals.db`
+- Animación de sync se quedaba cargando infinitamente
+- Manejo de error de permisos insuficientes de YouTube
+
+### Changed
+- Añadido scope `youtube.force-ssl` para permisos de comentarios
+- Mejorada animación de sync (opacity fade durante carga)
+- Mensaje de error claro cuando faltan permisos (reconectar canal)
+
+### Added - Comments Management
+- Nueva página de Comentarios en el dashboard (`/dashboard/comments`)
+- Sincronización de comentarios desde YouTube por video
+- Listado de comentarios con respuestas anidadas
+- Filtro por estado de moderación (todos, publicados, pendientes, rechazados)
+- Búsqueda dentro de comentarios
+- Estadísticas de comentarios por video (total, publicados, pendientes, rechazados, respuestas propias)
+
+### Added - Comments Backend (`/comments/*`)
+- `GET /comments?videoId=xxx` - Listar comentarios de un video con paginación
+- `GET /comments/stats?videoId=xxx` - Obtener estadísticas de comentarios
+- `POST /comments/sync?videoId=xxx` - Sincronizar comentarios desde YouTube
+- `GET /comments/:id` - Obtener un comentario específico
+- `POST /comments` - Responder a un comentario (se publica en YouTube)
+- `DELETE /comments/:id` - Eliminar comentario propio (se elimina de YouTube)
+- `PUT /comments/:id/moderate` - Moderar comentario (publicar/retener/rechazar)
+
+### Added - Database Schema
+- Tabla `comments` con campos: id, videoId, youtubeCommentId, youtubeParentId, parentCommentId, authorDisplayName, authorProfileImageUrl, authorChannelId, authorChannelUrl, textOriginal, textDisplay, likeCount, replyCount, moderationStatus, isPublic, canReply, isOwnerComment, publishedAt, updatedAt, syncedAt, createdAt
+- Índices optimizados para consultas por video, YouTube ID, parent y estado de moderación
+- Relaciones con tabla videos (cascade delete)
+
+### Added - Comments UI Features
+- Selector de video para ver comentarios
+- Avatar del autor con fallback a icono de usuario
+- Badge de "Tú" para comentarios propios del canal
+- Badge de estado de moderación con colores (verde/amarillo/rojo)
+- Botón para expandir/colapsar respuestas
+- Formulario inline para responder a comentarios
+- Menú dropdown de moderación (publicar, retener, rechazar)
+- Botón de eliminar para comentarios propios
+- Contador de likes por comentario
+
+### Added - Translations
+- Archivo `comments.json` para inglés y español
+- Traducciones para todos los estados, acciones y mensajes
+- Navegación "Comentarios" añadida al sidebar
+
+### Changed
+- Sidebar ahora incluye link a Comments entre Videos y Analytics
+- API root ahora lista `/comments` en endpoints disponibles
+
+---
+
 ## [0.4.0] - 2026-01-28
 
 ### Added - Desktop Notifications

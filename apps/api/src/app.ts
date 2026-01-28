@@ -16,6 +16,7 @@ import { ideasRoutes } from './modules/ideas/ideas.routes.js';
 import { calendarRoutes } from './modules/calendar/calendar.routes.js';
 import { aiRoutes } from './modules/ai/ai.routes.js';
 import { notificationsRoutes } from './modules/notifications/notifications.routes.js';
+import { commentsRoutes } from './modules/comments/comments.routes.js';
 
 export function createApp(db: DbClient): Express {
   const app = express();
@@ -54,7 +55,7 @@ export function createApp(db: DbClient): Express {
     res.json({
       name: 'CreatorOps API',
       version: '0.2.0',
-      endpoints: ['/health', '/auth', '/channels', '/videos', '/analytics', '/ideas', '/calendar', '/ai', '/notifications'],
+      endpoints: ['/health', '/auth', '/channels', '/videos', '/analytics', '/ideas', '/calendar', '/ai', '/notifications', '/comments'],
     });
   });
 
@@ -72,6 +73,7 @@ export function createApp(db: DbClient): Express {
   app.use('/calendar', calendarRoutes);
   app.use('/ai', aiRoutes);
   app.use('/notifications', notificationsRoutes);
+  app.use('/comments', commentsRoutes);
 
   // Error handler
   app.use(errorHandler);

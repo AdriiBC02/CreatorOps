@@ -11,6 +11,7 @@ import enAnalytics from './locales/en/analytics.json';
 import enAssistant from './locales/en/assistant.json';
 import enSettings from './locales/en/settings.json';
 import enNotifications from './locales/en/notifications.json';
+import enComments from './locales/en/comments.json';
 
 // Spanish translations
 import esCommon from './locales/es/common.json';
@@ -22,6 +23,7 @@ import esAnalytics from './locales/es/analytics.json';
 import esAssistant from './locales/es/assistant.json';
 import esSettings from './locales/es/settings.json';
 import esNotifications from './locales/es/notifications.json';
+import esComments from './locales/es/comments.json';
 
 const resources = {
   en: {
@@ -34,6 +36,7 @@ const resources = {
     assistant: enAssistant,
     settings: enSettings,
     notifications: enNotifications,
+    comments: enComments,
   },
   es: {
     common: esCommon,
@@ -45,6 +48,7 @@ const resources = {
     assistant: esAssistant,
     settings: esSettings,
     notifications: esNotifications,
+    comments: esComments,
   },
 };
 
