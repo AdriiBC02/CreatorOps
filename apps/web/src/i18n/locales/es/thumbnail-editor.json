@@ -6,7 +6,11 @@
     "rectangle": "Rectángulo",
     "circle": "Círculo",
     "triangle": "Triángulo",
-    "image": "Subir Imagen"
+    "image": "Subir Imagen",
+    "line": "Línea",
+    "arrow": "Flecha",
+    "emoji": "Emoji",
+    "templates": "Plantillas"
   },
   "actions": {
     "download": "Descargar PNG",
@@ -28,7 +32,31 @@
     "font": "Fuente",
     "size": "Tamaño",
     "color": "Color",
-    "stroke": "Contorno"
+    "stroke": "Contorno",
+    "strokeColor": "Contorno",
+    "strokeWidth": "Grosor"
+  },
+  "align": {
+    "title": "Alineación",
+    "left": "Alinear Izquierda",
+    "right": "Alinear Derecha",
+    "centerH": "Centrar Horizontal",
+    "centerV": "Centrar Vertical",
+    "top": "Alinear Arriba",
+    "bottom": "Alinear Abajo"
+  },
+  "transform": {
+    "title": "Transformar",
+    "flipH": "Voltear Horizontal",
+    "flipV": "Voltear Vertical",
+    "lock": "Bloquear/Desbloquear"
+  },
+  "properties": {
+    "opacity": "Opacidad"
+  },
+  "templates": {
+    "title": "Plantillas",
+    "background": "Color de Fondo"
   },
   "confirmClose": "Tienes cambios sin guardar. ¿Estás seguro de que quieres cerrar?"
 }

@@ -23,9 +23,23 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
   - Añadir texto con fuente, tamaño, color y contorno personalizables
   - Formas básicas: rectángulo, círculo, triángulo
   - Subir imágenes adicionales al canvas
+  - Herramienta de línea y flecha
+  - Selector de emojis populares (🔥 👀 😱 🎮 💯 etc.)
 - Panel de capas con ordenamiento (subir/bajar)
+- Herramientas de alineación:
+  - Centrar horizontal/vertical
+  - Alinear a bordes (izquierda, derecha, arriba, abajo)
+- Herramientas de transformación:
+  - Voltear horizontal/vertical
+  - Bloquear/desbloquear objetos
+- Control de opacidad por objeto
+- Control de color y grosor de contorno (stroke)
+- Panel de plantillas predefinidas:
+  - Gaming, Vlog, Tutorial, Reaction
+  - Selector de color de fondo
 - Sistema de historial con Undo/Redo (Ctrl+Z / Ctrl+Shift+Z)
 - Exportación a PNG de alta calidad
+- 10 fuentes disponibles (Impact, Arial Black, Georgia, etc.)
 - Atajos de teclado:
   - Delete/Backspace: eliminar selección
   - Ctrl+D: duplicar selección

@@ -385,6 +385,293 @@ const EditorCanvas = forwardRef<any, EditorCanvasProps>(
           multiplier: 1,
         });
       },
+
+      // Alignment tools
+      alignCenter: () => {
+        if (!fabricRef.current) return;
+        const activeObject = fabricRef.current.getActiveObject();
+        if (activeObject) {
+          activeObject.set({
+            left: CANVAS_WIDTH / 2,
+            originX: 'center',
+          });
+          fabricRef.current.renderAll();
+          saveHistory();
+        }
+      },
+
+      alignMiddle: () => {
+        if (!fabricRef.current) return;
+        const activeObject = fabricRef.current.getActiveObject();
+        if (activeObject) {
+          activeObject.set({
+            top: CANVAS_HEIGHT / 2,
+            originY: 'center',
+          });
+          fabricRef.current.renderAll();
+          saveHistory();
+        }
+      },
+
+      alignLeft: () => {
+        if (!fabricRef.current) return;
+        const activeObject = fabricRef.current.getActiveObject();
+        if (activeObject) {
+          const objWidth = (activeObject.width || 0) * (activeObject.scaleX || 1);
+          activeObject.set({
+            left: objWidth / 2,
+            originX: 'center',
+          });
+          fabricRef.current.renderAll();
+          saveHistory();
+        }
+      },
+
+      alignRight: () => {
+        if (!fabricRef.current) return;
+        const activeObject = fabricRef.current.getActiveObject();
+        if (activeObject) {
+          const objWidth = (activeObject.width || 0) * (activeObject.scaleX || 1);
+          activeObject.set({
+            left: CANVAS_WIDTH - objWidth / 2,
+            originX: 'center',
+          });
+          fabricRef.current.renderAll();
+          saveHistory();
+        }
+      },
+
+      alignTop: () => {
+        if (!fabricRef.current) return;
+        const activeObject = fabricRef.current.getActiveObject();
+        if (activeObject) {
+          const objHeight = (activeObject.height || 0) * (activeObject.scaleY || 1);
+          activeObject.set({
+            top: objHeight / 2,
+            originY: 'center',
+          });
+          fabricRef.current.renderAll();
+          saveHistory();
+        }
+      },
+
+      alignBottom: () => {
+        if (!fabricRef.current) return;
+        const activeObject = fabricRef.current.getActiveObject();
+        if (activeObject) {
+          const objHeight = (activeObject.height || 0) * (activeObject.scaleY || 1);
+          activeObject.set({
+            top: CANVAS_HEIGHT - objHeight / 2,
+            originY: 'center',
+          });
+          fabricRef.current.renderAll();
+          saveHistory();
+        }
+      },
+
+      // Opacity control
+      setSelectedOpacity: (opacity: number) => {
+        if (!fabricRef.current) return;
+        const activeObject = fabricRef.current.getActiveObject();
+        if (activeObject) {
+          activeObject.set('opacity', opacity);
+          fabricRef.current.renderAll();
+          saveHistory();
+        }
+      },
+
+      getSelectedOpacity: () => {
+        if (!fabricRef.current) return 1;
+        const activeObject = fabricRef.current.getActiveObject();
+        return activeObject?.opacity ?? 1;
+      },
+
+      // Stroke color
+      setSelectedStroke: (color: string) => {
+        if (!fabricRef.current) return;
+        const activeObject = fabricRef.current.getActiveObject();
+        if (activeObject) {
+          activeObject.set('stroke', color);
+          fabricRef.current.renderAll();
+          saveHistory();
+        }
+      },
+
+      setSelectedStrokeWidth: (width: number) => {
+        if (!fabricRef.current) return;
+        const activeObject = fabricRef.current.getActiveObject();
+        if (activeObject) {
+          activeObject.set('strokeWidth', width);
+          fabricRef.current.renderAll();
+          saveHistory();
+        }
+      },
+
+      // Arrow/Line tool
+      addLine: (options: any = {}) => {
+        if (!fabricRef.current) return;
+
+        const line = new fabric.Line([
+          CANVAS_WIDTH / 2 - 100,
+          CANVAS_HEIGHT / 2,
+          CANVAS_WIDTH / 2 + 100,
+          CANVAS_HEIGHT / 2,
+        ], {
+          stroke: options.stroke || '#FFFFFF',
+          strokeWidth: options.strokeWidth || 4,
+          originX: 'center',
+          originY: 'center',
+        });
+
+        (line as any).id = generateId();
+        fabricRef.current.add(line);
+        fabricRef.current.setActiveObject(line);
+        fabricRef.current.renderAll();
+        saveHistory();
+      },
+
+      addArrow: (options: any = {}) => {
+        if (!fabricRef.current) return;
+
+        // Create arrow as a group (line + triangle head)
+        const lineLength = 200;
+        const headSize = 20;
+
+        const line = new fabric.Line([0, 0, lineLength - headSize, 0], {
+          stroke: options.stroke || '#FFFFFF',
+          strokeWidth: options.strokeWidth || 4,
+        });
+
+        const head = new fabric.Triangle({
+          width: headSize,
+          height: headSize,
+          fill: options.stroke || '#FFFFFF',
+          left: lineLength - headSize,
+          top: -headSize / 2,
+          angle: 90,
+        });
+
+        const group = new fabric.Group([line, head], {
+          left: CANVAS_WIDTH / 2,
+          top: CANVAS_HEIGHT / 2,
+          originX: 'center',
+          originY: 'center',
+        });
+
+        (group as any).id = generateId();
+        fabricRef.current.add(group);
+        fabricRef.current.setActiveObject(group);
+        fabricRef.current.renderAll();
+        saveHistory();
+      },
+
+      // Emoji support
+      addEmoji: (emoji: string, options: any = {}) => {
+        if (!fabricRef.current) return;
+
+        const textObj = new fabric.IText(emoji, {
+          left: CANVAS_WIDTH / 2,
+          top: CANVAS_HEIGHT / 2,
+          originX: 'center',
+          originY: 'center',
+          fontSize: options.fontSize || 80,
+        });
+
+        (textObj as any).id = generateId();
+        fabricRef.current.add(textObj);
+        fabricRef.current.setActiveObject(textObj);
+        fabricRef.current.renderAll();
+        saveHistory();
+      },
+
+      // Clear canvas
+      clearCanvas: () => {
+        if (!fabricRef.current) return;
+        fabricRef.current.clear();
+        fabricRef.current.backgroundColor = '#1a1a1a';
+        fabricRef.current.renderAll();
+        saveHistory();
+        updateLayers();
+      },
+
+      // Load template (JSON string)
+      loadTemplate: (templateJson: string) => {
+        if (!fabricRef.current) return;
+        fabricRef.current.loadFromJSON(JSON.parse(templateJson)).then(() => {
+          fabricRef.current!.renderAll();
+          saveHistory();
+          updateLayers();
+        });
+      },
+
+      // Set background color
+      setBackgroundColor: (color: string) => {
+        if (!fabricRef.current) return;
+        fabricRef.current.backgroundColor = color;
+        fabricRef.current.renderAll();
+        saveHistory();
+      },
+
+      // Flip selected object
+      flipHorizontal: () => {
+        if (!fabricRef.current) return;
+        const activeObject = fabricRef.current.getActiveObject();
+        if (activeObject) {
+          activeObject.set('flipX', !activeObject.flipX);
+          fabricRef.current.renderAll();
+          saveHistory();
+        }
+      },
+
+      flipVertical: () => {
+        if (!fabricRef.current) return;
+        const activeObject = fabricRef.current.getActiveObject();
+        if (activeObject) {
+          activeObject.set('flipY', !activeObject.flipY);
+          fabricRef.current.renderAll();
+          saveHistory();
+        }
+      },
+
+      // Lock/unlock object
+      lockSelected: () => {
+        if (!fabricRef.current) return;
+        const activeObject = fabricRef.current.getActiveObject();
+        if (activeObject) {
+          const isLocked = activeObject.lockMovementX;
+          activeObject.set({
+            lockMovementX: !isLocked,
+            lockMovementY: !isLocked,
+            lockRotation: !isLocked,
+            lockScalingX: !isLocked,
+            lockScalingY: !isLocked,
+          });
+          fabricRef.current.renderAll();
+        }
+      },
+
+      // Bring to front / send to back
+      bringToFront: () => {
+        if (!fabricRef.current) return;
+        const activeObject = fabricRef.current.getActiveObject();
+        if (activeObject) {
+          fabricRef.current.bringObjectToFront(activeObject);
+          fabricRef.current.renderAll();
+          saveHistory();
+          updateLayers();
+        }
+      },
+
+      sendToBack: () => {
+        if (!fabricRef.current) return;
+        const activeObject = fabricRef.current.getActiveObject();
+        if (activeObject) {
+          fabricRef.current.sendObjectToBack(activeObject);
+          fabricRef.current.renderAll();
+          saveHistory();
+          updateLayers();
+        }
+      },
     }));
 
     return (

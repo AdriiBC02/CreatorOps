@@ -6,7 +6,11 @@
     "rectangle": "Rectangle",
     "circle": "Circle",
     "triangle": "Triangle",
-    "image": "Upload Image"
+    "image": "Upload Image",
+    "line": "Line",
+    "arrow": "Arrow",
+    "emoji": "Emoji",
+    "templates": "Templates"
   },
   "actions": {
     "download": "Download PNG",
@@ -28,7 +32,31 @@
     "font": "Font",
     "size": "Size",
     "color": "Color",
-    "stroke": "Outline"
+    "stroke": "Outline",
+    "strokeColor": "Outline",
+    "strokeWidth": "Width"
+  },
+  "align": {
+    "title": "Alignment",
+    "left": "Align Left",
+    "right": "Align Right",
+    "centerH": "Center Horizontal",
+    "centerV": "Center Vertical",
+    "top": "Align Top",
+    "bottom": "Align Bottom"
+  },
+  "transform": {
+    "title": "Transform",
+    "flipH": "Flip Horizontal",
+    "flipV": "Flip Vertical",
+    "lock": "Lock/Unlock"
+  },
+  "properties": {
+    "opacity": "Opacity"
+  },
+  "templates": {
+    "title": "Templates",
+    "background": "Background Color"
   },
   "confirmClose": "You have unsaved changes. Are you sure you want to close?"
 }
