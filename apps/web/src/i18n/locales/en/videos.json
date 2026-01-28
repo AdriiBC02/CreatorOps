@@ -51,7 +51,8 @@
     "exportJSON": "Export JSON",
     "uploadVideo": "Upload Video",
     "editMetadata": "Edit metadata",
-    "clickToEnlarge": "Click to enlarge"
+    "clickToEnlarge": "Click to enlarge",
+    "editThumbnail": "Edit thumbnail"
   },
   "stats": {
     "totalVideos": "Total Videos",

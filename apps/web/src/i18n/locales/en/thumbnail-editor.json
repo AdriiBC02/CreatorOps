@@ -1,0 +1,34 @@
+{
+  "title": "Thumbnail Editor",
+  "tools": {
+    "select": "Select",
+    "text": "Add Text",
+    "rectangle": "Rectangle",
+    "circle": "Circle",
+    "triangle": "Triangle",
+    "image": "Upload Image"
+  },
+  "actions": {
+    "download": "Download PNG",
+    "save": "Save",
+    "cancel": "Cancel",
+    "undo": "Undo",
+    "redo": "Redo"
+  },
+  "layers": {
+    "title": "Layers",
+    "empty": "No layers yet",
+    "moveUp": "Move Up",
+    "moveDown": "Move Down",
+    "delete": "Delete",
+    "duplicate": "Duplicate"
+  },
+  "text": {
+    "placeholder": "Enter text...",
+    "font": "Font",
+    "size": "Size",
+    "color": "Color",
+    "stroke": "Outline"
+  },
+  "confirmClose": "You have unsaved changes. Are you sure you want to close?"
+}

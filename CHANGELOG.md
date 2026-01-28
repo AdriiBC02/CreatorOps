@@ -16,6 +16,22 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [0.5.0] - 2026-01-28
 
+### Added - Thumbnail Editor
+- Nuevo editor de miniaturas integrado en la página de videos
+- Canvas basado en Fabric.js (1280x720, ratio YouTube estándar)
+- Herramientas de diseño:
+  - Añadir texto con fuente, tamaño, color y contorno personalizables
+  - Formas básicas: rectángulo, círculo, triángulo
+  - Subir imágenes adicionales al canvas
+- Panel de capas con ordenamiento (subir/bajar)
+- Sistema de historial con Undo/Redo (Ctrl+Z / Ctrl+Shift+Z)
+- Exportación a PNG de alta calidad
+- Atajos de teclado:
+  - Delete/Backspace: eliminar selección
+  - Ctrl+D: duplicar selección
+  - Escape: cerrar editor
+- Integración con página de videos (botón "Edit Thumbnail" por video)
+
 ### Fixed
 - Bug en controlador de comentarios: `req.db` → `req.app.locals.db`
 - Animación de sync se quedaba cargando infinitamente

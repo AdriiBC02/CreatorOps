@@ -12,6 +12,7 @@ import enAssistant from './locales/en/assistant.json';
 import enSettings from './locales/en/settings.json';
 import enNotifications from './locales/en/notifications.json';
 import enComments from './locales/en/comments.json';
+import enThumbnailEditor from './locales/en/thumbnail-editor.json';
 
 // Spanish translations
 import esCommon from './locales/es/common.json';
@@ -24,6 +25,7 @@ import esAssistant from './locales/es/assistant.json';
 import esSettings from './locales/es/settings.json';
 import esNotifications from './locales/es/notifications.json';
 import esComments from './locales/es/comments.json';
+import esThumbnailEditor from './locales/es/thumbnail-editor.json';
 
 const resources = {
   en: {
@@ -37,6 +39,7 @@ const resources = {
     settings: enSettings,
     notifications: enNotifications,
     comments: enComments,
+    'thumbnail-editor': enThumbnailEditor,
   },
   es: {
     common: esCommon,
@@ -49,6 +52,7 @@ const resources = {
     settings: esSettings,
     notifications: esNotifications,
     comments: esComments,
+    'thumbnail-editor': esThumbnailEditor,
   },
 };
 

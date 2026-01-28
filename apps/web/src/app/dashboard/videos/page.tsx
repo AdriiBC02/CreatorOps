@@ -2,11 +2,18 @@
 
 import { useState, useEffect } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, Search, RefreshCw, Play, Edit, Download, Copy, ExternalLink, X, ChevronUp, ChevronDown, Calendar, Sparkles, BarChart3, Lightbulb, Target, Users, TrendingUp, Video, LayoutGrid, Table2, Eye, ThumbsUp, MessageCircle } from 'lucide-react';
+import { Plus, Search, RefreshCw, Play, Edit, Download, Copy, ExternalLink, X, ChevronUp, ChevronDown, Calendar, Sparkles, BarChart3, Lightbulb, Target, Users, TrendingUp, Video, LayoutGrid, Table2, Eye, ThumbsUp, MessageCircle, Image as ImageIcon } from 'lucide-react';
 import { Skeleton, SkeletonTable } from '@/components/ui/skeleton';
 import { FloatingShapes, GlowingBadge } from '@/components/ui/decorative';
 import Link from 'next/link';
 import { cn } from '@/lib/utils';
+import dynamic from 'next/dynamic';
+
+// Dynamic import for Thumbnail Editor (client-only)
+const ThumbnailEditorModal = dynamic(
+  () => import('@/components/thumbnail-editor/ThumbnailEditorModal'),
+  { ssr: false }
+);
 
 interface Video {
   id: string;
@@ -56,6 +63,7 @@ export default function VideosPage() {
   const [dateTo, setDateTo] = useState<string>('');
   const [showDateFilter, setShowDateFilter] = useState(false);
   const [previewVideo, setPreviewVideo] = useState<Video | null>(null);
+  const [editingThumbnail, setEditingThumbnail] = useState<Video | null>(null);
   const [viewMode, setViewMode] = useState<'table' | 'gallery'>(() => {
     if (typeof window !== 'undefined') {
       return (localStorage.getItem('videos-view-mode') as 'table' | 'gallery') || 'table';
@@ -210,7 +218,7 @@ export default function VideosPage() {
   const exportToJSON = () => {
     const exportData = videos.map((video) => ({
       title: video.title,
-      youtubeId: video.youtubeId,
+      youtubeVideoId: video.youtubeVideoId,
       privacyStatus: video.privacyStatus,
       viewCount: video.viewCount,
       likeCount: video.likeCount,
@@ -637,6 +645,13 @@ export default function VideosPage() {
                   </span>
                   <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
                     <button
+                      onClick={() => setEditingThumbnail(video)}
+                      className="p-1.5 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg text-blue-500"
+                      title={t('actions.editThumbnail')}
+                    >
+                      <ImageIcon className="w-4 h-4" />
+                    </button>
+                    <button
                       onClick={() => analyzeVideoWithAI(video)}
                       className="p-1.5 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg text-purple-500"
                       title={t('actions.analyze')}
@@ -753,6 +768,13 @@ export default function VideosPage() {
                   </td>
                   <td className="p-4">
                     <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => setEditingThumbnail(video)}
+                        className="p-2 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-lg text-blue-500"
+                        title={t('actions.editThumbnail')}
+                      >
+                        <ImageIcon className="w-4 h-4" />
+                      </button>
                       <button
                         onClick={() => analyzeVideoWithAI(video)}
                         className="p-2 hover:bg-purple-100 dark:hover:bg-purple-900/30 rounded-lg text-purple-500"
@@ -1048,6 +1070,16 @@ export default function VideosPage() {
             </div>
           </div>
         </div>
+      )}
+
+      {/* Thumbnail Editor Modal */}
+      {editingThumbnail && (
+        <ThumbnailEditorModal
+          isOpen={!!editingThumbnail}
+          onClose={() => setEditingThumbnail(null)}
+          initialImage={editingThumbnail.thumbnailUrl}
+          videoTitle={editingThumbnail.title}
+        />
       )}
     </div>
   );

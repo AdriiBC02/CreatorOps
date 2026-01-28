@@ -1,0 +1,34 @@
+{
+  "title": "Editor de Miniaturas",
+  "tools": {
+    "select": "Seleccionar",
+    "text": "Añadir Texto",
+    "rectangle": "Rectángulo",
+    "circle": "Círculo",
+    "triangle": "Triángulo",
+    "image": "Subir Imagen"
+  },
+  "actions": {
+    "download": "Descargar PNG",
+    "save": "Guardar",
+    "cancel": "Cancelar",
+    "undo": "Deshacer",
+    "redo": "Rehacer"
+  },
+  "layers": {
+    "title": "Capas",
+    "empty": "Sin capas aún",
+    "moveUp": "Mover Arriba",
+    "moveDown": "Mover Abajo",
+    "delete": "Eliminar",
+    "duplicate": "Duplicar"
+  },
+  "text": {
+    "placeholder": "Escribe texto...",
+    "font": "Fuente",
+    "size": "Tamaño",
+    "color": "Color",
+    "stroke": "Contorno"
+  },
+  "confirmClose": "Tienes cambios sin guardar. ¿Estás seguro de que quieres cerrar?"
+}
