@@ -59,7 +59,10 @@
     "permissionsEnabled": "Permisos activados",
     "permissionsEnabledDesc": "Recibirás notificaciones de escritorio",
     "permissionsNotGranted": "Permisos no concedidos",
-    "permissionsNotGrantedDesc": "No se pudieron activar las notificaciones"
+    "permissionsNotGrantedDesc": "No se pudieron activar las notificaciones. Haz clic en 'Activar notificaciones' primero.",
+    "permissionsBlocked": "Notificaciones bloqueadas",
+    "permissionsBlockedDesc": "Las notificaciones están bloqueadas. Ve a la configuración del navegador para permitirlas.",
+    "notSupportedDesc": "Tu navegador no soporta notificaciones de escritorio."
   },
   "appearance": {
     "title": "Apariencia",
@@ -85,12 +88,14 @@
     "deleteAccountConfirm": "Esta acción no se puede deshacer. ¿Estás seguro?"
   },
   "toast": {
-    "soloToast": "Solo Toast (guarda en 4s)",
+    "testDesktop": "Probar Solo Desktop",
+    "desktopTestTitle": "Prueba de Notificación",
+    "soloToast": "Toast en App",
     "soloToastDesc": "Muestra notificación sin guardar",
-    "milestone": "Toast + Desktop (guarda en 4s)",
+    "milestone": "Toast + Desktop",
     "milestoneDesc": "Prueba notificación de hito",
     "milestoneTitle": "¡Nuevo hito alcanzado!",
-    "testCreatedAt": "Prueba creada a las {{time}} - se guardará en 4s",
+    "testCreatedAt": "Prueba creada a las {{time}}",
     "aiSuggestionTitle": "Sugerencia de IA",
     "uploadComplete": "Subida Completa",
     "uploadCompleteDesc": "Prueba notificación de subida",

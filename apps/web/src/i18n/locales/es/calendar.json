@@ -40,7 +40,9 @@
   },
   "actions": {
     "addContent": "Añadir Contenido",
-    "export": "Exportar a CSV",
+    "export": "Exportar",
+    "exportCSV": "Exportar CSV",
+    "exportJSON": "Exportar JSON",
     "duplicate": "Duplicar",
     "delete": "Eliminar",
     "save": "Guardar",

@@ -13,7 +13,9 @@
   "actions": {
     "newIdea": "New Idea",
     "suggestAI": "Suggest with AI",
-    "export": "Export to CSV",
+    "export": "Export",
+    "exportCSV": "Export CSV",
+    "exportJSON": "Export JSON",
     "copyTitle": "Copy title",
     "duplicate": "Duplicate",
     "delete": "Delete",
@@ -95,11 +97,24 @@
     "list": "List"
   },
   "list": {
-    "created": "Created"
+    "created": "Created",
+    "actions": "Actions"
   },
   "confirm": {
     "unsavedChanges": "You have unsaved changes. Are you sure you want to close?",
     "unsavedCancel": "You have unsaved changes. Are you sure you want to cancel?",
-    "deleteIdea": "Are you sure you want to delete this idea?"
+    "deleteIdea": "Are you sure you want to delete this idea?",
+    "bulkDelete": "Delete {{count}} selected ideas?"
+  },
+  "bulk": {
+    "selected": "{{count}} selected",
+    "selectAll": "Select all",
+    "deselectAll": "Deselect",
+    "changeStatus": "Change status",
+    "delete": "Delete",
+    "moveTo": "Move to"
+  },
+  "keyboard": {
+    "hint": "Use j/k to navigate, Enter to edit, Space to select"
   }
 }

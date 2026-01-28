@@ -94,6 +94,7 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 
 #### Notificaciones
 - [x] Sistema de notificaciones in-app
+- [x] Notificaciones de escritorio (Desktop Notifications API)
 - [ ] Alertas para eventos del calendario
 - [x] Notificaciones de milestones (10K views, etc.)
 - [ ] Email digest semanal
@@ -113,10 +114,10 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 - [ ] Búsqueda con filtros avanzados
 
 #### Bulk Actions
-- [ ] Selección múltiple en Ideas
-- [ ] Cambiar estado de múltiples items
-- [ ] Eliminar múltiples items
-- [ ] Mover ideas entre columnas en bulk
+- [x] Selección múltiple en Ideas (v0.4.0)
+- [x] Cambiar estado de múltiples items (v0.4.0)
+- [x] Eliminar múltiples items (v0.4.0)
+- [x] Mover ideas entre columnas en bulk (v0.4.0)
 
 #### Tags y Categorías
 - [ ] Sistema de tags para ideas
@@ -140,7 +141,7 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 - [x] Modal con guía de shortcuts (?)
 - [ ] Shortcuts personalizables
 - [ ] Navegación con teclado entre secciones
-- [ ] Vim-like navigation (j/k)
+- [x] Vim-like navigation (j/k) - Ideas list view (v0.4.0)
 
 ### Prioridad Baja (Nice to Have)
 
@@ -170,6 +171,8 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 - [ ] Celebración de milestones
 
 #### Importar/Exportar
+- [x] Exportar a JSON (Ideas, Videos) (v0.4.0)
+- [x] Dropdown de formatos de exportación (v0.4.0)
 - [ ] Backup completo de datos
 - [ ] Importar ideas desde CSV
 - [ ] Importar desde Notion/Trello
@@ -302,9 +305,14 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 ### v0.4.0 (Current)
 - Global search (Cmd+K): Search videos, ideas, calendar across the app
 - Ideas list view: Toggle between kanban and list view
+- Bulk actions for Ideas (select multiple, change status, delete)
+- Vim-like keyboard navigation (j/k) in Ideas list
+- Export to JSON (Ideas, Videos, Calendar)
+- Videos gallery view with thumbnails
 - Automatic YouTube sync every 5 minutes with BullMQ
+- Desktop notifications (native OS notifications)
 - Milestone notifications (subscribers, views)
-- Keyboard shortcuts modal
+- Keyboard shortcuts modal (compact with scroll)
 - macOS-style glassmorphism UI
 - Full i18n support (Spanish/English)
 
@@ -354,4 +362,4 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 
 ---
 
-*Última actualización: 27 Enero 2026 - v0.4.0*
+*Última actualización: 28 Enero 2026 - v0.4.0*

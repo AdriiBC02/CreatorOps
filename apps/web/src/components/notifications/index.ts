@@ -4,6 +4,7 @@ export {
   showToast,
   showToastFromAPI,
   requestNotificationPermission,
+  testDesktopNotification,
   wasRecentlyShown,
   markAsShown,
   toastManager,

@@ -59,7 +59,10 @@
     "permissionsEnabled": "Permissions enabled",
     "permissionsEnabledDesc": "You will receive desktop notifications",
     "permissionsNotGranted": "Permissions not granted",
-    "permissionsNotGrantedDesc": "Could not enable notifications"
+    "permissionsNotGrantedDesc": "Could not enable notifications. Click 'Enable notifications' first.",
+    "permissionsBlocked": "Notifications blocked",
+    "permissionsBlockedDesc": "Notifications are blocked. Go to browser settings to allow them.",
+    "notSupportedDesc": "Your browser does not support desktop notifications."
   },
   "appearance": {
     "title": "Appearance",
@@ -85,12 +88,14 @@
     "deleteAccountConfirm": "This action cannot be undone. Are you sure?"
   },
   "toast": {
-    "soloToast": "Solo Toast (saves in 4s)",
+    "testDesktop": "Test Desktop Only",
+    "desktopTestTitle": "Desktop Notification Test",
+    "soloToast": "In-App Toast",
     "soloToastDesc": "Show notification without saving",
-    "milestone": "Toast + Desktop (saves in 4s)",
+    "milestone": "Toast + Desktop",
     "milestoneDesc": "Test a milestone notification",
     "milestoneTitle": "New milestone reached!",
-    "testCreatedAt": "Test created at {{time}} - will save in 4s",
+    "testCreatedAt": "Test created at {{time}}",
     "aiSuggestionTitle": "AI Suggestion",
     "uploadComplete": "Upload Complete",
     "uploadCompleteDesc": "Test upload notification",

@@ -46,7 +46,9 @@
     "copyUrl": "Copiar URL del video",
     "analyze": "Analizar con IA",
     "urlCopied": "¡Copiado al portapapeles!",
-    "exportCSV": "Exportar a CSV",
+    "export": "Exportar",
+    "exportCSV": "Exportar CSV",
+    "exportJSON": "Exportar JSON",
     "uploadVideo": "Subir Video",
     "editMetadata": "Editar metadatos",
     "clickToEnlarge": "Clic para ampliar"

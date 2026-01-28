@@ -13,7 +13,9 @@
   "actions": {
     "newIdea": "Nueva Idea",
     "suggestAI": "Sugerir con IA",
-    "export": "Exportar a CSV",
+    "export": "Exportar",
+    "exportCSV": "Exportar CSV",
+    "exportJSON": "Exportar JSON",
     "copyTitle": "Copiar título",
     "duplicate": "Duplicar",
     "delete": "Eliminar",
@@ -95,11 +97,24 @@
     "list": "Lista"
   },
   "list": {
-    "created": "Creada"
+    "created": "Creada",
+    "actions": "Acciones"
   },
   "confirm": {
     "unsavedChanges": "Tienes cambios sin guardar. ¿Estás seguro de que quieres cerrar?",
     "unsavedCancel": "Tienes cambios sin guardar. ¿Estás seguro de que quieres cancelar?",
-    "deleteIdea": "¿Estás seguro de que quieres eliminar esta idea?"
+    "deleteIdea": "¿Estás seguro de que quieres eliminar esta idea?",
+    "bulkDelete": "¿Eliminar {{count}} ideas seleccionadas?"
+  },
+  "bulk": {
+    "selected": "{{count}} seleccionadas",
+    "selectAll": "Seleccionar todas",
+    "deselectAll": "Deseleccionar",
+    "changeStatus": "Cambiar estado",
+    "delete": "Eliminar",
+    "moveTo": "Mover a"
+  },
+  "keyboard": {
+    "hint": "Usa j/k para navegar, Enter para editar, Espacio para seleccionar"
   }
 }

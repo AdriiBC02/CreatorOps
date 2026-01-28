@@ -16,6 +16,20 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [0.4.0] - 2026-01-28
 
+### Added - Desktop Notifications
+- Notificaciones nativas del sistema operativo funcionando
+- Botón "Probar Solo Desktop" para testear notificaciones nativas
+- Feedback claro si los permisos están bloqueados o pendientes
+
+### Changed - UI Improvements
+- Modal de atajos de teclado más compacto con scroll (max 70vh)
+- Botón de cerrar sesión movido de sidebar a Settings → Security
+- Sección de usuario en sidebar ahora es clickeable y lleva a Settings
+
+### Fixed
+- Error 404 de favicon.ico en notificaciones de escritorio
+- Dropdowns cerrándose al pasar el ratón lentamente por el gap
+
 ### Added - Global Search (Cmd+K)
 - Componente `GlobalSearch` con modal estilo glassmorphism
 - Búsqueda unificada en videos, ideas y eventos de calendario
@@ -31,6 +45,34 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 - Acciones directas en cada fila (copiar, duplicar, eliminar)
 - Click en fila para editar idea
 - Preferencia de vista persistida en localStorage
+
+### Added - Bulk Actions for Ideas
+- Selección múltiple con checkboxes en vista de lista
+- Checkbox "Seleccionar todas" en header de tabla
+- Indicador parcial cuando algunas ideas están seleccionadas
+- Barra flotante de acciones masivas con animación slide-up
+- Cambiar estado en bloque (mover a columna)
+- Eliminar múltiples ideas seleccionadas con confirmación
+- Deseleccionar todas con un click
+- Selección se limpia automáticamente al cambiar de vista
+
+### Added - Vim-like Navigation for Ideas (List View)
+- Navegación con `j` (bajar) y `k` (subir)
+- `Enter` para abrir/editar la idea enfocada
+- `Space` para alternar selección de la idea enfocada
+- `G` para ir al último elemento
+- `g` para ir al primer elemento
+- `x` para eliminar la idea enfocada
+- Resaltado visual de la fila enfocada (ring + background)
+- Focus se actualiza también con hover del mouse
+- Hint de atajos en el footer de la tabla
+- Nuevos atajos añadidos al modal de Keyboard Shortcuts
+
+### Added - Export Formats
+- Dropdown de exportación con múltiples formatos en Ideas y Videos
+- Exportar a CSV (existente, mejorado UI)
+- Exportar a JSON (nuevo)
+- Datos JSON incluyen campos completos para backup/migración
 
 ### Added - Videos Gallery View
 - Toggle para alternar entre vista Tabla y Galería

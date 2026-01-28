@@ -384,6 +384,26 @@ export default function CalendarPage() {
     URL.revokeObjectURL(url);
   };
 
+  const exportToJSON = () => {
+    const exportData = items.map((item) => ({
+      title: item.title,
+      scheduledDate: item.scheduledDate,
+      scheduledTime: item.scheduledTime,
+      status: item.status,
+      contentType: item.contentType,
+      notes: item.notes,
+    }));
+
+    const jsonContent = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'calendar.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   const days = getDaysInMonth(currentDate);
   const monthsFull = t('monthsFull', { returnObjects: true }) as string[];
   const monthsShort = t('monthsShort', { returnObjects: true }) as string[];
@@ -458,14 +478,33 @@ export default function CalendarPage() {
           </p>
         </div>
         <div className="flex gap-2">
-          <button
-            onClick={exportToCSV}
-            disabled={items.length === 0}
-            className="btn-glass px-3 py-2.5 rounded-xl disabled:opacity-50"
-            title={t('actions.export')}
-          >
-            <Download className="w-4 h-4" />
-          </button>
+          {/* Export dropdown */}
+          <div className="relative group">
+            <button
+              disabled={items.length === 0}
+              className="btn-glass px-4 py-2.5 rounded-xl flex items-center gap-2 disabled:opacity-50"
+              title={t('actions.export')}
+            >
+              <Download className="w-4 h-4" />
+              <ChevronDown className="w-4 h-4" />
+            </button>
+            <div className="absolute right-0 top-full pt-1 hidden group-hover:block z-10">
+              <div className="glass-card rounded-xl py-1 min-w-[140px] shadow-xl border">
+                <button
+                  onClick={exportToCSV}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-muted/50 transition-colors"
+                >
+                  {t('actions.exportCSV')}
+                </button>
+                <button
+                  onClick={exportToJSON}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-muted/50 transition-colors"
+                >
+                  {t('actions.exportJSON')}
+                </button>
+              </div>
+            </div>
+          </div>
           <button
             onClick={() => openAddModal()}
             className="btn-primary px-4 py-2.5 rounded-xl"

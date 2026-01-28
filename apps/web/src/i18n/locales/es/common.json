@@ -112,7 +112,14 @@
     "sync": "Sincronizar",
     "closeModal": "Cerrar modal",
     "showShortcuts": "Mostrar atajos",
-    "globalSearch": "Búsqueda global"
+    "globalSearch": "Búsqueda global",
+    "moveDown": "Bajar (lista)",
+    "moveUp": "Subir (lista)",
+    "editIdea": "Editar idea enfocada",
+    "selectIdea": "Alternar selección",
+    "goToEnd": "Ir al último elemento",
+    "deleteIdea": "Eliminar idea enfocada",
+    "pressToClose": "Pulsa Esc para cerrar"
   },
   "search": {
     "placeholder": "Buscar videos, ideas, eventos...",

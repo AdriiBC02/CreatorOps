@@ -66,13 +66,32 @@ function showDesktopNotification(notification: Omit<ToastNotification, 'id'>) {
   try {
     const notif = new Notification(notification.title, {
       body: notification.message,
-      icon: '/favicon.ico',
       tag: `${notification.type}-${Date.now()}`,
     });
     notif.onclick = () => { window.focus(); notif.close(); };
     setTimeout(() => notif.close(), 4000);
   } catch (error) {
     // Desktop notification error - silent fail
+  }
+}
+
+// Test desktop notification directly (exported for settings page)
+export async function testDesktopNotification(title: string, message: string): Promise<'success' | 'no-support' | 'denied' | 'not-granted' | 'error'> {
+  if (typeof window === 'undefined') return 'no-support';
+  if (!('Notification' in window)) return 'no-support';
+  if (Notification.permission === 'denied') return 'denied';
+  if (Notification.permission !== 'granted') return 'not-granted';
+
+  try {
+    const notif = new Notification(title, {
+      body: message,
+      tag: `test-${Date.now()}`,
+    });
+    notif.onclick = () => { window.focus(); notif.close(); };
+    setTimeout(() => notif.close(), 5000);
+    return 'success';
+  } catch {
+    return 'error';
   }
 }
 

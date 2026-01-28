@@ -7,7 +7,7 @@ import { RefreshCw, User, Bell, Shield, Palette, LogOut, Trash2, Youtube, Sun, M
 import { cn } from '@/lib/utils';
 import { FloatingShapes, GlowingBadge } from '@/components/ui/decorative';
 import { Skeleton } from '@/components/ui/skeleton';
-import { showToast, requestNotificationPermission } from '@/components/notifications';
+import { showToast, requestNotificationPermission, testDesktopNotification } from '@/components/notifications';
 import { useLanguage, type Language } from '@/i18n/LanguageProvider';
 
 interface User {
@@ -530,6 +530,40 @@ export default function SettingsPage() {
                     className="px-4 py-2 bg-primary text-primary-foreground rounded-xl text-sm font-medium hover:bg-primary/90 transition-all"
                   >
                     {t('notifications.enableNotifications')}
+                  </button>
+                  <button
+                    onClick={async () => {
+                      const timestamp = new Date().toLocaleTimeString(i18n.language === 'es' ? 'es-ES' : 'en-US');
+                      const result = await testDesktopNotification(
+                        t('toast.desktopTestTitle'),
+                        t('toast.testCreatedAt', { time: timestamp })
+                      );
+
+                      if (result === 'success') {
+                        // Desktop notification sent - no in-app toast
+                      } else if (result === 'denied') {
+                        showToast({
+                          type: 'system',
+                          title: t('notifications.permissionsBlocked'),
+                          message: t('notifications.permissionsBlockedDesc')
+                        }, false);
+                      } else if (result === 'not-granted') {
+                        showToast({
+                          type: 'system',
+                          title: t('notifications.permissionsNotGranted'),
+                          message: t('notifications.permissionsNotGrantedDesc')
+                        }, false);
+                      } else {
+                        showToast({
+                          type: 'system',
+                          title: t('notifications.statusNotSupported'),
+                          message: t('notifications.notSupportedDesc')
+                        }, false);
+                      }
+                    }}
+                    className="px-4 py-2 bg-amber-600 text-white rounded-xl text-sm font-medium hover:bg-amber-700 transition-all"
+                  >
+                    {t('toast.testDesktop')}
                   </button>
                   <button
                     onClick={() => {

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import { useTranslation } from 'react-i18next';
-import { Plus, RefreshCw, Lightbulb, GripVertical, Trash2, ExternalLink, Search, X, Copy, Download, Sparkles, Check, Filter, ChevronDown, LayoutGrid, List } from 'lucide-react';
+import { Plus, RefreshCw, Lightbulb, GripVertical, Trash2, ExternalLink, Search, X, Copy, Download, Sparkles, Check, Filter, ChevronDown, LayoutGrid, List, CheckSquare, Square, MoreHorizontal } from 'lucide-react';
 import { SkeletonKanban } from '@/components/ui/skeleton';
 import { FloatingShapes, GlowingBadge } from '@/components/ui/decorative';
 import { cn } from '@/lib/utils';
@@ -270,6 +270,13 @@ export default function IdeasPage() {
     return 'kanban';
   });
 
+  // Bulk selection state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [showBulkActions, setShowBulkActions] = useState(false);
+
+  // Vim-like navigation
+  const [focusedIndex, setFocusedIndex] = useState<number>(-1);
+
   const [formData, setFormData] = useState({
     title: '',
     description: '',
@@ -346,15 +353,28 @@ export default function IdeasPage() {
 
   const hasUnsavedChanges = showModal && formData.title.trim() !== '';
 
+  // Moved here so it's available in the keyboard event handler
+  const filteredIdeas = ideas.filter((idea) => {
+    const matchesSearch =
+      idea.title.toLowerCase().includes(search.toLowerCase()) ||
+      idea.description?.toLowerCase().includes(search.toLowerCase());
+    const matchesPriority = priorityFilter === 'all' || idea.priority === priorityFilter;
+    const matchesContentType = contentTypeFilter === 'all' || idea.contentType === contentTypeFilter;
+    return matchesSearch && matchesPriority && matchesContentType;
+  });
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'n' && !e.metaKey && !e.ctrlKey && !showModal) {
-        const target = e.target as HTMLElement;
-        if (target.tagName !== 'INPUT' && target.tagName !== 'TEXTAREA') {
-          e.preventDefault();
-          openAddModal();
-        }
+      const target = e.target as HTMLElement;
+      const isInputActive = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA';
+
+      // N for new idea
+      if (e.key === 'n' && !e.metaKey && !e.ctrlKey && !showModal && !isInputActive) {
+        e.preventDefault();
+        openAddModal();
       }
+
+      // Escape to close modal
       if (e.key === 'Escape' && showModal) {
         if (hasUnsavedChanges) {
           if (confirm(t('confirm.unsavedChanges'))) {
@@ -366,11 +386,56 @@ export default function IdeasPage() {
           resetForm();
         }
       }
+
+      // Vim-like navigation (only in list view, when no modal is open)
+      if (viewMode === 'list' && !showModal && !showAiSuggestions && !isInputActive) {
+        // j - move down
+        if (e.key === 'j') {
+          e.preventDefault();
+          setFocusedIndex(prev =>
+            prev < filteredIdeas.length - 1 ? prev + 1 : prev
+          );
+        }
+        // k - move up
+        if (e.key === 'k') {
+          e.preventDefault();
+          setFocusedIndex(prev => prev > 0 ? prev - 1 : 0);
+        }
+        // Enter - open focused idea
+        if (e.key === 'Enter' && focusedIndex >= 0 && focusedIndex < filteredIdeas.length) {
+          e.preventDefault();
+          openEditModal(filteredIdeas[focusedIndex]);
+        }
+        // Space - toggle selection of focused idea
+        if (e.key === ' ' && focusedIndex >= 0 && focusedIndex < filteredIdeas.length) {
+          e.preventDefault();
+          toggleSelectIdea(filteredIdeas[focusedIndex].id);
+        }
+        // g then g - go to top (first idea)
+        if (e.key === 'g') {
+          // This is simplified - full vim would need key sequence detection
+          setFocusedIndex(0);
+        }
+        // G - go to bottom (last idea)
+        if (e.key === 'G') {
+          e.preventDefault();
+          setFocusedIndex(filteredIdeas.length - 1);
+        }
+        // x - delete focused idea
+        if (e.key === 'x' && focusedIndex >= 0 && focusedIndex < filteredIdeas.length) {
+          e.preventDefault();
+          deleteIdea(filteredIdeas[focusedIndex].id);
+        }
+        // Escape - clear focus
+        if (e.key === 'Escape') {
+          setFocusedIndex(-1);
+        }
+      }
     };
 
     window.addEventListener('keydown', handleKeyDown);
     return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [showModal, hasUnsavedChanges]);
+  }, [showModal, hasUnsavedChanges, viewMode, showAiSuggestions, focusedIndex, filteredIdeas, t]);
 
   useEffect(() => {
     const handleBeforeUnload = (e: BeforeUnloadEvent) => {
@@ -384,9 +449,13 @@ export default function IdeasPage() {
     return () => window.removeEventListener('beforeunload', handleBeforeUnload);
   }, [hasUnsavedChanges]);
 
-  // Persist view mode preference
+  // Persist view mode preference and clear selection when switching views
   useEffect(() => {
     localStorage.setItem('ideas-view-mode', viewMode);
+    // Clear selection when switching away from list view
+    if (viewMode !== 'list') {
+      setSelectedIds(new Set());
+    }
   }, [viewMode]);
 
   const fetchChannel = async () => {
@@ -598,6 +667,75 @@ export default function IdeasPage() {
     }
   };
 
+  // Bulk Selection Functions
+  const toggleSelectIdea = (ideaId: string) => {
+    const newSelected = new Set(selectedIds);
+    if (newSelected.has(ideaId)) {
+      newSelected.delete(ideaId);
+    } else {
+      newSelected.add(ideaId);
+    }
+    setSelectedIds(newSelected);
+  };
+
+  const selectAllIdeas = () => {
+    if (selectedIds.size === filteredIdeas.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(filteredIdeas.map(i => i.id)));
+    }
+  };
+
+  const clearSelection = () => {
+    setSelectedIds(new Set());
+    setShowBulkActions(false);
+  };
+
+  const bulkChangeStatus = async (newStatus: string) => {
+    if (selectedIds.size === 0) return;
+
+    try {
+      const updatePromises = Array.from(selectedIds).map(ideaId =>
+        fetch(`http://localhost:4000/ideas/${ideaId}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          credentials: 'include',
+          body: JSON.stringify({ status: newStatus }),
+        })
+      );
+
+      await Promise.all(updatePromises);
+
+      setIdeas(ideas.map(idea =>
+        selectedIds.has(idea.id) ? { ...idea, status: newStatus } : idea
+      ));
+      clearSelection();
+    } catch (err) {
+      console.error('Failed to bulk update status:', err);
+    }
+  };
+
+  const bulkDelete = async () => {
+    if (selectedIds.size === 0) return;
+    if (!confirm(t('confirm.bulkDelete', { count: selectedIds.size }))) return;
+
+    try {
+      const deletePromises = Array.from(selectedIds).map(ideaId =>
+        fetch(`http://localhost:4000/ideas/${ideaId}`, {
+          method: 'DELETE',
+          credentials: 'include',
+        })
+      );
+
+      await Promise.all(deletePromises);
+
+      setIdeas(ideas.filter(idea => !selectedIds.has(idea.id)));
+      clearSelection();
+    } catch (err) {
+      console.error('Failed to bulk delete:', err);
+    }
+  };
+
   // AI Functions
   const generateAiSuggestions = async (customPrompt?: string) => {
     if (!channel) return;
@@ -694,6 +832,27 @@ export default function IdeasPage() {
     URL.revokeObjectURL(url);
   };
 
+  const exportToJSON = () => {
+    const exportData = ideas.map((idea) => ({
+      title: idea.title,
+      description: idea.description,
+      status: idea.status,
+      priority: idea.priority,
+      contentType: idea.contentType,
+      inspirationUrls: idea.inspirationUrls,
+      createdAt: idea.createdAt,
+    }));
+
+    const jsonContent = JSON.stringify(exportData, null, 2);
+    const blob = new Blob([jsonContent], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'ideas.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  };
+
   // Drag and Drop handlers
   const handleDragStart = (event: DragStartEvent) => {
     setActiveId(event.active.id as string);
@@ -780,21 +939,6 @@ export default function IdeasPage() {
     }
   };
 
-  const filteredIdeas = ideas.filter((idea) => {
-    // Search filter
-    const matchesSearch =
-      idea.title.toLowerCase().includes(search.toLowerCase()) ||
-      idea.description?.toLowerCase().includes(search.toLowerCase());
-
-    // Priority filter
-    const matchesPriority = priorityFilter === 'all' || idea.priority === priorityFilter;
-
-    // Content type filter
-    const matchesContentType = contentTypeFilter === 'all' || idea.contentType === contentTypeFilter;
-
-    return matchesSearch && matchesPriority && matchesContentType;
-  });
-
   const getIdeasByStatus = (status: string) =>
     filteredIdeas.filter((idea) => idea.status === status);
 
@@ -869,13 +1013,32 @@ export default function IdeasPage() {
               <List className="w-4 h-4" />
             </button>
           </div>
-          <button
-            onClick={exportToCSV}
-            className="btn-glass px-3 py-2 rounded-xl"
-            title={t('actions.export')}
-          >
-            <Download className="w-4 h-4" />
-          </button>
+          {/* Export dropdown */}
+          <div className="relative group">
+            <button
+              className="btn-glass px-4 py-2 rounded-xl flex items-center gap-2"
+              title={t('actions.export')}
+            >
+              <Download className="w-4 h-4" />
+              <ChevronDown className="w-4 h-4" />
+            </button>
+            <div className="absolute right-0 top-full pt-1 hidden group-hover:block z-10">
+              <div className="glass-card rounded-xl py-1 min-w-[140px] shadow-xl border">
+                <button
+                  onClick={exportToCSV}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-muted/50 transition-colors"
+                >
+                  {t('actions.exportCSV')}
+                </button>
+                <button
+                  onClick={exportToJSON}
+                  className="w-full px-4 py-2 text-left text-sm hover:bg-muted/50 transition-colors"
+                >
+                  {t('actions.exportJSON')}
+                </button>
+              </div>
+            </div>
+          </div>
           <button
             onClick={openAiSuggestionsModal}
             className="btn px-4 py-2 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40 hover:scale-[1.02] active:scale-[0.98]"
@@ -986,6 +1149,59 @@ export default function IdeasPage() {
         )}
       </div>
 
+      {/* Bulk Actions Bar - Sticky at top */}
+      {selectedIds.size > 0 && viewMode === 'list' && (
+        <div className="sticky top-0 z-30 -mx-4 px-4 py-3 bg-background/80 backdrop-blur-lg border-b animate-fade-in">
+          <div className="flex items-center gap-4 flex-wrap">
+            <div className="flex items-center gap-2">
+              <CheckSquare className="w-5 h-5 text-primary" />
+              <span className="font-medium">{t('bulk.selected', { count: selectedIds.size })}</span>
+            </div>
+
+            <div className="w-px h-6 bg-border hidden sm:block" />
+
+            {/* Move to status dropdown */}
+            <div className="relative group">
+              <button className="btn-secondary px-4 py-2 text-sm flex items-center gap-2">
+                {t('bulk.moveTo')}
+                <ChevronDown className="w-4 h-4" />
+              </button>
+              <div className="absolute top-full left-0 pt-1 hidden group-hover:block z-50">
+                <div className="glass-card rounded-xl py-2 min-w-[160px] shadow-xl border">
+                  {statusColumns.map((col) => (
+                    <button
+                      key={col.id}
+                      onClick={() => bulkChangeStatus(col.id)}
+                      className="w-full px-4 py-2 text-left text-sm hover:bg-muted/50 transition-colors flex items-center gap-2"
+                    >
+                      <div className={cn('w-2 h-2 rounded-full bg-gradient-to-b', col.color)} />
+                      {t(col.titleKey)}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </div>
+
+            <button
+              onClick={bulkDelete}
+              className="btn-ghost px-4 py-2 text-sm text-destructive hover:bg-destructive/10 flex items-center gap-2"
+            >
+              <Trash2 className="w-4 h-4" />
+              {t('bulk.delete')}
+            </button>
+
+            <div className="w-px h-6 bg-border hidden sm:block" />
+
+            <button
+              onClick={clearSelection}
+              className="btn-ghost px-4 py-2 text-sm"
+            >
+              {t('bulk.deselectAll')}
+            </button>
+          </div>
+        </div>
+      )}
+
       {/* View: Kanban or List */}
       {viewMode === 'kanban' ? (
         <DndContext
@@ -1030,85 +1246,121 @@ export default function IdeasPage() {
       ) : (
         /* List View */
         <div className="glass-card rounded-2xl overflow-hidden">
-          <table className="w-full">
+          <table className="w-full table-fixed">
             <thead>
               <tr className="border-b bg-muted/30">
-                <th className="text-left px-4 py-3 text-sm font-semibold">{t('idea.title')}</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold hidden md:table-cell">{t('idea.status')}</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold hidden sm:table-cell">{t('idea.priority')}</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold hidden lg:table-cell">{t('idea.contentType')}</th>
-                <th className="text-left px-4 py-3 text-sm font-semibold hidden lg:table-cell">{t('list.created')}</th>
-                <th className="text-right px-4 py-3 text-sm font-semibold">{t('actions.delete')}</th>
+                <th className="w-14 px-3 py-3">
+                  <button
+                    onClick={selectAllIdeas}
+                    className="p-1 hover:bg-muted rounded transition-colors"
+                    title={selectedIds.size === filteredIdeas.length ? t('bulk.deselectAll') : t('bulk.selectAll')}
+                  >
+                    {selectedIds.size === filteredIdeas.length && filteredIdeas.length > 0 ? (
+                      <CheckSquare className="w-5 h-5 text-primary" />
+                    ) : selectedIds.size > 0 ? (
+                      <div className="w-5 h-5 border-2 border-primary rounded flex items-center justify-center">
+                        <div className="w-2 h-2 bg-primary rounded-sm" />
+                      </div>
+                    ) : (
+                      <Square className="w-5 h-5 text-muted-foreground" />
+                    )}
+                  </button>
+                </th>
+                <th className="text-left px-3 py-3 text-sm font-semibold">{t('idea.title')}</th>
+                <th className="text-left px-3 py-3 text-sm font-semibold hidden md:table-cell w-28">{t('idea.status')}</th>
+                <th className="text-left px-3 py-3 text-sm font-semibold hidden sm:table-cell w-24">{t('idea.priority')}</th>
+                <th className="text-left px-3 py-3 text-sm font-semibold hidden lg:table-cell w-28">{t('idea.contentType')}</th>
+                <th className="text-left px-3 py-3 text-sm font-semibold hidden lg:table-cell w-24">{t('list.created')}</th>
+                <th className="text-right px-3 py-3 text-sm font-semibold w-28">{t('list.actions')}</th>
               </tr>
             </thead>
             <tbody>
               {filteredIdeas.length === 0 ? (
                 <tr>
-                  <td colSpan={6} className="text-center py-12 text-muted-foreground">
+                  <td colSpan={7} className="text-center py-12 text-muted-foreground">
                     <Lightbulb className="w-12 h-12 mx-auto mb-3 opacity-50" />
                     <p>{t('empty.noIdeas')}</p>
                   </td>
                 </tr>
               ) : (
-                filteredIdeas.map((idea) => {
+                filteredIdeas.map((idea, index) => {
                   const priority = priorityConfig[idea.priority];
                   const statusColumn = statusColumns.find(c => c.id === idea.status);
+                  const isSelected = selectedIds.has(idea.id);
+                  const isFocused = focusedIndex === index;
                   return (
                     <tr
                       key={idea.id}
-                      className="border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer"
+                      className={cn(
+                        "border-b last:border-0 hover:bg-muted/30 transition-colors cursor-pointer",
+                        isSelected && "bg-primary/5",
+                        isFocused && "ring-2 ring-inset ring-primary bg-primary/10"
+                      )}
                       onClick={() => openEditModal(idea)}
+                      onMouseEnter={() => setFocusedIndex(index)}
                     >
-                      <td className="px-4 py-3">
-                        <div className="flex items-center gap-3">
-                          <div className={cn('w-1 h-8 rounded-full bg-gradient-to-b', statusColumn?.color || 'from-gray-400 to-gray-500')} />
-                          <div className="min-w-0">
+                      <td className="px-3 py-3" onClick={(e) => e.stopPropagation()}>
+                        <button
+                          onClick={() => toggleSelectIdea(idea.id)}
+                          className="p-1 hover:bg-muted rounded transition-colors"
+                        >
+                          {isSelected ? (
+                            <CheckSquare className="w-5 h-5 text-primary" />
+                          ) : (
+                            <Square className="w-5 h-5 text-muted-foreground hover:text-foreground" />
+                          )}
+                        </button>
+                      </td>
+                      <td className="px-3 py-3">
+                        <div className="flex items-center gap-2">
+                          <div className={cn('w-1 h-8 rounded-full bg-gradient-to-b flex-shrink-0', statusColumn?.color || 'from-gray-400 to-gray-500')} />
+                          <div className="min-w-0 flex-1">
                             <p className="font-medium truncate">{idea.title}</p>
                             {idea.description && (
-                              <p className="text-sm text-muted-foreground truncate max-w-md">{idea.description}</p>
+                              <p className="text-sm text-muted-foreground truncate">{idea.description}</p>
                             )}
                           </div>
                         </div>
                       </td>
-                      <td className="px-4 py-3 hidden md:table-cell">
-                        <span className="text-sm">{t(`status.${idea.status}`)}</span>
+                      <td className="px-3 py-3 hidden md:table-cell">
+                        <span className="text-sm truncate block">{t(`status.${idea.status}`)}</span>
                       </td>
-                      <td className="px-4 py-3 hidden sm:table-cell">
+                      <td className="px-3 py-3 hidden sm:table-cell">
                         <span className={cn(
-                          'inline-flex items-center gap-1.5 px-2 py-1 rounded-md text-xs font-medium',
+                          'inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-xs font-medium',
                           priority.color
                         )}>
                           <span className={cn('w-1.5 h-1.5 rounded-full', priority.dot)} />
                           {t(priority.labelKey)}
                         </span>
                       </td>
-                      <td className="px-4 py-3 hidden lg:table-cell">
-                        <span className="px-2 py-1 rounded-md text-xs font-medium bg-secondary text-secondary-foreground">
+                      <td className="px-3 py-3 hidden lg:table-cell">
+                        <span className="px-2 py-0.5 rounded-md text-xs font-medium bg-secondary text-secondary-foreground truncate block">
                           {idea.contentType === 'short' ? t('contentType.short') : t('contentType.video')}
                         </span>
                       </td>
-                      <td className="px-4 py-3 hidden lg:table-cell text-sm text-muted-foreground">
+                      <td className="px-3 py-3 hidden lg:table-cell text-sm text-muted-foreground">
                         {new Date(idea.createdAt).toLocaleDateString()}
                       </td>
-                      <td className="px-4 py-3 text-right">
-                        <div className="flex items-center justify-end gap-1">
+                      <td className="px-3 py-3 text-right">
+                        <div className="flex items-center justify-end gap-0.5">
                           <button
                             onClick={(e) => { e.stopPropagation(); copyToClipboard(idea.title); }}
-                            className="p-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+                            className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors"
                             title={t('actions.copyTitle')}
                           >
                             <Copy className="w-4 h-4" />
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); duplicateIdea(idea); }}
-                            className="p-2 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors"
+                            className="p-1.5 hover:bg-muted rounded-lg text-muted-foreground hover:text-foreground transition-colors"
                             title={t('actions.duplicate')}
                           >
                             <Plus className="w-4 h-4" />
                           </button>
                           <button
                             onClick={(e) => { e.stopPropagation(); deleteIdea(idea.id); }}
-                            className="p-2 hover:bg-destructive/10 rounded-lg text-muted-foreground hover:text-destructive transition-colors"
+                            className="p-1.5 hover:bg-destructive/10 rounded-lg text-muted-foreground hover:text-destructive transition-colors"
                             title={t('actions.delete')}
                           >
                             <Trash2 className="w-4 h-4" />
@@ -1121,6 +1373,15 @@ export default function IdeasPage() {
               )}
             </tbody>
           </table>
+
+          {/* Keyboard navigation hint */}
+          {filteredIdeas.length > 0 && (
+            <div className="px-4 py-2 border-t bg-muted/20 text-xs text-muted-foreground flex items-center gap-2">
+              <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">j</kbd>
+              <kbd className="px-1.5 py-0.5 rounded bg-muted font-mono">k</kbd>
+              <span className="mr-2">{t('keyboard.hint')}</span>
+            </div>
+          )}
         </div>
       )}
 
