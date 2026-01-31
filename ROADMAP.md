@@ -76,6 +76,19 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 
 ## Backlog - Por Implementar
 
+### Bugs y Mejoras Pendientes
+
+#### Editor de Thumbnails (Requiere arreglar)
+- [ ] Revisar y arreglar funcionalidad completa del editor
+- [ ] Probar todas las herramientas (texto, formas, líneas, flechas)
+- [ ] Verificar plantillas predefinidas
+- [ ] Probar alineación y transformación de objetos
+- [ ] Corregir posibles bugs en el canvas de Fabric.js
+- [ ] Optimizar rendimiento del editor
+- [ ] Añadir subida de thumbnail editado a YouTube
+
+---
+
 ### Prioridad Alta (Core Features)
 
 #### Analytics Dashboard
@@ -239,7 +252,7 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 - [ ] Eliminar playlists
 
 ### Video Upload (Avanzado)
-- [ ] Editor de thumbnails
+- [x] Editor de thumbnails (básico - ver bugs pendientes arriba)
 - [ ] A/B testing de thumbnails
 - [ ] Auto-generación de shorts
 
