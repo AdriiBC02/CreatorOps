@@ -4,10 +4,10 @@ import { NotFoundError } from '../../middleware/error-handler.js';
 
 interface CreateNotificationData {
   userId: string;
-  type: 'milestone' | 'upload_complete' | 'new_comment' | 'system' | 'ai_suggestion';
+  type: 'milestone' | 'upload_complete' | 'new_comment' | 'system' | 'ai_suggestion' | 'calendar_reminder';
   title: string;
   message: string;
-  entityType?: 'video' | 'channel' | 'idea';
+  entityType?: 'video' | 'channel' | 'idea' | 'calendar_item';
   entityId?: string;
   metadata?: Record<string, unknown>;
 }
@@ -18,6 +18,11 @@ interface UpdatePreferencesData {
   newComment?: boolean;
   milestones?: boolean;
   aiSuggestions?: boolean;
+  calendarReminders?: boolean;
+  calendarReminderDayBefore?: boolean;
+  calendarReminderHourBefore?: boolean;
+  calendarReminder15MinBefore?: boolean;
+  calendarReminderAtTime?: boolean;
 }
 
 export class NotificationsService {
@@ -124,6 +129,11 @@ export class NotificationsService {
     if (data.newComment !== undefined) updateData.newComment = data.newComment;
     if (data.milestones !== undefined) updateData.milestones = data.milestones;
     if (data.aiSuggestions !== undefined) updateData.aiSuggestions = data.aiSuggestions;
+    if (data.calendarReminders !== undefined) updateData.calendarReminders = data.calendarReminders;
+    if (data.calendarReminderDayBefore !== undefined) updateData.calendarReminderDayBefore = data.calendarReminderDayBefore;
+    if (data.calendarReminderHourBefore !== undefined) updateData.calendarReminderHourBefore = data.calendarReminderHourBefore;
+    if (data.calendarReminder15MinBefore !== undefined) updateData.calendarReminder15MinBefore = data.calendarReminder15MinBefore;
+    if (data.calendarReminderAtTime !== undefined) updateData.calendarReminderAtTime = data.calendarReminderAtTime;
 
     const [updated] = await db
       .update(notificationPreferences)

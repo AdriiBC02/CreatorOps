@@ -28,7 +28,18 @@
     "ai_suggestion": {
       "title": "Sugerencia IA",
       "message": "Tienes una nueva sugerencia"
+    },
+    "calendar_reminder": {
+      "title": "Recordatorio de Calendario",
+      "message": "Tienes un evento próximo"
     }
+  },
+  "preferences": {
+    "calendarReminders": "Recordatorios de calendario",
+    "calendarReminderDayBefore": "1 día antes",
+    "calendarReminderHourBefore": "1 hora antes",
+    "calendarReminder15MinBefore": "15 minutos antes",
+    "calendarReminderAtTime": "A la hora del evento"
   },
   "time": {
     "now": "Ahora",

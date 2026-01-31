@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useCallback } from 'react';
-import { X, PartyPopper, CheckCircle, MessageCircle, Info, Sparkles, Bell } from 'lucide-react';
+import { X, PartyPopper, CheckCircle, MessageCircle, Info, Sparkles, Bell, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { useTranslation } from 'react-i18next';
 
@@ -21,6 +21,7 @@ const typeIcons: Record<string, { icon: React.ElementType; color: string; bgColo
   new_comment: { icon: MessageCircle, color: 'text-blue-500', bgColor: 'bg-blue-500/20', barColor: '#3b82f6' },
   system: { icon: Info, color: 'text-gray-500', bgColor: 'bg-gray-500/20', barColor: '#6b7280' },
   ai_suggestion: { icon: Sparkles, color: 'text-purple-500', bgColor: 'bg-purple-500/20', barColor: '#a855f7' },
+  calendar_reminder: { icon: Calendar, color: 'text-orange-500', bgColor: 'bg-orange-500/20', barColor: '#f97316' },
 };
 
 // Track recently shown toasts to prevent duplicates from polling

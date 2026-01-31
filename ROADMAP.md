@@ -108,7 +108,7 @@ CreatorOps es una plataforma de gestión para creadores de contenido de YouTube 
 #### Notificaciones
 - [x] Sistema de notificaciones in-app
 - [x] Notificaciones de escritorio (Desktop Notifications API)
-- [ ] Alertas para eventos del calendario
+- [x] Alertas para eventos del calendario (v0.5.0)
 - [x] Notificaciones de milestones (10K views, etc.)
 - [ ] Email digest semanal
 - [ ] Push notifications (PWA)

@@ -28,7 +28,18 @@
     "ai_suggestion": {
       "title": "AI Suggestion",
       "message": "You have a new suggestion"
+    },
+    "calendar_reminder": {
+      "title": "Calendar Reminder",
+      "message": "You have an upcoming event"
     }
+  },
+  "preferences": {
+    "calendarReminders": "Calendar reminders",
+    "calendarReminderDayBefore": "1 day before",
+    "calendarReminderHourBefore": "1 hour before",
+    "calendarReminder15MinBefore": "15 minutes before",
+    "calendarReminderAtTime": "At event time"
   },
   "time": {
     "now": "Now",

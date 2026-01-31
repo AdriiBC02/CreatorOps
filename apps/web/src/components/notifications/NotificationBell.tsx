@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { Bell, Trash2, X, PartyPopper, CheckCircle, MessageCircle, Info, Sparkles } from 'lucide-react';
+import { Bell, Trash2, X, PartyPopper, CheckCircle, MessageCircle, Info, Sparkles, Calendar } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { showToastFromAPI, requestNotificationPermission, wasRecentlyShown, NOTIFICATION_SAVED_EVENT } from './NotificationToast';
 import { useTranslation } from 'react-i18next';
@@ -23,6 +23,7 @@ const typeIcons: Record<string, { icon: React.ElementType; color: string }> = {
   new_comment: { icon: MessageCircle, color: 'text-blue-500' },
   system: { icon: Info, color: 'text-gray-500' },
   ai_suggestion: { icon: Sparkles, color: 'text-purple-500' },
+  calendar_reminder: { icon: Calendar, color: 'text-orange-500' },
 };
 
 // Polling interval - 5 seconds for near real-time

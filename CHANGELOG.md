@@ -16,6 +16,21 @@ y este proyecto adhiere a [Semantic Versioning](https://semver.org/lang/es/).
 
 ## [0.5.0] - 2026-01-28
 
+### Added - Calendar Notifications
+- Sistema de notificaciones para eventos del calendario
+- Recordatorios configurables:
+  - 1 día antes del evento
+  - 1 hora antes del evento
+  - 15 minutos antes del evento
+  - A la hora del evento
+- Notificaciones en:
+  - Campana de notificaciones (in-app)
+  - Toast popup con animación
+  - Notificaciones de escritorio (push)
+- Scheduler automático que revisa eventos cada minuto
+- Preferencias de usuario para cada tipo de recordatorio
+- Icono naranja distintivo para notificaciones de calendario
+
 ### Added - Thumbnail Editor
 - Nuevo editor de miniaturas integrado en la página de videos
 - Canvas basado en Fabric.js (1280x720, ratio YouTube estándar)

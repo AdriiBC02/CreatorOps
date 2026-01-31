@@ -3,6 +3,7 @@ import { createDbClient, channels, type DbClient } from '@creatorops/database';
 import { config } from '../config/index.js';
 import { logger } from '../config/logger.js';
 import { channelsService } from '../modules/channels/channels.service.js';
+import { calendarNotificationService } from '../modules/notifications/calendar-notification.service.js';
 
 // Sync interval in milliseconds (5 minutes)
 const SYNC_INTERVAL_MS = 5 * 60 * 1000;
@@ -10,10 +11,14 @@ const SYNC_INTERVAL_MS = 5 * 60 * 1000;
 // Minimum time between syncs for the same channel (to prevent too frequent syncs)
 const MIN_SYNC_INTERVAL_MS = 3 * 60 * 1000;
 
+// Calendar reminder check interval (1 minute)
+const CALENDAR_REMINDER_INTERVAL_MS = 60 * 1000;
+
 class SyncSchedulerService {
   private syncQueue: Queue<ChannelSyncJobData> | null = null;
   private syncWorker: Worker<ChannelSyncJobData> | null = null;
   private schedulerInterval: NodeJS.Timeout | null = null;
+  private calendarReminderInterval: NodeJS.Timeout | null = null;
   private db: DbClient | null = null;
   private isRunning = false;
 
@@ -73,7 +78,44 @@ class SyncSchedulerService {
       SYNC_INTERVAL_MS
     );
 
+    // Start calendar reminder scheduler
+    await this.startCalendarReminderScheduler();
+
     logger.info(`Sync scheduler started with interval: ${SYNC_INTERVAL_MS / 1000}s`);
+  }
+
+  private async startCalendarReminderScheduler() {
+    // Run initial check after a short delay
+    setTimeout(() => this.checkCalendarReminders(), 5000);
+
+    // Set up interval for periodic checks (every minute)
+    this.calendarReminderInterval = setInterval(
+      () => this.checkCalendarReminders(),
+      CALENDAR_REMINDER_INTERVAL_MS
+    );
+
+    logger.info(`Calendar reminder scheduler started with interval: ${CALENDAR_REMINDER_INTERVAL_MS / 1000}s`);
+  }
+
+  private async checkCalendarReminders() {
+    if (!this.db) {
+      logger.warn('Database not initialized for calendar reminders');
+      return;
+    }
+
+    try {
+      const result = await calendarNotificationService.checkAndSendReminders(this.db);
+
+      if (result.created > 0) {
+        logger.info(`Calendar reminders: checked ${result.checked} items, created ${result.created} notifications`);
+      }
+
+      if (result.errors.length > 0) {
+        logger.warn('Calendar reminder errors:', result.errors);
+      }
+    } catch (error) {
+      logger.error('Error checking calendar reminders:', error);
+    }
   }
 
   private async scheduleAllChannelSyncs() {
@@ -156,6 +198,11 @@ class SyncSchedulerService {
     if (this.schedulerInterval) {
       clearInterval(this.schedulerInterval);
       this.schedulerInterval = null;
+    }
+
+    if (this.calendarReminderInterval) {
+      clearInterval(this.calendarReminderInterval);
+      this.calendarReminderInterval = null;
     }
 
     if (this.syncWorker) {
